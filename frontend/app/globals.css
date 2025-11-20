@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-dark-200;
+  }
+  
+  body {
+    @apply bg-dark-50 text-dark-900;
+    font-family: 'Cairo', 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  }
+
+  html {
+    direction: rtl;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-800 text-white shadow-almasar;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-100 hover:bg-dark-200 text-dark-900;
+  }
+
+  .btn-success {
+    @apply bg-success hover:bg-success-dark text-white;
+  }
+
+  .btn-danger {
+    @apply bg-danger hover:bg-danger-dark text-white;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 border border-dark-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-success-light text-success-dark;
+  }
+
+  .badge-warning {
+    @apply bg-warning-light text-warning-dark;
+  }
+
+  .badge-danger {
+    @apply bg-danger-light text-danger-dark;
+  }
+
+  .badge-primary {
+    @apply bg-primary-200 text-primary-900;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 0.5s;
+  }
+
+  /* Custom Scrollbar for Sidebar */
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: rgba(6, 182, 212, 0.1);
+    border-radius: 10px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #06b6d4, #2563eb);
+    border-radius: 10px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #0891b2, #1d4ed8);
+  }
+}
