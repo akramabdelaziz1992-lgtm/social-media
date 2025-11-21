@@ -1,3 +1,4 @@
+# AlMasar Backend Deployment Configuration
 databases:
   - name: almasar-db
     databaseName: almasar_production
