@@ -1,0 +1,40 @@
+# ===============================================
+# Vercel.com Frontend Deployment Settings
+# ===============================================
+
+## Copy these EXACT settings when importing project:
+
+### Basic Settings:
+- Framework Preset: Next.js
+- Root Directory: frontend
+- Build Command: npm run build
+- Output Directory: .next
+- Install Command: npm install
+
+### Environment Variables:
+(Click "Add" and paste each one)
+
+Key: NEXT_PUBLIC_API_URL
+Value: https://almasar-backend.onrender.com
+
+⚠️ IMPORTANT: Replace "almasar-backend" with your actual backend service name!
+
+===============================================
+
+## After Deployment:
+
+Your frontend will be available at:
+https://your-project-name.vercel.app
+
+Or custom domain:
+https://almasar-suite.vercel.app
+
+===============================================
+
+## Automatic Updates:
+
+✅ Every git push will auto-deploy to Vercel
+✅ Preview deployments for branches
+✅ Production deployment for main branch
+
+===============================================

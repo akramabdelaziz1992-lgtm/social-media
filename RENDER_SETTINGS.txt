@@ -1,0 +1,62 @@
+# ===============================================
+# Render.com Backend Deployment Settings
+# ===============================================
+
+## Copy these EXACT settings when creating Web Service on Render:
+
+### Basic Settings:
+- Name: almasar-backend
+- Region: Singapore
+- Branch: main
+- Root Directory: backend
+- Runtime: Node
+- Build Command: npm install && npm run build
+- Start Command: npm run start:prod
+- Instance Type: Free
+
+### Environment Variables:
+(Copy each line exactly as is)
+
+NODE_ENV=production
+PORT=4000
+JWT_SECRET=almasar-super-secret-jwt-key-2024-production
+TWILIO_ACCOUNT_SID=<from your .env file>
+TWILIO_AUTH_TOKEN=<from your .env file>
+TWILIO_PHONE_NUMBER=<from your .env file>
+TWILIO_TWIML_APP_SID=<from your .env file>
+TWILIO_API_KEY=<from your .env file>
+TWILIO_API_SECRET=<from your .env file>
+
+### ⚠️ DATABASE_URL: 
+Add this AFTER creating PostgreSQL database:
+DATABASE_URL=<paste your Internal Database URL here>
+
+===============================================
+
+## PostgreSQL Database Settings:
+
+### When creating database:
+- Name: almasar-db
+- Database: almasar
+- User: almasar_user
+- Region: Singapore
+- Plan: Free
+
+### After creation:
+1. Copy "Internal Database URL" from database page
+2. Go back to Backend service
+3. Environment tab → Add variable:
+   - Key: DATABASE_URL
+   - Value: <paste the URL>
+
+===============================================
+
+## After Deployment:
+
+Your backend will be available at:
+https://almasar-backend.onrender.com
+
+Test it:
+https://almasar-backend.onrender.com/api/calls/stats
+
+===============================================

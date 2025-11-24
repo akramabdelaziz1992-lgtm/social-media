@@ -1,0 +1,32 @@
+﻿================================================
+GITHUB PUSH INSTRUCTIONS
+================================================
+
+PROBLEM: Token is for wrong account (stay5422-wq)
+
+SOLUTION:
+---------
+
+1. Sign out from GitHub.com (stay5422-wq)
+2. Sign in as: akramabdelaziz1992-lgtm
+3. Create token: https://github.com/settings/tokens/new
+   - Scopes: repo, workflow
+   - Click "Generate token"
+   - COPY THE TOKEN!
+
+4. Run these commands in PowerShell:
+
+cd "d:\social media\almasar-suite"
+
+git remote set-url origin https://akramabdelaziz1992-lgtm:YOUR_TOKEN@github.com/akramabdelaziz1992-lgtm/social-media.git
+
+git push origin main
+
+================================================
+
+After successful push:
+- Go to Render.com for Backend
+- Go to Vercel.com for Frontend
+- See DEPLOY_NOW.md for details
+
+================================================

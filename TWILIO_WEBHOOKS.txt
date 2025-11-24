@@ -1,0 +1,59 @@
+# ===============================================
+# Twilio Webhooks Configuration
+# ===============================================
+
+⚠️ Update these AFTER backend is deployed on Render!
+
+===============================================
+
+## 1. Phone Number Configuration
+
+Go to: https://console.twilio.com/us1/develop/phone-numbers/manage/active
+
+Click on: +1 815 486 0356
+
+### Voice Configuration:
+A CALL COMES IN:
+https://almasar-backend.onrender.com/api/calls/webhook/inbound
+(Select: HTTP POST)
+
+Click SAVE
+
+===============================================
+
+## 2. TwiML App Configuration
+
+Go to: https://console.twilio.com/us1/develop/voice/manage/twiml-apps
+
+Click on: AP1774964f1009f2f8430d50b78a9afb0c
+
+### Voice Configuration:
+
+Voice Request URL:
+https://almasar-backend.onrender.com/api/calls/twiml/outbound
+(Select: HTTP POST)
+
+Voice Status Callback URL:
+https://almasar-backend.onrender.com/api/calls/webhook/status
+(Select: HTTP POST)
+
+Click SAVE
+
+===============================================
+
+## 3. Test the webhooks:
+
+### View logs:
+https://console.twilio.com/us1/monitor/logs/debugger
+
+### Make test call from frontend:
+https://your-app.vercel.app/unified-number
+Click "اتصال جديد"
+Enter test number
+Click "اتصال"
+
+===============================================
+
+⚠️ REMEMBER: Replace "almasar-backend" with your actual service name!
+
+===============================================
