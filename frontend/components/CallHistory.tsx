@@ -14,6 +14,8 @@ import {
   RefreshCw
 } from 'lucide-react';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+
 export interface CallHistoryItem {
   id: string;
   type: 'incoming' | 'outgoing' | 'missed';
@@ -42,11 +44,11 @@ export default function CallHistory({ onCall, disabled = false, autoRefresh = tr
     setLoading(true);
     try {
       // Fetch calls from database
-      const callsResponse = await fetch('http://localhost:4000/api/calls');
+      const callsResponse = await fetch(`${apiUrl}/api/calls`);
       const callsData = await callsResponse.json();
 
       // Fetch recordings from Twilio
-      const recordingsResponse = await fetch('http://localhost:4000/api/calls/recordings?limit=50');
+      const recordingsResponse = await fetch(`${apiUrl}/api/calls/recordings?limit=50`);
       const recordingsData = await recordingsResponse.json();
       
       setRecordings(recordingsData);

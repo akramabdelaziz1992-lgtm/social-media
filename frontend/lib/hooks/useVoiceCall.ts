@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Device } from '@twilio/voice-sdk';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+
 interface VoiceCallState {
   isActive: boolean;
   isMuted: boolean;
@@ -49,7 +51,7 @@ export function useVoiceCall(): VoiceCallHook {
       try {
         console.log('🔧 جاري تهيئة Twilio Device...');
 
-        const response = await fetch('http://localhost:4000/api/calls/token?identity=agent');
+        const response = await fetch(`${apiUrl}/api/calls/token?identity=agent`);
         if (!response.ok) {
           throw new Error('فشل الحصول على access token');
         }

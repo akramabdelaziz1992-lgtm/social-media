@@ -41,6 +41,8 @@ import {
 import { useVoiceCall } from '@/lib/hooks/useVoiceCall';
 import Dialpad from '@/components/Dialpad';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+
 interface CallRecord {
   id: string;
   type: 'incoming' | 'outgoing' | 'missed';
@@ -93,7 +95,7 @@ export default function CallCenterPage() {
 
   const loadCallRecords = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/calls');
+      const response = await fetch(`${apiUrl}/api/calls`);
       if (response.ok) {
         const calls = await response.json();
         
@@ -190,7 +192,7 @@ export default function CallCenterPage() {
     
     try {
       // استخدام Click-to-Call API بدلاً من WebRTC
-      const response = await fetch('http://localhost:4000/api/calls/make-call', {
+      const response = await fetch(`${apiUrl}/api/calls/make-call`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -252,7 +254,7 @@ export default function CallCenterPage() {
 
   const checkSoftphoneStatus = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/softphone/status');
+      const response = await fetch(`${apiUrl}/api/softphone/status`);
       const result = await response.json();
       setIsSoftphoneRunning(result.running);
     } catch (error) {
@@ -264,7 +266,7 @@ export default function CallCenterPage() {
   const openSoftphone = async () => {
     try {
       // Launch softphone via backend API
-      const response = await fetch('http://localhost:4000/api/softphone/launch', {
+      const response = await fetch(`${apiUrl}/api/softphone/launch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

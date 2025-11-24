@@ -17,6 +17,7 @@ import {
 export default function InboxPage() {
   const router = useRouter();
   const { user, setUser, logout } = useAuthStore();
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
   const [conversations, setConversations] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -97,7 +98,7 @@ export default function InboxPage() {
     const initSocket = async () => {
       try {
         const { io } = await import('socket.io-client');
-        socketRef.current = io('http://localhost:4000/whatsapp');
+        socketRef.current = io(`${apiUrl}/whatsapp`);
         
         socketRef.current.on('connect', () => {
           console.log('✅ WebSocket متصل - جاهز لاستقبال الرسائل');
@@ -191,7 +192,7 @@ export default function InboxPage() {
             
             // Also send via WhatsApp if it's a WhatsApp conversation
             if (selectedConversation.channel?.type === 'whatsapp') {
-              fetch('http://localhost:4000/api/whatsapp/send', {
+              fetch(`${apiUrl}/api/whatsapp/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -231,7 +232,7 @@ export default function InboxPage() {
     setLoading(true);
     try {
       // جلب محادثات WhatsApp
-      const whatsappResponse = await fetch('http://localhost:4000/api/whatsapp/chats', {
+      const whatsappResponse = await fetch(`${apiUrl}/api/whatsapp/chats`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -332,7 +333,7 @@ export default function InboxPage() {
     if (!selectedConversation || selectedConversation.channel?.type !== 'whatsapp') return;
     
     try {
-      const response = await fetch(`http://localhost:4000/api/whatsapp/messages/${selectedConversation.id}`);
+      const response = await fetch(`${apiUrl}/api/whatsapp/messages/${selectedConversation.id}`);
       const data = await response.json();
       
       if (data.success && data.messages) {
@@ -379,7 +380,7 @@ export default function InboxPage() {
     try {
       // إذا كانت محادثة WhatsApp، جلب الرسائل من API الخاص بها
       if (conv.channel?.type === 'whatsapp') {
-        const response = await fetch(`http://localhost:4000/api/whatsapp/messages/${conv.id}`);
+        const response = await fetch(`${apiUrl}/api/whatsapp/messages/${conv.id}`);
         const data = await response.json();
         
         if (data.success && data.messages) {
@@ -431,7 +432,7 @@ export default function InboxPage() {
     try {
       // إذا كانت محادثة WhatsApp، إرسال عبر WhatsApp API
       if (selectedConversation.channel?.type === 'whatsapp') {
-        const response = await fetch('http://localhost:4000/api/whatsapp/send', {
+        const response = await fetch(`${apiUrl}/api/whatsapp/send`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -531,7 +532,7 @@ export default function InboxPage() {
             // إرسال عبر WhatsApp API إذا كانت محادثة WhatsApp
             if (selectedConversation.channel?.type === 'whatsapp') {
               try {
-                await fetch('http://localhost:4000/api/whatsapp/send', {
+                await fetch(`${apiUrl}/api/whatsapp/send`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -641,7 +642,7 @@ export default function InboxPage() {
           // إرسال عبر WhatsApp API إذا كانت محادثة WhatsApp
           if (selectedConversation.channel?.type === 'whatsapp') {
             try {
-              await fetch('http://localhost:4000/api/whatsapp/send', {
+              await fetch(`${apiUrl}/api/whatsapp/send`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
