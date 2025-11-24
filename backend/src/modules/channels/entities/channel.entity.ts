@@ -48,7 +48,7 @@ export class Channel {
   @Column({ type: 'text', nullable: true })
   lastError: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ nullable: true })
   lastConnectedAt: Date;
 
   @Column({ default: true })
