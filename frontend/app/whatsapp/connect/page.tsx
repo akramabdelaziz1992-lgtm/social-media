@@ -29,7 +29,8 @@ export default function WhatsAppConnectPage() {
 
   useEffect(() => {
     // الاتصال بـ WebSocket للحصول على QR Code
-    const newSocket = io('http://localhost:4000/whatsapp', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+    const newSocket = io(`${apiUrl}/whatsapp`, {
       transports: ['websocket'],
     });
 
@@ -66,7 +67,8 @@ export default function WhatsAppConnectPage() {
     setConnectionStatus('connecting');
     
     try {
-      const response = await fetch('http://localhost:4000/api/whatsapp/connect', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/api/whatsapp/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +91,8 @@ export default function WhatsAppConnectPage() {
 
   const handleDisconnect = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/whatsapp/disconnect', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/api/whatsapp/disconnect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
