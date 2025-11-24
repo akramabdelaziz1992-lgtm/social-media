@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Bot Manager Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
 @layer base {
   * {
     @apply border-dark-200;

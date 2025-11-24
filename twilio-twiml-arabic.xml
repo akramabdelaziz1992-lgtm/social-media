@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zeina" language="ar-AE">
+    مرحباً بك في مركز اتصالات المسار الساخن
+  </Say>
+  <Gather input="dtmf" numDigits="1" timeout="10">
+    <Say voice="Polly.Zeina" language="ar-AE">
+      للتحدث مع خدمة العملاء اضغط واحد.
+      لترك رسالة صوتية اضغط اثنين
+    </Say>
+  </Gather>
+  <Say voice="Polly.Zeina" language="ar-AE">
+    شكراً لاتصالك. مع السلامة
+  </Say>
+  <Hangup/>
+</Response>

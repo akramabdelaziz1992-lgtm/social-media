@@ -91,7 +91,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
+    <div className="w-52 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
       {/* Logo */}
       <div className="p-6 border-b border-cyan-500/20">
         <div className="flex items-center gap-3">
@@ -196,6 +196,48 @@ export default function Sidebar() {
               🇸🇦 KSA
             </span>
           </div>
+        </Link>
+
+        {/* Customers */}
+        <Link
+          href="/customers"
+          className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+            pathname === '/customers' 
+              ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 backdrop-blur-sm border border-purple-400/30 shadow-lg shadow-purple-500/20' 
+              : 'text-slate-300 hover:bg-white/5 hover:border-purple-400/20 border border-transparent'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+            pathname === '/customers' 
+              ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg' 
+              : 'bg-white/10 group-hover:bg-white/15'
+          }`}>
+            <span className="text-xl">👥</span>
+          </div>
+          <span className={`font-semibold ${pathname === '/customers' ? 'text-white' : 'text-slate-300'}`}>
+            العملاء
+          </span>
+        </Link>
+
+        {/* Employees & Departments */}
+        <Link
+          href="/employees"
+          className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+            pathname === '/employees' 
+              ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' 
+              : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+            pathname === '/employees' 
+              ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' 
+              : 'bg-white/10 group-hover:bg-white/15'
+          }`}>
+            <span className="text-xl">👨‍💼</span>
+          </div>
+          <span className={`font-semibold ${pathname === '/employees' ? 'text-white' : 'text-slate-300'}`}>
+            الموظفين
+          </span>
         </Link>
 
         {/* Divider */}

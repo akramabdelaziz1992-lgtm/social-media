@@ -1,221 +1,256 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+'use client';
 
-export interface VoiceCallState {
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Device } from '@twilio/voice-sdk';
+
+interface VoiceCallState {
   isActive: boolean;
   isMuted: boolean;
   isSpeakerOn: boolean;
   duration: number;
+  phoneNumber: string;
+  error: string | null;
+  isDeviceReady: boolean;
   status: 'idle' | 'connecting' | 'ringing' | 'active' | 'ended';
-  error?: string;
 }
 
-export function useVoiceCall() {
+interface VoiceCallHook extends VoiceCallState {
+  startCall: (phoneNumber: string) => Promise<void>;
+  endCall: () => void;
+  toggleMute: () => void;
+  toggleSpeaker: () => void;
+  formattedDuration: string;
+}
+
+export function useVoiceCall(): VoiceCallHook {
   const [state, setState] = useState<VoiceCallState>({
     isActive: false,
     isMuted: false,
-    isSpeakerOn: true,
+    isSpeakerOn: false,
     duration: 0,
+    phoneNumber: '',
+    error: null,
+    isDeviceReady: false,
     status: 'idle',
   });
 
-  const localStreamRef = useRef<MediaStream | null>(null);
-  const remoteStreamRef = useRef<MediaStream | null>(null);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  // Format duration as MM:SS
+  const formattedDuration = `${Math.floor(state.duration / 60).toString().padStart(2, '0')}:${(state.duration % 60).toString().padStart(2, '0')}`;
+
+  const deviceRef = useRef<Device | null>(null);
+  const callRef = useRef<any>(null);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize audio element
+  // Initialize Twilio Device
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      audioElementRef.current = new Audio();
-      audioElementRef.current.autoplay = true;
-    }
+    let mounted = true;
+
+    const initializeDevice = async () => {
+      try {
+        console.log('🔧 جاري تهيئة Twilio Device...');
+
+        const response = await fetch('http://localhost:4000/api/calls/token?identity=agent');
+        if (!response.ok) {
+          throw new Error('فشل الحصول على access token');
+        }
+
+        const { token } = await response.json();
+        console.log('🎫 تم الحصول على access token');
+
+        const device = new Device(token, {
+          logLevel: 1,
+          codecPreferences: ['opus', 'pcmu'] as any,
+        });
+
+        if (!mounted) return;
+
+        device.on('registered', () => {
+          console.log('✅ Twilio Device مسجل ✅');
+          if (mounted) {
+            setState(prev => ({ ...prev, isDeviceReady: true, error: null }));
+          }
+        });
+
+        device.on('error', (error) => {
+          console.error('❌ خطأ في Twilio Device:', error);
+          if (mounted) {
+            setState(prev => ({ 
+              ...prev, 
+              error: error?.message || 'خطأ في الجهاز',
+              isDeviceReady: false,
+            }));
+          }
+        });
+
+        await device.register();
+        deviceRef.current = device;
+
+        console.log('✅ Twilio Device جاهز للاتصال من المتصفح! 🎤');
+
+      } catch (error: any) {
+        console.error('❌ فشل تهيئة Twilio Device:', error);
+        if (mounted) {
+          setState(prev => ({ 
+            ...prev, 
+            error: error?.message || String(error) || 'فشل تهيئة الجهاز',
+            isDeviceReady: false,
+          }));
+        }
+      }
+    };
+
+    initializeDevice();
+
     return () => {
-      if (audioElementRef.current) {
-        audioElementRef.current.pause();
-        audioElementRef.current.srcObject = null;
+      mounted = false;
+      if (deviceRef.current) {
+        deviceRef.current.unregister();
+        deviceRef.current.destroy();
+        deviceRef.current = null;
+      }
+      if (durationIntervalRef.current) {
+        clearInterval(durationIntervalRef.current);
       }
     };
   }, []);
 
-  // Duration counter
-  useEffect(() => {
-    if (state.status === 'active') {
-      durationIntervalRef.current = setInterval(() => {
-        setState(prev => ({ ...prev, duration: prev.duration + 1 }));
-      }, 1000);
-    } else {
+  const startCall = useCallback(async (phoneNumber: string) => {
+    try {
+      if (!deviceRef.current) {
+        throw new Error('الجهاز غير جاهز');
+      }
+
+      if (!state.isDeviceReady) {
+        throw new Error('الجهاز غير مسجل');
+      }
+
+      setState(prev => ({ 
+        ...prev, 
+        phoneNumber,
+        error: null,
+        status: 'connecting',
+      }));
+
+      let formattedNumber = phoneNumber.replace(/\s+/g, '');
+      if (!formattedNumber.startsWith('+')) {
+        if (formattedNumber.startsWith('05')) {
+          formattedNumber = '+966' + formattedNumber.substring(1);
+        } else if (formattedNumber.startsWith('5')) {
+          formattedNumber = '+966' + formattedNumber;
+        } else {
+          formattedNumber = '+' + formattedNumber;
+        }
+      }
+
+      console.log(`📞 اتصال WebRTC إلى: ${formattedNumber}`);
+
+      const call = await deviceRef.current.connect({
+        params: {
+          To: formattedNumber,
+        },
+      });
+
+      callRef.current = call;
+
+      call.on('accept', () => {
+        console.log('✅ المكالمة متصلة!');
+        setState(prev => ({ ...prev, isActive: true, status: 'active' }));
+
+        let duration = 0;
+        durationIntervalRef.current = setInterval(() => {
+          duration++;
+          setState(prev => ({ ...prev, duration }));
+        }, 1000);
+      });
+
+      call.on('disconnect', () => {
+        console.log('📴 المكالمة انتهت');
+        if (durationIntervalRef.current) {
+          clearInterval(durationIntervalRef.current);
+          durationIntervalRef.current = null;
+        }
+        setState(prev => ({
+          ...prev,
+          isActive: false,
+          duration: 0,
+          phoneNumber: '',
+          status: 'ended',
+        }));
+        callRef.current = null;
+      });
+
+      call.on('error', (error) => {
+        console.error('❌ خطأ في المكالمة:', error);
+        setState(prev => ({ 
+          ...prev, 
+          error: error?.message || 'خطأ في المكالمة',
+          isActive: false,
+        }));
+        if (durationIntervalRef.current) {
+          clearInterval(durationIntervalRef.current);
+          durationIntervalRef.current = null;
+        }
+        callRef.current = null;
+      });
+
+    } catch (error: any) {
+      console.error('❌ فشل بدء المكالمة:', error);
+      setState(prev => ({ 
+        ...prev, 
+        error: error?.message || String(error) || 'فشل بدء المكالمة',
+        isActive: false,
+      }));
+      throw error;
+    }
+  }, [state.isDeviceReady]);
+
+  const endCall = useCallback(() => {
+    try {
+      console.log('📴 إنهاء المكالمة');
+      
+      if (callRef.current) {
+        callRef.current.disconnect();
+        callRef.current = null;
+      }
+
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
         durationIntervalRef.current = null;
       }
-    }
-    return () => {
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
-      }
-    };
-  }, [state.status]);
 
-  const startCall = useCallback(async (phoneNumber: string) => {
-    try {
-      setState(prev => ({ ...prev, status: 'connecting', isActive: true, duration: 0, error: undefined }));
-
-      // Request microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        } 
-      });
-      
-      localStreamRef.current = stream;
-
-      // Create peer connection
-      const peerConnection = new RTCPeerConnection({
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-        ],
-      });
-
-      peerConnectionRef.current = peerConnection;
-
-      // Add local stream tracks
-      stream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, stream);
-      });
-
-      // Handle remote stream
-      peerConnection.ontrack = (event) => {
-        remoteStreamRef.current = event.streams[0];
-        if (audioElementRef.current) {
-          audioElementRef.current.srcObject = event.streams[0];
-        }
-        setState(prev => ({ ...prev, status: 'active' }));
-      };
-
-      // Handle ICE candidates
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          // In a real implementation, send this to your signaling server
-          console.log('ICE candidate:', event.candidate);
-        }
-      };
-
-      // Connection state changes
-      peerConnection.onconnectionstatechange = () => {
-        console.log('Connection state:', peerConnection.connectionState);
-        if (peerConnection.connectionState === 'connected') {
-          setState(prev => ({ ...prev, status: 'active' }));
-        } else if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'disconnected') {
-          endCall();
-        }
-      };
-
-      // Simulate ringing and connection (in real app, this would be handled by signaling server)
-      setState(prev => ({ ...prev, status: 'ringing' }));
-      
-      // For demo: simulate connection after 2 seconds
-      setTimeout(() => {
-        if (peerConnectionRef.current) {
-          setState(prev => ({ ...prev, status: 'active' }));
-        }
-      }, 2000);
-
-      // In a real implementation, you would:
-      // 1. Send call request to your backend with phoneNumber
-      // 2. Backend connects to VoIP provider (Twilio, Vonage, etc.)
-      // 3. Exchange SDP offers/answers through signaling server
-      // 4. Establish WebRTC connection
-
-    } catch (error) {
-      console.error('Error starting call:', error);
-      setState(prev => ({ 
-        ...prev, 
-        status: 'idle', 
+      setState(prev => ({
+        ...prev,
         isActive: false,
-        error: error instanceof Error ? error.message : 'فشل بدء المكالمة'
-      }));
-      cleanup();
-    }
-  }, []);
-
-  const endCall = useCallback(() => {
-    setState(prev => ({ ...prev, status: 'ended' }));
-    
-    setTimeout(() => {
-      cleanup();
-      setState({
-        isActive: false,
-        isMuted: false,
-        isSpeakerOn: true,
         duration: 0,
+        phoneNumber: '',
         status: 'idle',
-      });
-    }, 1000);
+      }));
+    } catch (error: any) {
+      console.error('❌ فشل إنهاء المكالمة:', error);
+    }
   }, []);
 
   const toggleMute = useCallback(() => {
-    if (localStreamRef.current) {
-      const audioTrack = localStreamRef.current.getAudioTracks()[0];
-      if (audioTrack) {
-        audioTrack.enabled = !audioTrack.enabled;
-        setState(prev => ({ ...prev, isMuted: !audioTrack.enabled }));
+    try {
+      if (callRef.current) {
+        const newMutedState = !state.isMuted;
+        callRef.current.mute(newMutedState);
+        setState(prev => ({ ...prev, isMuted: newMutedState }));
+        console.log(newMutedState ? '🔇 كتم الصوت' : '🔊 تشغيل الصوت');
       }
+    } catch (error: any) {
+      console.error('❌ فشل كتم/تشغيل الصوت:', error);
     }
-  }, []);
+  }, [state.isMuted]);
 
   const toggleSpeaker = useCallback(() => {
-    if (audioElementRef.current) {
-      setState(prev => {
-        const newSpeakerState = !prev.isSpeakerOn;
-        if (audioElementRef.current) {
-          audioElementRef.current.volume = newSpeakerState ? 1 : 0;
-        }
-        return { ...prev, isSpeakerOn: newSpeakerState };
-      });
+    try {
+      setState(prev => ({ ...prev, isSpeakerOn: !prev.isSpeakerOn }));
+      console.log(!state.isSpeakerOn ? '🔊 السماعة مفعلة' : '🎧 السماعة غير مفعلة');
+    } catch (error: any) {
+      console.error('❌ فشل تفعيل/تعطيل السماعة:', error);
     }
-  }, []);
-
-  const cleanup = useCallback(() => {
-    // Stop local stream
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(track => track.stop());
-      localStreamRef.current = null;
-    }
-
-    // Close peer connection
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
-    }
-
-    // Clear audio element
-    if (audioElementRef.current) {
-      audioElementRef.current.srcObject = null;
-    }
-
-    // Clear duration interval
-    if (durationIntervalRef.current) {
-      clearInterval(durationIntervalRef.current);
-      durationIntervalRef.current = null;
-    }
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      cleanup();
-    };
-  }, [cleanup]);
-
-  const formatDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, [state.isSpeakerOn]);
 
   return {
     ...state,
@@ -223,6 +258,7 @@ export function useVoiceCall() {
     endCall,
     toggleMute,
     toggleSpeaker,
-    formattedDuration: formatDuration(state.duration),
+    formattedDuration,
   };
 }
+

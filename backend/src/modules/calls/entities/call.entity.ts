@@ -33,19 +33,17 @@ export class Call {
   @Column({ name: 'from_number' })
   fromNumber: string;
 
-  @Column({ name: 'to_number' })
+  @Column({ name: 'to_number', nullable: true })
   toNumber: string;
 
   @Column({
-    type: 'enum',
-    enum: CallDirection,
+    type: 'varchar',
     default: CallDirection.INBOUND,
   })
   direction: CallDirection;
 
   @Column({
-    type: 'enum',
-    enum: CallStatus,
+    type: 'varchar',
     default: CallStatus.INITIATED,
   })
   status: CallStatus;

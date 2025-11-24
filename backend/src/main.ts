@@ -7,16 +7,21 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
+    bodyParser: true,
   });
 
   const configService = app.get(ConfigService);
+
+  // Enable URL-encoded body parsing for Twilio webhooks
+  app.use(require('express').urlencoded({ extended: true }));
+  app.use(require('express').json());
 
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      forbidNonWhitelisted: true,
+      forbidNonWhitelisted: false, // Allow Twilio extra fields
       transformOptions: {
         enableImplicitConversion: true,
       },

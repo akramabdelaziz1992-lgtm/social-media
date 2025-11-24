@@ -14,6 +14,9 @@ import { GatewayModule } from './modules/gateway/gateway.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { CallsModule } from './modules/calls/calls.module';
+import { WhatsAppModule } from './modules/whatsapp/whatsapp.module';
+import { AIModule } from './modules/ai/ai.module';
+import { EmployeesModule } from './modules/employees/employees.module';
 
 // Import all entities explicitly
 import { User } from './modules/users/entities/user.entity';
@@ -24,6 +27,8 @@ import { Template } from './modules/templates/entities/template.entity';
 import { AutoReplyRule } from './modules/auto-reply/entities/auto-reply-rule.entity';
 import { AuditLog } from './modules/audit/entities/audit-log.entity';
 import { Call } from './modules/calls/entities/call.entity';
+import { Employee } from './modules/employees/entities/employee.entity';
+import { Department } from './modules/employees/entities/department.entity';
 
 @Module({
   imports: [
@@ -44,7 +49,7 @@ import { Call } from './modules/calls/entities/call.entity';
           return {
             type: 'postgres',
             url: databaseUrl,
-            entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call],
+            entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
             synchronize: !isProd, // avoid auto-sync in production by default
             logging: false,
           };
@@ -54,7 +59,7 @@ import { Call } from './modules/calls/entities/call.entity';
         return {
           type: 'better-sqlite3',
           database: 'almasar.db',
-          entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog],
+          entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
           synchronize: true,
           logging: true,
         };
@@ -86,7 +91,10 @@ import { Call } from './modules/calls/entities/call.entity';
     GatewayModule,
     StorageModule,
     AuditModule,
+    AIModule,
     CallsModule,
+    WhatsAppModule,
+    EmployeesModule,
   ],
 })
 export class AppModule {}

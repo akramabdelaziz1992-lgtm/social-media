@@ -62,31 +62,37 @@ export default function SocialMediaPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm sticky top-0 z-50">
+      <header className="relative bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-cyan-600/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
               <Share2 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
                 📱 النشر الاجتماعي
               </h1>
-              <p className="text-sm text-slate-500">إدارة ونشر المحتوى على جميع المنصات</p>
+              <p className="text-sm text-cyan-200">إدارة ونشر المحتوى على جميع المنصات</p>
             </div>
           </div>
           <div className="flex gap-3">
             <button 
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition-all"
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg text-sm font-medium transition-all shadow-lg text-white"
             >
               لوحة التحكم
             </button>
             <button 
               onClick={() => router.push('/inbox')}
-              className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg"
+              className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg"
             >
               صندوق الوارد
             </button>
@@ -100,7 +106,7 @@ export default function SocialMediaPage() {
           {stats.map((stat, index) => (
             <div 
               key={index}
-              className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+              className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center shadow-md`}>
@@ -110,8 +116,8 @@ export default function SocialMediaPage() {
                   {stat.change}
                 </span>
               </div>
-              <div className="text-3xl font-bold text-slate-800 mb-1">{stat.value}</div>
-              <div className="text-sm text-slate-500">{stat.label}</div>
+              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+              <div className="text-sm text-cyan-200">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -124,12 +130,12 @@ export default function SocialMediaPage() {
                 <div className="w-10 h-10 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800">إنشاء منشور جديد</h2>
+                <h2 className="text-xl font-bold text-white">إنشاء منشور جديد</h2>
               </div>
 
               {/* Platform Selection */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-700 mb-3">اختر المنصات</label>
+                <label className="block text-sm font-medium text-cyan-200 mb-3">اختر المنصات</label>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                   {platforms.map((platform) => {
                     const Icon = platform.icon;

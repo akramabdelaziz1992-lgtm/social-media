@@ -7,10 +7,14 @@ interface ApiOptions extends RequestInit {
 export async function api<T = any>(path: string, options?: ApiOptions): Promise<T> {
   const { token, ...opts } = options || {};
   
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...opts.headers,
   };
+
+  // Merge existing headers
+  if (opts.headers) {
+    Object.assign(headers, opts.headers);
+  }
 
   // Get token from localStorage if not provided
   if (typeof window !== 'undefined') {

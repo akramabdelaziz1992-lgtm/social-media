@@ -1,55 +1,148 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Smartphone, QrCode, Link2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { io, Socket } from 'socket.io-client';
+import QRCodeLib from 'qrcode';
 
 export default function WhatsAppConnectPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [showQR, setShowQR] = useState(false);
+  const [qrCode, setQrCode] = useState<string>('');
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const handleConnect = () => {
+  // رسم QR Code على Canvas
+  useEffect(() => {
+    if (qrCode && qrCanvasRef.current) {
+      QRCodeLib.toCanvas(qrCanvasRef.current, qrCode, {
+        width: 256,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      });
+    }
+  }, [qrCode]);
+
+  useEffect(() => {
+    // الاتصال بـ WebSocket للحصول على QR Code
+    const newSocket = io('http://localhost:4000/whatsapp', {
+      transports: ['websocket'],
+    });
+
+    newSocket.on('connect', () => {
+      console.log('✅ متصل بـ WebSocket');
+    });
+
+    newSocket.on('qr', (data: { qr: string }) => {
+      console.log('📱 QR Code وصل!');
+      setQrCode(data.qr);
+      setShowQR(true);
+      setConnectionStatus('connecting');
+    });
+
+    newSocket.on('status', (data: { status: string }) => {
+      console.log('📢 حالة الاتصال:', data.status);
+      if (data.status === 'connected') {
+        setConnectionStatus('connected');
+        setShowQR(false);
+      } else if (data.status === 'disconnected') {
+        setConnectionStatus('disconnected');
+        setShowQR(false);
+      }
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  const handleConnect = async () => {
     setConnectionStatus('connecting');
-    setShowQR(true);
-    // Simulate connection after 3 seconds
-    setTimeout(() => {
-      setConnectionStatus('connected');
-      setShowQR(false);
-    }, 3000);
+    
+    try {
+      const response = await fetch('http://localhost:4000/api/whatsapp/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅', result.message);
+      } else {
+        console.error('❌', result.error);
+        setConnectionStatus('disconnected');
+      }
+    } catch (error) {
+      console.error('❌ خطأ في الاتصال:', error);
+      setConnectionStatus('disconnected');
+    }
   };
 
-  const handleDisconnect = () => {
-    setConnectionStatus('disconnected');
-    setPhoneNumber('');
-    setShowQR(false);
+  const handleDisconnect = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/whatsapp/disconnect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅', result.message);
+        setConnectionStatus('disconnected');
+        setPhoneNumber('');
+        setShowQR(false);
+        setQrCode('');
+      }
+    } catch (error) {
+      console.error('❌ خطأ في قطع الاتصال:', error);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-slate-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto relative">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
               <Smartphone className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
                 ربط حساب واتساب
               </h1>
-              <p className="text-gray-600">اربط حساب واتساب الأعمال الخاص بك لبدء المراسلة</p>
+              <p className="text-cyan-200">اربط حساب واتساب الأعمال الخاص بك لبدء المراسلة</p>
             </div>
           </div>
         </div>
 
         {/* Status Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100 mb-6">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/10 mb-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                connectionStatus === 'connected' ? 'bg-green-100' :
-                connectionStatus === 'connecting' ? 'bg-yellow-100' :
-                'bg-gray-100'
+                connectionStatus === 'connected' ? 'bg-emerald-500/20 border border-emerald-400/50' :
+                connectionStatus === 'connecting' ? 'bg-yellow-500/20 border border-yellow-400/50' :
+                'bg-white/10 border border-white/20'
               }`}>
                 {connectionStatus === 'connected' ? (
                   <CheckCircle className="text-green-600" size={32} />
@@ -60,12 +153,12 @@ export default function WhatsAppConnectPage() {
                 )}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-white">
                   {connectionStatus === 'connected' ? 'متصل' :
                    connectionStatus === 'connecting' ? 'جاري الاتصال...' :
                    'غير متصل'}
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-cyan-200">
                   {connectionStatus === 'connected' ? `رقم الهاتف: ${phoneNumber || '+966 50 123 4567'}` :
                    connectionStatus === 'connecting' ? 'امسح رمز QR بهاتفك' :
                    'اضغط أدناه لربط واتساب'}
@@ -83,23 +176,32 @@ export default function WhatsAppConnectPage() {
           </div>
 
           {/* QR Code Display */}
-          {showQR && connectionStatus === 'connecting' && (
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 text-center animate-fadeInUp">
-              <div className="w-64 h-64 bg-white mx-auto rounded-2xl shadow-lg flex items-center justify-center mb-4">
-                <QrCode size={200} className="text-gray-800" />
+          {showQR && connectionStatus === 'connecting' && qrCode && (
+            <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-md rounded-2xl p-8 text-center animate-fadeInUp border border-emerald-400/30">
+              <div className="w-80 h-80 bg-white mx-auto rounded-2xl shadow-2xl flex items-center justify-center mb-6 p-6 border-4 border-emerald-400">
+                <canvas 
+                  ref={qrCanvasRef}
+                  className="max-w-full"
+                />
               </div>
-              <p className="text-gray-700 font-medium mb-2">امسح رمز QR بواسطة واتساب</p>
-              <p className="text-sm text-gray-600">
-                افتح واتساب ← الإعدادات ← الأجهزة المرتبطة ← ربط جهاز
-              </p>
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 mb-4 border border-white/20">
+                <p className="text-white font-bold text-lg mb-2">📱 امسح رمز QR بواسطة واتساب</p>
+                <p className="text-sm text-cyan-200">
+                  افتح واتساب ← الإعدادات ← الأجهزة المرتبطة ← ربط جهاز
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-yellow-200 bg-yellow-500/20 backdrop-blur-md rounded-lg p-3 border border-yellow-400/30">
+                <RefreshCw className="animate-spin" size={16} />
+                <span className="text-sm font-medium">في انتظار المسح...</span>
+              </div>
             </div>
           )}
 
           {/* Connection Steps */}
           {connectionStatus === 'disconnected' && (
             <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
-                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <div className="p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-md rounded-xl border border-emerald-400/30">
+                <h3 className="font-bold text-white mb-2 flex items-center gap-2">
                   <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">1</span>
                   افتح واتساب على هاتفك
                 </h3>

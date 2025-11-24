@@ -1,0 +1,55 @@
+{
+  "name": "mobile-call-softphone",
+  "version": "1.0.0",
+  "description": "تطبيق موبايل كول للاتصالات الصوتية",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "softphone",
+    "voip",
+    "webrtc",
+    "almasar"
+  ],
+  "author": "Almasar Hot Line",
+  "license": "MIT",
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "socket.io-client": "^4.7.2"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.mobilecall.softphone",
+    "productName": "موبايل كول",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "assets/icon.png"
+    }
+  }
+}

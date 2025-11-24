@@ -35,9 +35,11 @@ import {
   Activity,
   Award,
   Target,
-  Bell
+  Bell,
+  X
 } from 'lucide-react';
 import { useVoiceCall } from '@/lib/hooks/useVoiceCall';
+import Dialpad from '@/components/Dialpad';
 
 interface CallRecord {
   id: string;
@@ -68,9 +70,52 @@ export default function CallCenterPage() {
   const [showNewCallDialog, setShowNewCallDialog] = useState(false);
   const [newCallNumber, setNewCallNumber] = useState('');
   const [callHistory, setCallHistory] = useState<CallRecord[]>([]);
+  const [showNewCallModal, setShowNewCallModal] = useState(false);
+  const [modalCallNumber, setModalCallNumber] = useState('');
+  const [realCallRecords, setRealCallRecords] = useState<CallRecord[]>([]);
+  const [isSoftphoneRunning, setIsSoftphoneRunning] = useState(false);
 
   // Real voice call hook
   const voiceCall = useVoiceCall();
+
+  // Load real call records from backend
+  useEffect(() => {
+    loadCallRecords();
+    checkSoftphoneStatus();
+    
+    // Refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadCallRecords();
+      checkSoftphoneStatus();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadCallRecords = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/calls');
+      if (response.ok) {
+        const calls = await response.json();
+        
+        // Transform backend data to CallRecord format
+        const transformedCalls: CallRecord[] = calls.map((call: any) => ({
+          id: call.id,
+          type: call.direction === 'inbound' ? 'incoming' : 'outgoing',
+          callerName: call.toNumber || 'غير معروف',
+          callerNumber: call.direction === 'inbound' ? call.fromNumber : call.toNumber,
+          employeeName: call.agentName || 'موبايل كول',
+          duration: call.durationSeconds ? `${Math.floor(call.durationSeconds / 60)}:${(call.durationSeconds % 60).toString().padStart(2, '0')}` : '0:00',
+          timestamp: new Date(call.createdAt).toLocaleString('ar-SA'),
+          status: call.status === 'completed' ? 'completed' : call.status === 'failed' ? 'missed' : 'ongoing',
+          recordingUrl: call.recordingUrl
+        }));
+        
+        setRealCallRecords(transformedCalls);
+      }
+    } catch (error) {
+      console.error('خطأ في تحميل سجل المكالمات:', error);
+    }
+  };
 
   // Mock Data
   const callRecords: CallRecord[] = [
@@ -138,11 +183,41 @@ export default function CallCenterPage() {
     },
   ];
 
-  // Start real call
+  // Start real call using Click-to-Call (working method)
   const handleStartCall = async (number: string) => {
     setShowNewCallDialog(false);
     setNewCallNumber('');
-    await voiceCall.startCall(number);
+    
+    try {
+      // استخدام Click-to-Call API بدلاً من WebRTC
+      const response = await fetch('http://localhost:4000/api/calls/make-call', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: number,
+          from: '+18154860356', // رقم Twilio
+          agentPhone: '+966559902557', // رقم الموظف
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅ المكالمة بدأت:', result.message);
+        alert('✅ جاري الاتصال... سيتم الاتصال بك أولاً ثم توصيلك بالعميل');
+        
+        // إعادة تحميل سجل المكالمات
+        setTimeout(() => loadCallRecords(), 2000);
+      } else {
+        console.error('❌ فشل بدء المكالمة:', result.error);
+        alert('❌ فشل بدء المكالمة. الرجاء المحاولة مرة أخرى');
+      }
+    } catch (error) {
+      console.error('❌ خطأ في الاتصال:', error);
+      alert('❌ خطأ في الاتصال بالخادم');
+    }
   };
 
   // End real call
@@ -172,6 +247,43 @@ export default function CallCenterPage() {
   const handleStartNewCall = () => {
     if (newCallNumber.trim()) {
       handleStartCall(newCallNumber);
+    }
+  };
+
+  const checkSoftphoneStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/softphone/status');
+      const result = await response.json();
+      setIsSoftphoneRunning(result.running);
+    } catch (error) {
+      console.error('خطأ في التحقق من حالة التطبيق:', error);
+      setIsSoftphoneRunning(false);
+    }
+  };
+
+  const openSoftphone = async () => {
+    try {
+      // Launch softphone via backend API
+      const response = await fetch('http://localhost:4000/api/softphone/launch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅ تم تشغيل موبايل كول');
+        // Check status after 2 seconds
+        setTimeout(() => checkSoftphoneStatus(), 2000);
+      } else {
+        console.error('❌ فشل تشغيل التطبيق:', result.error);
+        alert('فشل تشغيل تطبيق موبايل كول. الرجاء المحاولة مرة أخرى.');
+      }
+    } catch (error) {
+      console.error('خطأ في فتح التطبيق:', error);
+      alert('خطأ في الاتصال بالخادم. تأكد من تشغيل Backend.');
     }
   };
 
@@ -211,7 +323,13 @@ export default function CallCenterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-slate-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -221,7 +339,7 @@ export default function CallCenterPage() {
                 <Phone className="text-white" size={24} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
                   ☎️ مركز الاتصالات - Call Center
                 </h1>
                 <p className="text-gray-600">نظام متكامل لإدارة مركز الاتصالات والعملاء | المملكة العربية السعودية 🇸🇦</p>
@@ -233,11 +351,19 @@ export default function CallCenterPage() {
                 <div className="text-xl font-bold text-green-600 text-center" dir="ltr">0555254915</div>
               </div>
               <button 
-                onClick={handleNewCallClick}
+                onClick={() => setShowNewCallModal(true)}
                 className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
               >
                 <PhoneCall size={20} />
                 <span>اتصال جديد</span>
+              </button>
+              <button 
+                onClick={openSoftphone}
+                className={`px-6 py-3 ${isSoftphoneRunning ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-cyan-600'} text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2`}
+                title={isSoftphoneRunning ? 'تطبيق موبايل كول يعمل' : 'فتح تطبيق موبايل كول'}
+              >
+                <Headphones size={20} />
+                <span>{isSoftphoneRunning ? '✅ موبايل كول' : 'موبايل كول'}</span>
               </button>
             </div>
           </div>
@@ -623,7 +749,7 @@ export default function CallCenterPage() {
             </div>
 
             {/* Call Records List */}
-            {[...callHistory, ...callRecords].map((call) => (
+            {[...realCallRecords, ...callHistory, ...callRecords].map((call) => (
               <div
                 key={call.id}
                 className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-100 hover:scale-[1.01] transition"
@@ -1254,52 +1380,130 @@ export default function CallCenterPage() {
         )}
       </div>
 
-      {/* New Call Dialog */}
+      {/* Dialpad Dialog - لوحة الاتصال */}
       {showNewCallDialog && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowNewCallDialog(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                <PhoneCall className="text-white" size={24} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowNewCallDialog(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <PhoneCall className="text-white" size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">اتصال جديد</h3>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">اتصال جديد</h3>
-            </div>
-            
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف</label>
-              <input
-                type="tel"
-                value={newCallNumber}
-                onChange={(e) => setNewCallNumber(e.target.value)}
-                placeholder="مثال: +966501234567"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                dir="ltr"
-                autoFocus
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleStartNewCall();
-                  }
-                }}
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleStartNewCall}
-                disabled={!newCallNumber.trim()}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-              >
-                <PhoneCall size={20} />
-                <span>اتصال</span>
-              </button>
               <button
                 onClick={() => {
                   setShowNewCallDialog(false);
                   setNewCallNumber('');
                 }}
-                className="px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition"
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
               >
-                إلغاء
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <Dialpad
+              value={newCallNumber}
+              onChange={setNewCallNumber}
+              onCall={handleStartNewCall}
+              disabled={voiceCall.isActive}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* New Call Modal with Dialpad */}
+      {showNewCallModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-cyan-600/30 via-blue-600/30 to-cyan-600/30 backdrop-blur-sm border-b border-white/10 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">اتصال جديد</h2>
+                <button
+                  onClick={() => {
+                    setShowNewCallModal(false);
+                    setModalCallNumber('');
+                  }}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-all"
+                >
+                  <X className="w-5 h-5 text-cyan-300" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              {/* Tabs */}
+              <div className="flex gap-2 mb-6 bg-white/5 p-1 rounded-lg">
+                <button className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium text-sm">
+                  اتصال
+                </button>
+                <button className="flex-1 px-4 py-2 text-cyan-300 hover:bg-white/5 rounded-lg font-medium text-sm transition-all">
+                  سجل المكالمات
+                </button>
+                <button className="flex-1 px-4 py-2 text-cyan-300 hover:bg-white/5 rounded-lg font-medium text-sm transition-all">
+                  جهات الاتصال
+                </button>
+              </div>
+
+              {/* Phone Number Input */}
+              <div className="mb-6">
+                <input
+                  type="tel"
+                  value={modalCallNumber}
+                  onChange={(e) => setModalCallNumber(e.target.value)}
+                  placeholder="ex. 12345"
+                  dir="ltr"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-cyan-300/50 text-lg text-center focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono"
+                />
+              </div>
+
+              {/* Dialpad Grid */}
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {[
+                  { digit: '1', letters: '' },
+                  { digit: '2', letters: 'ABC' },
+                  { digit: '3', letters: 'DEF' },
+                  { digit: '4', letters: 'GHI' },
+                  { digit: '5', letters: 'JKL' },
+                  { digit: '6', letters: 'MNO' },
+                  { digit: '7', letters: 'PQRS' },
+                  { digit: '8', letters: 'TUV' },
+                  { digit: '9', letters: 'WXYZ' },
+                  { digit: '*', letters: '' },
+                  { digit: '0', letters: '+' },
+                  { digit: '#', letters: '' },
+                ].map(({ digit, letters }) => (
+                  <button
+                    key={digit}
+                    onClick={() => setModalCallNumber(modalCallNumber + digit)}
+                    className="aspect-square bg-white/5 hover:bg-cyan-500/20 border border-white/10 rounded-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95"
+                  >
+                    <span className="text-2xl font-semibold text-white">{digit}</span>
+                    {letters && (
+                      <span className="text-xs text-cyan-300/70">{letters}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Call Button */}
+              <button
+                onClick={async () => {
+                  if (modalCallNumber.trim()) {
+                    await handleStartCall(modalCallNumber);
+                    setShowNewCallModal(false);
+                    setModalCallNumber('');
+                  }
+                }}
+                disabled={!modalCallNumber.trim()}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg disabled:cursor-not-allowed"
+              >
+                <Phone size={24} />
+                <span className="text-lg">اتصال</span>
               </button>
             </div>
           </div>

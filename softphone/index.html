@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موبايل كول - Mobile Call</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"/>
+            <path d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443c-.16-.139-.36-.22-.573-.22h-.002a.849.849 0 0 0-.588.227l-1.818 1.658c-3.41-1.294-5.294-3.23-6.295-6.295l1.658-1.818c.155-.155.234-.361.227-.588a.85.85 0 0 0-.22-.573L6.777 3.8a.85.85 0 0 0-.573-.22c-.228 0-.429.083-.588.227L3.9 5.523c-.39.39-.608.919-.608 1.489 0 .12.008.241.025.363C3.836 9.704 5.226 13.696 8.273 16.743c3.047 3.047 7.039 4.437 9.368 4.956.122.017.243.025.363.025.57 0 1.099-.218 1.489-.608l1.716-1.716a.846.846 0 0 0 .227-.588c0-.228-.083-.429-.227-.573l-2.034-2.034z"/>
+          </svg>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="dialpad">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"/>
+            <path d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443c-.16-.139-.36-.22-.573-.22h-.002a.849.849 0 0 0-.588.227l-1.818 1.658c-3.41-1.294-5.294-3.23-6.295-6.295l1.658-1.818c.155-.155.234-.361.227-.588a.85.85 0 0 0-.22-.573L6.777 3.8a.85.85 0 0 0-.573-.22c-.228 0-.429.083-.588.227L3.9 5.523c-.39.39-.608.919-.608 1.489 0 .12.008.241.025.363C3.836 9.704 5.226 13.696 8.273 16.743c3.047 3.047 7.039 4.437 9.368 4.956.122.017.243.025.363.025.57 0 1.099-.218 1.489-.608l1.716-1.716a.846.846 0 0 0 .227-.588c0-.228-.083-.429-.227-.573l-2.034-2.034z"/>
+          </svg>
+          <span>لوحة المفاتيح</span>
+        </button>
+
+        <button class="nav-item" data-page="contacts">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 4H4c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM8.715 8c1.151 0 2 .849 2 2s-.849 2-2 2-2-.849-2-2 .848-2 2-2zm3.715 8H5v-.465c0-1.373 1.676-2.785 3.715-2.785s3.715 1.412 3.715 2.785V16zM19 15h-4v-2h4v2zm0-4h-5V9h5v2z"/>
+          </svg>
+          <span>جهات الاتصال</span>
+        </button>
+
+        <button class="nav-item" data-page="history">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+            <path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/>
+          </svg>
+          <span>المحفوظات</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item settings" data-page="settings">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="m2.344 15.271 2 3.46a1 1 0 0 0 1.366.365l1.396-.806c.58.457 1.221.832 1.895 1.112V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.598a8.094 8.094 0 0 0 1.895-1.112l1.396.806c.477.275 1.091.11 1.366-.365l2-3.46a1.004 1.004 0 0 0-.365-1.366l-1.372-.793a7.683 7.683 0 0 0-.002-2.224l1.372-.793c.476-.275.641-.89.365-1.366l-2-3.46a1 1 0 0 0-1.366-.365l-1.396.806A8.034 8.034 0 0 0 15 4.598V3a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v1.598A8.094 8.094 0 0 0 7.105 5.71L5.71 4.904a.999.999 0 0 0-1.366.365l-2 3.46a1.004 1.004 0 0 0 .365 1.366l1.372.793a7.683 7.683 0 0 0 0 2.224l-1.372.793c-.476.275-.641.89-.365 1.366zM12 8c2.206 0 4 1.794 4 4s-1.794 4-4 4-4-1.794-4-4 1.794-4 4-4z"/>
+          </svg>
+          <div class="status-indicator online"></div>
+        </button>
+
+        <div class="app-logo">
+          <div class="logo-text">MC</div>
+          <div class="status-dot online"></div>
+          <div class="app-name">موبايل<br>كول</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Dialpad Page -->
+      <div class="page active" id="dialpad-page">
+        <div class="page-header">
+          <h2>رقم الهاتف</h2>
+        </div>
+
+        <div class="phone-display">
+          <input type="text" id="phone-number" placeholder="أدخل الرقم" readonly>
+        </div>
+
+        <div class="dialpad">
+          <button class="dial-btn" data-digit="1">
+            <span class="digit">1</span>
+          </button>
+          <button class="dial-btn" data-digit="2">
+            <span class="digit">2</span>
+            <span class="letters">ABC</span>
+          </button>
+          <button class="dial-btn" data-digit="3">
+            <span class="digit">3</span>
+            <span class="letters">DEF</span>
+          </button>
+
+          <button class="dial-btn" data-digit="4">
+            <span class="digit">4</span>
+            <span class="letters">GHI</span>
+          </button>
+          <button class="dial-btn" data-digit="5">
+            <span class="digit">5</span>
+            <span class="letters">JKL</span>
+          </button>
+          <button class="dial-btn" data-digit="6">
+            <span class="digit">6</span>
+            <span class="letters">MNO</span>
+          </button>
+
+          <button class="dial-btn" data-digit="7">
+            <span class="digit">7</span>
+            <span class="letters">PQRS</span>
+          </button>
+          <button class="dial-btn" data-digit="8">
+            <span class="digit">8</span>
+            <span class="letters">TUV</span>
+          </button>
+          <button class="dial-btn" data-digit="9">
+            <span class="digit">9</span>
+            <span class="letters">WXYZ</span>
+          </button>
+
+          <button class="dial-btn" data-digit="*">
+            <span class="digit">*</span>
+            <span class="letters">+</span>
+          </button>
+          <button class="dial-btn" data-digit="0">
+            <span class="digit">0</span>
+          </button>
+          <button class="dial-btn" data-digit="#">
+            <span class="digit">#</span>
+          </button>
+        </div>
+
+        <button class="call-btn" id="call-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"/>
+            <path d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443c-.16-.139-.36-.22-.573-.22h-.002a.849.849 0 0 0-.588.227l-1.818 1.658c-3.41-1.294-5.294-3.23-6.295-6.295l1.658-1.818c.155-.155.234-.361.227-.588a.85.85 0 0 0-.22-.573L6.777 3.8a.85.85 0 0 0-.573-.22c-.228 0-.429.083-.588.227L3.9 5.523c-.39.39-.608.919-.608 1.489 0 .12.008.241.025.363C3.836 9.704 5.226 13.696 8.273 16.743c3.047 3.047 7.039 4.437 9.368 4.956.122.017.243.025.363.025.57 0 1.099-.218 1.489-.608l1.716-1.716a.846.846 0 0 0 .227-.588c0-.228-.083-.429-.227-.573l-2.034-2.034z"/>
+          </svg>
+        </button>
+
+        <div class="quick-contact">
+          <p>اتصال سريع</p>
+        </div>
+      </div>
+
+      <!-- Contacts Page -->
+      <div class="page" id="contacts-page">
+        <div class="page-header">
+          <h2>جهات الاتصال</h2>
+          <button class="add-btn" id="add-contact-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="search-box">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"/>
+          </svg>
+          <input type="text" id="contact-search" placeholder="بحث في جهات الاتصال...">
+        </div>
+
+        <div class="contacts-list" id="contacts-list">
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 4H4c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM8.715 8c1.151 0 2 .849 2 2s-.849 2-2 2-2-.849-2-2 .848-2 2-2zm3.715 8H5v-.465c0-1.373 1.676-2.785 3.715-2.785s3.715 1.412 3.715 2.785V16zM19 15h-4v-2h4v2zm0-4h-5V9h5v2z"/>
+            </svg>
+            <p>لا توجد جهات اتصال</p>
+            <button class="add-first-btn" onclick="document.getElementById('add-contact-btn').click()">
+              إضافة جهة اتصال
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Page -->
+      <div class="page" id="history-page">
+        <div class="page-header">
+          <h2>سجل المكالمات</h2>
+          <button class="clear-btn" id="clear-history-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 7H5v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7H6zm4 12H8v-9h2v9zm6 0h-2v-9h2v9zm.618-15L15 2H9L7.382 4H3v2h18V4z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="history-list" id="history-list">
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+              <path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"/>
+            </svg>
+            <p>لا يوجد سجل مكالمات</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Page -->
+      <div class="page" id="settings-page">
+        <div class="page-header">
+          <h2>الإعدادات</h2>
+        </div>
+
+        <div class="settings-content">
+          <div class="setting-group">
+            <h3>الاتصال بالخادم</h3>
+            <div class="input-group">
+              <label>عنوان الخادم</label>
+              <input type="text" id="server-url" placeholder="http://localhost:4000">
+            </div>
+            <div class="toggle-group">
+              <label>الاتصال التلقائي</label>
+              <label class="toggle">
+                <input type="checkbox" id="auto-connect" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <h3>الإشعارات</h3>
+            <div class="toggle-group">
+              <label>إشعارات المكالمات</label>
+              <label class="toggle">
+                <input type="checkbox" id="notifications" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <h3>معلومات التطبيق</h3>
+            <div class="info-item">
+              <span>الإصدار</span>
+              <span>1.0.0</span>
+            </div>
+            <div class="info-item">
+              <span>الحالة</span>
+              <span class="status-badge connected">متصل</span>
+            </div>
+          </div>
+
+          <button class="save-btn" id="save-settings-btn">حفظ الإعدادات</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call Dialog -->
+  <div class="call-dialog hidden" id="call-dialog">
+    <div class="call-dialog-content">
+      <div class="caller-avatar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.579 2 2 6.579 2 12s4.579 10 10 10 10-4.579 10-10S17.421 2 12 2zm0 5c1.727 0 3 1.272 3 3s-1.273 3-3 3c-1.726 0-3-1.272-3-3s1.274-3 3-3zm-5.106 9.772c.897-1.32 2.393-2.2 4.106-2.2h2c1.714 0 3.209.88 4.106 2.2C15.828 18.14 14.015 19 12 19s-3.828-.86-5.106-2.228z"/>
+        </svg>
+      </div>
+      <h3 id="caller-name">اتصال جارٍ...</h3>
+      <p id="caller-number"></p>
+      <p class="call-timer" id="call-timer">00:00</p>
+      
+      <div class="call-actions">
+        <button class="call-action-btn mute" id="mute-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 21h3c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-3c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1zm-8 0h3c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1zM4 21h3c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1zm8-17c3.31 0 6 2.69 6 6v4h2V10c0-4.42-3.58-8-8-8s-8 3.58-8 8v4h2v-4c0-3.31 2.69-6 6-6z"/>
+          </svg>
+        </button>
+        <button class="call-action-btn end" id="end-call-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.57 19.5c-.78 0-1.55-.3-2.15-.9l-3.42-3.42-3.42 3.42c-.6.6-1.37.9-2.15.9s-1.55-.3-2.15-.9l-.71-.71c-.6-.6-.9-1.37-.9-2.15s.3-1.55.9-2.15l3.42-3.42-3.42-3.42c-.6-.6-.9-1.37-.9-2.15s.3-1.55.9-2.15l.71-.71c.6-.6 1.37-.9 2.15-.9s1.55.3 2.15.9l3.42 3.42 3.42-3.42c.6-.6 1.37-.9 2.15-.9s1.55.3 2.15.9l.71.71c.6.6.9 1.37.9 2.15s-.3 1.55-.9 2.15L15.41 12l3.42 3.42c.6.6.9 1.37.9 2.15s-.3 1.55-.9 2.15l-.71.71c-.6.6-1.37.9-2.15.9z"/>
+          </svg>
+        </button>
+        <button class="call-action-btn keypad" id="keypad-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="6" cy="4" r="2"/>
+            <circle cx="6" cy="12" r="2"/>
+            <circle cx="6" cy="20" r="2"/>
+            <circle cx="14" cy="4" r="2"/>
+            <circle cx="14" cy="12" r="2"/>
+            <circle cx="14" cy="20" r="2"/>
+            <circle cx="22" cy="4" r="2"/>
+            <circle cx="22" cy="12" r="2"/>
+            <circle cx="22" cy="20" r="2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
