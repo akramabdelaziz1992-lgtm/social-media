@@ -117,61 +117,59 @@ export default function WhatsAppConnectPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
       </div>
       
-      <div className="max-w-4xl mx-auto relative">
+      <div className="max-w-5xl mx-auto relative">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
-              <Smartphone className="text-white" size={24} />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
-                ربط حساب واتساب
-              </h1>
-              <p className="text-cyan-200">اربط حساب واتساب الأعمال الخاص بك لبدء المراسلة</p>
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center gap-3 mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-emerald-500/30">
+              <Smartphone className="text-white" size={32} />
             </div>
           </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-3">
+            ربط حساب واتساب
+          </h1>
+          <p className="text-slate-400 text-lg">اربط حساب واتساب الأعمال الخاص بك وابدأ في إدارة المحادثات بذكاء</p>
         </div>
 
         {/* Status Card */}
-        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/10 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                connectionStatus === 'connected' ? 'bg-emerald-500/20 border border-emerald-400/50' :
-                connectionStatus === 'connecting' ? 'bg-yellow-500/20 border border-yellow-400/50' :
-                'bg-white/10 border border-white/20'
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-slate-700/50 mb-8">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-5">
+              <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl ${
+                connectionStatus === 'connected' ? 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/50' :
+                connectionStatus === 'connecting' ? 'bg-gradient-to-br from-yellow-500 to-orange-600 shadow-yellow-500/50' :
+                'bg-gradient-to-br from-slate-600 to-slate-700 shadow-slate-500/50'
               }`}>
                 {connectionStatus === 'connected' ? (
-                  <CheckCircle className="text-green-600" size={32} />
+                  <CheckCircle className="text-white" size={36} />
                 ) : connectionStatus === 'connecting' ? (
-                  <RefreshCw className="text-yellow-600 animate-spin" size={32} />
+                  <RefreshCw className="text-white animate-spin" size={36} />
                 ) : (
-                  <AlertCircle className="text-gray-400" size={32} />
+                  <AlertCircle className="text-slate-300" size={36} />
                 )}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {connectionStatus === 'connected' ? 'متصل' :
-                   connectionStatus === 'connecting' ? 'جاري الاتصال...' :
-                   'غير متصل'}
+                <h2 className="text-3xl font-bold text-white mb-1">
+                  {connectionStatus === 'connected' ? '✅ متصل بنجاح' :
+                   connectionStatus === 'connecting' ? '⏳ جاري الاتصال...' :
+                   '⚠️ غير متصل'}
                 </h2>
-                <p className="text-cyan-200">
-                  {connectionStatus === 'connected' ? `رقم الهاتف: ${phoneNumber || '+966 50 123 4567'}` :
-                   connectionStatus === 'connecting' ? 'امسح رمز QR بهاتفك' :
-                   'اضغط أدناه لربط واتساب'}
+                <p className="text-slate-400 text-lg">
+                  {connectionStatus === 'connected' ? `📱 ${phoneNumber || '+966 50 123 4567'}` :
+                   connectionStatus === 'connecting' ? 'امسح رمز QR باستخدام هاتفك' :
+                   'ابدأ بربط حساب واتساب الأعمال'}
                 </p>
               </div>
             </div>
             {connectionStatus === 'connected' && (
               <button
                 onClick={handleDisconnect}
-                className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg transition"
+                className="px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all"
               >
                 قطع الاتصال
               </button>
@@ -180,55 +178,88 @@ export default function WhatsAppConnectPage() {
 
           {/* QR Code Display */}
           {showQR && connectionStatus === 'connecting' && qrCode && (
-            <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-md rounded-2xl p-8 text-center animate-fadeInUp border border-emerald-400/30">
-              <div className="w-80 h-80 bg-white mx-auto rounded-2xl shadow-2xl flex items-center justify-center mb-6 p-6 border-4 border-emerald-400">
-                <canvas 
-                  ref={qrCanvasRef}
-                  className="max-w-full"
-                />
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-3xl p-10 text-center animate-fadeInUp border-2 border-emerald-500/30 shadow-2xl shadow-emerald-500/20">
+              <div className="inline-block relative mb-8">
+                <div className="w-80 h-80 bg-white rounded-3xl shadow-2xl flex items-center justify-center p-8 border-4 border-emerald-400 relative overflow-hidden">
+                  <canvas 
+                    ref={qrCanvasRef}
+                    className="max-w-full relative z-10"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 pointer-events-none"></div>
+                </div>
+                {/* Decorative corners */}
+                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg"></div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg"></div>
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg"></div>
+                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg"></div>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 mb-4 border border-white/20">
-                <p className="text-white font-bold text-lg mb-2">📱 امسح رمز QR بواسطة واتساب</p>
-                <p className="text-sm text-cyan-200">
-                  افتح واتساب ← الإعدادات ← الأجهزة المرتبطة ← ربط جهاز
+              
+              <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 backdrop-blur-md rounded-2xl p-6 mb-6 border border-emerald-400/30">
+                <p className="text-white font-bold text-xl mb-3 flex items-center justify-center gap-2">
+                  <Smartphone size={24} className="text-emerald-400" />
+                  امسح رمز QR بواسطة واتساب
                 </p>
+                <div className="text-slate-300 space-y-2">
+                  <p className="flex items-center justify-center gap-2">
+                    <span className="text-emerald-400">1.</span> افتح تطبيق واتساب على هاتفك
+                  </p>
+                  <p className="flex items-center justify-center gap-2">
+                    <span className="text-emerald-400">2.</span> اضغط على الإعدادات ⚙️
+                  </p>
+                  <p className="flex items-center justify-center gap-2">
+                    <span className="text-emerald-400">3.</span> اختر "الأجهزة المرتبطة"
+                  </p>
+                  <p className="flex items-center justify-center gap-2">
+                    <span className="text-emerald-400">4.</span> اضغط "ربط جهاز" وامسح الكود
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center justify-center gap-2 text-yellow-200 bg-yellow-500/20 backdrop-blur-md rounded-lg p-3 border border-yellow-400/30">
-                <RefreshCw className="animate-spin" size={16} />
-                <span className="text-sm font-medium">في انتظار المسح...</span>
+              
+              <div className="flex items-center justify-center gap-3 text-yellow-300 bg-yellow-500/20 backdrop-blur-md rounded-xl p-4 border border-yellow-400/30">
+                <RefreshCw className="animate-spin" size={20} />
+                <span className="font-bold">في انتظار المسح الضوئي...</span>
               </div>
             </div>
           )}
 
           {/* Connection Steps */}
           {connectionStatus === 'disconnected' && (
-            <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-md rounded-xl border border-emerald-400/30">
-                <h3 className="font-bold text-white mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">1</span>
-                  افتح واتساب على هاتفك
-                </h3>
-                <p className="text-sm text-gray-600 ml-8">قم بتشغيل تطبيق واتساب على جهازك المحمول</p>
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="p-5 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-md rounded-2xl border border-emerald-400/30 hover:border-emerald-400/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <span className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg flex-shrink-0">1</span>
+                    <div>
+                      <h3 className="font-bold text-white mb-2">افتح واتساب</h3>
+                      <p className="text-sm text-slate-400">شغّل تطبيق واتساب على هاتفك</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-md rounded-2xl border border-cyan-400/30 hover:border-cyan-400/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <span className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg flex-shrink-0">2</span>
+                    <div>
+                      <h3 className="font-bold text-white mb-2">الإعدادات</h3>
+                      <p className="text-sm text-slate-400">انتقل إلى الأجهزة المرتبطة</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl border border-indigo-400/30 hover:border-indigo-400/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <span className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg flex-shrink-0">3</span>
+                    <div>
+                      <h3 className="font-bold text-white mb-2">امسح الكود</h3>
+                      <p className="text-sm text-slate-400">وجّه الكاميرا نحو QR</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
-                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">2</span>
-                  انتقل إلى الأجهزة المرتبطة
-                </h3>
-                <p className="text-sm text-gray-600 ml-8">اضغط الإعدادات ← الأجهزة المرتبطة ← ربط جهاز</p>
-              </div>
-
-              <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl">
-                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm">3</span>
-                  امسح رمز QR
-                </h3>
-                <p className="text-sm text-gray-600 ml-8">وجّه هاتفك نحو رمز QR المعروض أدناه</p>
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
+                <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
+                  <Smartphone size={18} />
                   رقم الهاتف (اختياري)
                 </label>
                 <input
@@ -236,15 +267,15 @@ export default function WhatsAppConnectPage() {
                   placeholder="+966 50 123 4567"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4"
+                  className="w-full px-5 py-4 bg-slate-900/50 border-2 border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white placeholder-slate-500 mb-5 transition-all"
                   dir="ltr"
                 />
                 <button
                   onClick={handleConnect}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center justify-center gap-3"
+                  className="w-full px-8 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-lg rounded-xl hover:shadow-2xl hover:shadow-emerald-500/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-3 group"
                 >
-                  <Link2 size={24} />
-                  <span>ربط حساب واتساب</span>
+                  <QrCode size={28} className="group-hover:rotate-12 transition-transform" />
+                  <span>ربط حساب واتساب الآن</span>
                 </button>
               </div>
             </div>
@@ -252,22 +283,22 @@ export default function WhatsAppConnectPage() {
 
           {/* Connected Features */}
           {connectionStatus === 'connected' && (
-            <div className="grid grid-cols-2 gap-4 animate-fadeInUp">
-              <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
-                <div className="text-2xl font-bold text-green-600 mb-1">24/7</div>
-                <div className="text-sm text-gray-600">الرد التلقائي نشط</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fadeInUp">
+              <div className="p-6 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-md rounded-2xl border border-emerald-400/30 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-emerald-400 mb-2">24/7</div>
+                <div className="text-sm text-slate-300 font-medium">الرد التلقائي نشط</div>
               </div>
-              <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl">
-                <div className="text-2xl font-bold text-blue-600 mb-1">1,234</div>
-                <div className="text-sm text-gray-600">رسائل مُرسلة</div>
+              <div className="p-6 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-md rounded-2xl border border-cyan-400/30 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-cyan-400 mb-2">1,234</div>
+                <div className="text-sm text-slate-300 font-medium">رسائل مُرسلة</div>
               </div>
-              <div className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl">
-                <div className="text-2xl font-bold text-indigo-600 mb-1">856</div>
-                <div className="text-sm text-gray-600">جهات اتصال نشطة</div>
+              <div className="p-6 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl border border-indigo-400/30 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-indigo-400 mb-2">856</div>
+                <div className="text-sm text-slate-300 font-medium">جهات اتصال نشطة</div>
               </div>
-              <div className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl">
-                <div className="text-2xl font-bold text-yellow-600 mb-1">98%</div>
-                <div className="text-sm text-gray-600">معدل الاستجابة</div>
+              <div className="p-6 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-md rounded-2xl border border-yellow-400/30 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-yellow-400 mb-2">98%</div>
+                <div className="text-sm text-slate-300 font-medium">معدل الاستجابة</div>
               </div>
             </div>
           )}
@@ -275,52 +306,64 @@ export default function WhatsAppConnectPage() {
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <span className="text-2xl">💡</span>
-              الفوائد
+          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-emerald-500/30 hover:border-emerald-500/50 transition-all">
+            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <span className="text-3xl">✨</span>
+              المميزات
             </h3>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-500" />
-                ردود تلقائية على العملاء
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3 group">
+                <CheckCircle size={20} className="text-emerald-400 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <div>
+                  <p className="text-white font-medium">ردود تلقائية ذكية</p>
+                  <p className="text-slate-400 text-sm">رد فوري على استفسارات العملاء 24/7</p>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-500" />
-                إرسال رسائل جماعية للآلاف
+              <li className="flex items-start gap-3 group">
+                <CheckCircle size={20} className="text-emerald-400 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <div>
+                  <p className="text-white font-medium">رسائل جماعية</p>
+                  <p className="text-slate-400 text-sm">أرسل لآلاف العملاء بضغطة زر</p>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-500" />
-                مساعدة بوت ذكاء اصطناعي
+              <li className="flex items-start gap-3 group">
+                <CheckCircle size={20} className="text-emerald-400 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <div>
+                  <p className="text-white font-medium">بوت ذكاء اصطناعي</p>
+                  <p className="text-slate-400 text-sm">مساعد AI يفهم ويرد على العملاء</p>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-500" />
-                تحليلات ورؤى تفصيلية
+              <li className="flex items-start gap-3 group">
+                <CheckCircle size={20} className="text-emerald-400 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <div>
+                  <p className="text-white font-medium">تحليلات متقدمة</p>
+                  <p className="text-slate-400 text-sm">تقارير شاملة عن أداء المحادثات</p>
+                </div>
               </li>
             </ul>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-yellow-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <span className="text-2xl">⚠️</span>
-              ملاحظات مهمة
+          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all">
+            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <span className="text-3xl">⚠️</span>
+              ملاحظات هامة
             </h3>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                استخدم حساب واتساب الأعمال فقط
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 mt-2"></span>
+                <p className="text-slate-300">استخدم <span className="text-white font-bold">حساب واتساب الأعمال</span> فقط</p>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                أبقِ هاتفك متصلاً بالإنترنت
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 mt-2"></span>
+                <p className="text-slate-300">أبقِ هاتفك <span className="text-white font-bold">متصلاً بالإنترنت</span></p>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                لا تسجل الخروج من واتساب ويب
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 mt-2"></span>
+                <p className="text-slate-300">لا تسجل الخروج من <span className="text-white font-bold">واتساب ويب</span></p>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                قد يتطلب الاتصال مسح QR مجدداً
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 mt-2"></span>
+                <p className="text-slate-300">قد يتطلب إعادة مسح <span className="text-white font-bold">QR Code</span> بعد فترة</p>
               </li>
             </ul>
           </div>
