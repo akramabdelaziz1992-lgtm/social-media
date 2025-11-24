@@ -31,8 +31,11 @@ interface Department {
 }
 
 export default function EmployeesPage() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
   const [activeTab, setActiveTab] = useState<'employees' | 'departments'>('employees');
-  const [employees, setEmployees] = useState<Employee[]>([
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(true);
+  const [oldEmployees] = useState<Employee[]>([
     {
       id: '1',
       name: 'أحمد محمد',
@@ -158,6 +161,43 @@ export default function EmployeesPage() {
     color: 'blue'
   });
 
+  // Load employees from API
+  useEffect(() => {
+    const loadEmployees = async () => {
+      setLoadingEmployees(true);
+      try {
+        const response = await fetch(`${apiUrl}/api/employees`);
+        if (response.ok) {
+          const data = await response.json();
+          // Transform API data to match Employee interface
+          const transformedEmployees = data.map((emp: any) => ({
+            id: emp.id,
+            name: emp.name,
+            email: emp.email,
+            phone: emp.phone || 'غير محدد',
+            department: emp.department?.name || 'غير محدد',
+            role: emp.role === 'admin' ? 'مدير' : emp.role === 'supervisor' ? 'مشرف' : 'موظف',
+            status: emp.status === 'active' ? 'نشط' : emp.status === 'inactive' ? 'غير نشط' : 'إجازة',
+            hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            totalAssignedChats: 0,
+            todayChats: 0,
+            responseTime: '0 دقيقة',
+            permissions: emp.permissions || []
+          }));
+          setEmployees(transformedEmployees);
+        } else {
+          console.error('Failed to load employees');
+        }
+      } catch (error) {
+        console.error('Error loading employees:', error);
+      } finally {
+        setLoadingEmployees(false);
+      }
+    };
+
+    loadEmployees();
+  }, [apiUrl]);
+
   // Filter employees
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.includes(searchTerm) || 
@@ -169,30 +209,73 @@ export default function EmployeesPage() {
     return matchesSearch && matchesDept && matchesStatus && matchesRole;
   });
 
-  const handleAddEmployee = () => {
+  const handleAddEmployee = async () => {
     if (!formData.name || !formData.email || !formData.phone || !formData.department) {
       alert('الرجاء ملء جميع الحقول المطلوبة');
       return;
     }
 
-    const newEmployee: Employee = {
-      id: Date.now().toString(),
-      name: formData.name!,
-      email: formData.email!,
-      phone: formData.phone!,
-      department: formData.department!,
-      role: formData.role || 'موظف',
-      status: formData.status || 'نشط',
-      hireDate: formData.hireDate || new Date().toISOString().split('T')[0],
-      totalAssignedChats: 0,
-      todayChats: 0,
-      responseTime: '0 دقيقة',
-      permissions: formData.permissions || []
-    };
+    try {
+      // Convert Arabic role to English
+      const roleMapping: any = {
+        'مدير': 'admin',
+        'مشرف': 'supervisor',
+        'موظف': 'agent'
+      };
+      const statusMapping: any = {
+        'نشط': 'active',
+        'غير نشط': 'inactive',
+        'إجازة': 'leave'
+      };
 
-    setEmployees([...employees, newEmployee]);
-    setShowAddModal(false);
-    resetForm();
+      const response = await fetch(`${apiUrl}/api/employees`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          departmentId: formData.department, // This should be department ID
+          role: roleMapping[formData.role || 'موظف'],
+          status: statusMapping[formData.status || 'نشط'],
+          password: formData.password || '123456', // Default password
+        }),
+      });
+
+      if (response.ok) {
+        const newEmployee = await response.json();
+        // Reload employees list
+        const reloadResponse = await fetch(`${apiUrl}/api/employees`);
+        if (reloadResponse.ok) {
+          const data = await reloadResponse.json();
+          const transformedEmployees = data.map((emp: any) => ({
+            id: emp.id,
+            name: emp.name,
+            email: emp.email,
+            phone: emp.phone || 'غير محدد',
+            department: emp.department?.name || 'غير محدد',
+            role: emp.role === 'admin' ? 'مدير' : emp.role === 'supervisor' ? 'مشرف' : 'موظف',
+            status: emp.status === 'active' ? 'نشط' : emp.status === 'inactive' ? 'غير نشط' : 'إجازة',
+            hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            totalAssignedChats: 0,
+            todayChats: 0,
+            responseTime: '0 دقيقة',
+            permissions: emp.permissions || []
+          }));
+          setEmployees(transformedEmployees);
+        }
+        setShowAddModal(false);
+        resetForm();
+        alert('تم إضافة الموظف بنجاح');
+      } else {
+        alert('فشل إضافة الموظف');
+      }
+    } catch (error) {
+      console.error('Error adding employee:', error);
+      alert('حدث خطأ أثناء إضافة الموظف');
+    }
   };
 
   const handleUpdateEmployee = () => {
@@ -208,9 +291,42 @@ export default function EmployeesPage() {
     resetForm();
   };
 
-  const handleDeleteEmployee = (id: string) => {
+  const handleDeleteEmployee = async (id: string) => {
     if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
-      setEmployees(employees.filter(emp => emp.id !== id));
+      try {
+        const response = await fetch(`${apiUrl}/api/employees/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          // Reload employees list
+          const reloadResponse = await fetch(`${apiUrl}/api/employees`);
+          if (reloadResponse.ok) {
+            const data = await reloadResponse.json();
+            const transformedEmployees = data.map((emp: any) => ({
+              id: emp.id,
+              name: emp.name,
+              email: emp.email,
+              phone: emp.phone || 'غير محدد',
+              department: emp.department?.name || 'غير محدد',
+              role: emp.role === 'admin' ? 'مدير' : emp.role === 'supervisor' ? 'مشرف' : 'موظف',
+              status: emp.status === 'active' ? 'نشط' : emp.status === 'inactive' ? 'غير نشط' : 'إجازة',
+              hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+              totalAssignedChats: 0,
+              todayChats: 0,
+              responseTime: '0 دقيقة',
+              permissions: emp.permissions || []
+            }));
+            setEmployees(transformedEmployees);
+          }
+          alert('تم حذف الموظف بنجاح');
+        } else {
+          alert('فشل حذف الموظف');
+        }
+      } catch (error) {
+        console.error('Error deleting employee:', error);
+        alert('حدث خطأ أثناء حذف الموظف');
+      }
     }
   };
 

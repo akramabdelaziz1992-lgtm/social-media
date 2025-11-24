@@ -91,7 +91,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-52 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
+    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
       {/* Logo */}
       <div className="p-6 border-b border-cyan-500/20">
         <div className="flex items-center gap-3">
@@ -279,23 +279,23 @@ export default function Sidebar() {
 
               {/* Submenu */}
               {expandedChannels.includes(channel.id) && channel.submenus.length > 0 && (
-                <div className="mr-6 mt-2 space-y-1 animate-fadeInUp">
+                <div className="ml-3 mt-2 space-y-1 animate-fadeInUp border-l-2 border-cyan-500/30 pl-3">
                   {channel.submenus.map((submenu) => (
                     <Link
                       key={submenu.href}
                       href={submenu.href}
-                      className={`flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 ${
                         pathname === submenu.href
-                          ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-white font-medium border-r-2 border-cyan-400 shadow-sm'
+                          ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-white font-medium shadow-sm'
                           : 'text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{submenu.icon}</span>
-                        <span className="text-sm">{submenu.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{submenu.icon}</span>
+                        <span className="text-xs">{submenu.name}</span>
                       </div>
                       {submenu.badge && (
-                        <span className="px-2 py-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] rounded-full font-bold shadow-md animate-pulse">
+                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[9px] rounded-full font-bold shadow-md animate-pulse">
                           {submenu.badge}
                         </span>
                       )}
