@@ -342,7 +342,32 @@ export default function InboxPage() {
           senderType: msg.fromMe ? 'agent' : 'user',
           createdAt: new Date(msg.timestamp * 1000).toISOString(),
         }));
-        setMessages(whatsappMessages);
+        
+        // احتفظ بالـ options من الرسائل الموجودة
+        setMessages(prevMessages => {
+          // ابحث عن الرسائل التي تحتوي على options في الرسائل السابقة
+          const messagesWithOptions = prevMessages.filter(msg => msg.options && msg.options.length > 0);
+          
+          // دمج الرسائل الجديدة مع الرسائل التي تحتوي على options
+          const mergedMessages = whatsappMessages.map(newMsg => {
+            // ابحث عن رسالة مطابقة في الرسائل السابقة
+            const existingMsg = prevMessages.find(oldMsg => oldMsg.id === newMsg.id);
+            // إذا كانت موجودة ولديها options، احتفظ بها
+            if (existingMsg && existingMsg.options) {
+              return { ...newMsg, options: existingMsg.options };
+            }
+            return newMsg;
+          });
+          
+          // أضف أي رسائل bot جديدة (تبدأ بـ bot-) لم تأتِ من الـ API
+          const botMessages = prevMessages.filter(msg => 
+            msg.id.startsWith('bot-') && !whatsappMessages.find(wm => wm.id === msg.id)
+          );
+          
+          return [...mergedMessages, ...botMessages].sort((a, b) => 
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        });
       }
     } catch (error) {
       console.error('Error refreshing messages:', error);
@@ -364,6 +389,7 @@ export default function InboxPage() {
             senderType: msg.fromMe ? 'agent' : 'user',
             createdAt: new Date(msg.timestamp * 1000).toISOString(),
           }));
+          // ابدأ بالرسائل من الـ API أولاً عند فتح المحادثة
           setMessages(whatsappMessages);
           return;
         }
