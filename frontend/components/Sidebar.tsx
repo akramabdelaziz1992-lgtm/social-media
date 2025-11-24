@@ -174,22 +174,22 @@ export default function Sidebar() {
 
         {/* Call Center - Saudi Arabia */}
         <Link
-          href="/unified-number"
+          href="/call-center"
           className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-            pathname === '/unified-number' 
+            pathname === '/call-center' || pathname === '/unified-number'
               ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' 
               : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'
           }`}
         >
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-            pathname === '/unified-number' 
+            pathname === '/call-center' || pathname === '/unified-number'
               ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg' 
               : 'bg-white/10 group-hover:bg-white/15'
           }`}>
             <span className="text-xl">☎️</span>
           </div>
           <div className="flex-1 flex items-center justify-between">
-            <span className={`font-semibold ${pathname === '/unified-number' ? 'text-white' : 'text-slate-300'}`}>
+            <span className={`font-semibold ${pathname === '/call-center' || pathname === '/unified-number' ? 'text-white' : 'text-slate-300'}`}>
               مركز الاتصالات
             </span>
             <span className="px-2 py-0.5 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[10px] rounded-full font-bold shadow-md animate-pulse">

@@ -35,6 +35,12 @@ Thumbs.db
 *.sqlite
 *.db
 
+# WhatsApp Session Data (IMPORTANT: Don't commit session files)
+.wwebjs_auth/
+.wwebjs_cache/
+backend/.wwebjs_auth/
+backend/.wwebjs_cache/
+
 # Logs
 logs/
 *.log
