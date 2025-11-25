@@ -86,6 +86,26 @@ export class WhatsAppController {
   }
 
   /**
+   * تسجيل الخروج وحذف الجلسة
+   */
+  @Post('logout')
+  async logout() {
+    try {
+      await this.whatsappService.logout();
+      return {
+        success: true,
+        message: 'تم تسجيل الخروج وحذف الجلسة بنجاح',
+      };
+    } catch (error) {
+      this.logger.error('Error logging out:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
    * الحصول على قائمة المحادثات
    */
   @Get('chats')

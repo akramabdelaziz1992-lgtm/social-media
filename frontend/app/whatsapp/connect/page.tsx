@@ -125,6 +125,63 @@ export default function WhatsAppConnectPage() {
     }
   };
 
+  const handleLogout = async () => {
+    if (!confirm('هل تريد تسجيل الخروج وحذف جلسة الواتساب؟ ستحتاج لمسح QR Code مرة أخرى.')) {
+      return;
+    }
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiUrl}/api/whatsapp/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅', result.message);
+        setConnectionStatus('disconnected');
+        setPhoneNumber('');
+        setShowQR(false);
+        setQrCode('');
+        setErrorMessage('');
+        
+        // إعادة تحميل الصفحة لتنظيف كل شيء
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('❌ خطأ في تسجيل الخروج:', error);
+    }
+  };
+
+  // فحص الحالة عند تحميل الصفحة
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+        const response = await fetch(`${apiUrl}/api/whatsapp/status`);
+        const data = await response.json();
+        
+        if (data.isReady) {
+          setConnectionStatus('connected');
+          setPhoneNumber('متصل');
+        } else {
+          setConnectionStatus('disconnected');
+        }
+      } catch (error) {
+        console.error('❌ خطأ في فحص الحالة:', error);
+        setConnectionStatus('disconnected');
+      }
+    };
+
+    checkStatus();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 relative overflow-hidden">
       {/* Animated Background */}
@@ -184,12 +241,20 @@ export default function WhatsAppConnectPage() {
               </div>
             </div>
             {connectionStatus === 'connected' && (
-              <button
-                onClick={handleDisconnect}
-                className="px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all"
-              >
-                قطع الاتصال
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDisconnect}
+                  className="px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all"
+                >
+                  قطع الاتصال
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-red-500/50 hover:scale-105 transition-all"
+                >
+                  تسجيل خروج
+                </button>
+              </div>
             )}
           </div>
 

@@ -183,8 +183,40 @@ export class WhatsAppService implements OnModuleInit {
       await this.client.destroy();
       this.isReady = false;
       this.qrCode = '';
+      this.client = null;
       this.logger.log('🔌 WhatsApp client disconnected');
       this.whatsappGateway.sendConnectionStatus('disconnected');
+    }
+  }
+
+  async logout() {
+    try {
+      if (this.client) {
+        await this.client.logout();
+        this.logger.log('👋 WhatsApp client logged out');
+      }
+      
+      // حذف session files
+      const fs = require('fs');
+      const path = require('path');
+      const sessionPath = path.join(process.cwd(), '.wwebjs_auth');
+      
+      if (fs.existsSync(sessionPath)) {
+        fs.rmSync(sessionPath, { recursive: true, force: true });
+        this.logger.log('🗑️ Session files deleted');
+      }
+      
+      this.isReady = false;
+      this.qrCode = '';
+      this.client = null;
+      this.isInitializing = false;
+      
+      this.whatsappGateway.sendConnectionStatus('disconnected');
+      
+      return { success: true, message: 'تم تسجيل الخروج وحذف الجلسة' };
+    } catch (error) {
+      this.logger.error('❌ Error during logout:', error);
+      throw error;
     }
   }
 
