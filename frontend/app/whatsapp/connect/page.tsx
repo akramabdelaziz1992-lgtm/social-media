@@ -7,10 +7,11 @@ import QRCodeLib from 'qrcode';
 
 export default function WhatsAppConnectPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [showQR, setShowQR] = useState(false);
   const [qrCode, setQrCode] = useState<string>('');
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // رسم QR Code على Canvas
@@ -65,6 +66,9 @@ export default function WhatsAppConnectPage() {
 
   const handleConnect = async () => {
     setConnectionStatus('connecting');
+    setShowQR(false);
+    setQrCode('');
+    setErrorMessage('');
     
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
@@ -75,17 +79,25 @@ export default function WhatsAppConnectPage() {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
       
       if (result.success) {
-        console.log('✅', result.message);
+        console.log('✅ جاري الاتصال... انتظر QR Code');
+        // QR Code سيظهر تلقائياً عبر WebSocket
       } else {
-        console.error('❌', result.error);
-        setConnectionStatus('disconnected');
+        console.error('❌', result.error || result.message);
+        setErrorMessage(result.error || result.message || 'حدث خطأ غير متوقع');
+        setConnectionStatus('error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ خطأ في الاتصال:', error);
-      setConnectionStatus('disconnected');
+      const msg = error.message || 'تأكد من تشغيل Backend على localhost:4000';
+      setErrorMessage(msg);
+      setConnectionStatus('error');
     }
   };
 
@@ -143,12 +155,15 @@ export default function WhatsAppConnectPage() {
               <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl ${
                 connectionStatus === 'connected' ? 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/50' :
                 connectionStatus === 'connecting' ? 'bg-gradient-to-br from-yellow-500 to-orange-600 shadow-yellow-500/50' :
+                connectionStatus === 'error' ? 'bg-gradient-to-br from-red-500 to-pink-600 shadow-red-500/50' :
                 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-slate-500/50'
               }`}>
                 {connectionStatus === 'connected' ? (
                   <CheckCircle className="text-white" size={36} />
                 ) : connectionStatus === 'connecting' ? (
                   <RefreshCw className="text-white animate-spin" size={36} />
+                ) : connectionStatus === 'error' ? (
+                  <AlertCircle className="text-white" size={36} />
                 ) : (
                   <AlertCircle className="text-slate-300" size={36} />
                 )}
@@ -157,11 +172,13 @@ export default function WhatsAppConnectPage() {
                 <h2 className="text-3xl font-bold text-white mb-1">
                   {connectionStatus === 'connected' ? '✅ متصل بنجاح' :
                    connectionStatus === 'connecting' ? '⏳ جاري الاتصال...' :
+                   connectionStatus === 'error' ? '❌ فشل الاتصال' :
                    '⚠️ غير متصل'}
                 </h2>
                 <p className="text-slate-400 text-lg">
                   {connectionStatus === 'connected' ? `📱 ${phoneNumber || '+966 50 123 4567'}` :
                    connectionStatus === 'connecting' ? 'امسح رمز QR باستخدام هاتفك' :
+                   connectionStatus === 'error' ? 'حدث خطأ أثناء الاتصال بالخادم' :
                    'ابدأ بربط حساب واتساب الأعمال'}
                 </p>
               </div>
@@ -222,9 +239,53 @@ export default function WhatsAppConnectPage() {
             </div>
           )}
 
+          {/* Error State */}
+          {connectionStatus === 'error' && (
+            <div className="space-y-5 animate-fadeInUp">
+              <div className="bg-gradient-to-br from-red-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl p-8 border-2 border-red-500/30 shadow-2xl shadow-red-500/20">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-xl">
+                    <AlertCircle className="text-white" size={40} />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-white text-center mb-4">❌ فشل الاتصال</h3>
+                <div className="bg-slate-900/50 rounded-2xl p-6 mb-6 border border-red-400/30">
+                  <p className="text-red-300 text-center font-medium">{errorMessage}</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                    <p className="text-slate-300 text-sm mb-2">🔍 <span className="font-bold text-white">تحقق من:</span></p>
+                    <ul className="space-y-2 text-slate-400 text-sm mr-4">
+                      <li>• Backend شغال على localhost:4000</li>
+                      <li>• اتصال الإنترنت يعمل</li>
+                      <li>• لا يوجد Firewall يمنع الاتصال</li>
+                      <li>• المنفذ 4000 غير محجوز من برنامج آخر</li>
+                    </ul>
+                  </div>
+                  
+                  <button
+                    onClick={handleConnect}
+                    className="w-full px-8 py-5 bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold text-lg rounded-xl hover:shadow-2xl hover:shadow-red-500/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                  >
+                    <RefreshCw size={24} />
+                    <span>إعادة المحاولة</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Connection Steps */}
           {connectionStatus === 'disconnected' && (
             <div className="space-y-5">
+              {/* Status Check Message */}
+              <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-md rounded-2xl p-4 border border-blue-400/30 mb-6">
+                <p className="text-center text-slate-300 text-sm">
+                  💡 <span className="font-bold text-white">تأكد من تشغيل Backend</span> على localhost:4000 قبل الربط
+                </p>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="p-5 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-md rounded-2xl border border-emerald-400/30 hover:border-emerald-400/50 transition-all">
                   <div className="flex items-start gap-3">
