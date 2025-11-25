@@ -111,6 +111,10 @@ export default function WhatsAppConnectPage() {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
       
       if (result.success) {
@@ -119,9 +123,15 @@ export default function WhatsAppConnectPage() {
         setPhoneNumber('');
         setShowQR(false);
         setQrCode('');
+        setErrorMessage('');
+      } else {
+        setErrorMessage(result.error || 'فشل قطع الاتصال');
+        setConnectionStatus('error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ خطأ في قطع الاتصال:', error);
+      setErrorMessage('تعذر الاتصال بالخادم. تأكد من تشغيل Backend على localhost:4000');
+      setConnectionStatus('error');
     }
   };
 
@@ -139,6 +149,10 @@ export default function WhatsAppConnectPage() {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
       
       if (result.success) {
@@ -153,9 +167,14 @@ export default function WhatsAppConnectPage() {
         setTimeout(() => {
           window.location.reload();
         }, 500);
+      } else {
+        setErrorMessage(result.error || 'فشل تسجيل الخروج');
+        setConnectionStatus('error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ خطأ في تسجيل الخروج:', error);
+      setErrorMessage('تعذر الاتصال بالخادم. تأكد من تشغيل Backend على localhost:4000');
+      setConnectionStatus('error');
     }
   };
 
