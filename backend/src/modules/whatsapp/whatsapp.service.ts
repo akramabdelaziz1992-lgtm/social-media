@@ -1,42 +1,62 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import { WhatsAppGateway } from './whatsapp.gateway';
 import { AIService } from '../ai/ai.service';
 
 @Injectable()
-export class WhatsAppService {
+export class WhatsAppService implements OnModuleInit {
   private readonly logger = new Logger(WhatsAppService.name);
   private client: Client;
   private isReady = false;
   private qrCode: string = '';
   private conversationHistory: Map<string, string[]> = new Map();
   private userBotState: Map<string, { currentStep: string; data: any }> = new Map();
+  private isInitializing = false;
 
   constructor(
     private whatsappGateway: WhatsAppGateway,
     private aiService: AIService,
   ) {}
 
+  async onModuleInit() {
+    // تهيئة WhatsApp عند بدء التطبيق
+    this.logger.log('🚀 WhatsApp Module initialized, starting client...');
+    await this.initialize();
+  }
+
   async initialize() {
+    // منع تهيئة متعددة
+    if (this.isInitializing || this.client) {
+      this.logger.warn('⚠️ WhatsApp Client already initializing or initialized');
+      return;
+    }
+
+    this.isInitializing = true;
     this.logger.log('🔧 Initializing WhatsApp Client...');
 
-    this.client = new Client({
-      authStrategy: new LocalAuth({
-        dataPath: '.wwebjs_auth',
-      }),
-      puppeteer: {
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu',
-        ],
-      },
-    });
+    try {
+      this.client = new Client({
+        authStrategy: new LocalAuth({
+          dataPath: '.wwebjs_auth',
+        }),
+        puppeteer: {
+          headless: true,
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--disable-gpu',
+          ],
+        },
+      });
+    } catch (error) {
+      this.logger.error('❌ Failed to create WhatsApp Client:', error);
+      this.isInitializing = false;
+      throw error;
+    }
 
     // QR Code Event
     this.client.on('qr', (qr) => {
@@ -116,7 +136,16 @@ export class WhatsAppService {
     });
 
     // بدء الاتصال
-    await this.client.initialize();
+    try {
+      await this.client.initialize();
+      this.logger.log('✅ WhatsApp Client initialization started successfully');
+    } catch (error) {
+      this.logger.error('❌ Failed to initialize WhatsApp Client:', error);
+      this.isInitializing = false;
+      throw error;
+    } finally {
+      this.isInitializing = false;
+    }
   }
 
   getConnectionStatus() {
@@ -160,24 +189,31 @@ export class WhatsAppService {
   }
 
   async getChats() {
-    if (!this.isReady) {
-      throw new Error('WhatsApp client is not ready');
+    if (!this.isReady || !this.client) {
+      this.logger.warn('⚠️ WhatsApp client is not ready yet, returning empty array');
+      return [];
     }
 
-    const chats = await this.client.getChats();
-    return chats.map(chat => ({
-      id: chat.id._serialized,
-      name: chat.name,
-      isGroup: chat.isGroup,
-      unreadCount: chat.unreadCount,
-      lastMessage: chat.lastMessage?.body || '',
-      timestamp: chat.timestamp,
-    }));
+    try {
+      const chats = await this.client.getChats();
+      return chats.map(chat => ({
+        id: chat.id._serialized,
+        name: chat.name,
+        isGroup: chat.isGroup,
+        unreadCount: chat.unreadCount,
+        lastMessage: chat.lastMessage?.body || '',
+        timestamp: chat.timestamp,
+      }));
+    } catch (error) {
+      this.logger.error(`❌ Error fetching chats: ${error.message}`);
+      return [];
+    }
   }
 
   async getChatMessages(chatId: string) {
-    if (!this.isReady) {
-      throw new Error('WhatsApp client is not ready');
+    if (!this.isReady || !this.client) {
+      this.logger.warn('⚠️ WhatsApp client is not ready yet, returning empty array');
+      return [];
     }
 
     try {
@@ -196,7 +232,7 @@ export class WhatsAppService {
       }));
     } catch (error) {
       this.logger.error(`❌ Error fetching messages: ${error.message}`);
-      throw error;
+      return [];
     }
   }
 
