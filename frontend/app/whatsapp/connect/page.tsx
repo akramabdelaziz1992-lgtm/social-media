@@ -165,6 +165,14 @@ export default function WhatsAppConnectPage() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
         const response = await fetch(`${apiUrl}/api/whatsapp/status`);
+        
+        if (!response.ok) {
+          console.warn('⚠️ Backend not responding');
+          setConnectionStatus('disconnected');
+          setErrorMessage('Backend غير متاح. تأكد من تشغيله على localhost:4000');
+          return;
+        }
+        
         const data = await response.json();
         
         if (data.isReady) {
@@ -173,9 +181,10 @@ export default function WhatsAppConnectPage() {
         } else {
           setConnectionStatus('disconnected');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ خطأ في فحص الحالة:', error);
         setConnectionStatus('disconnected');
+        setErrorMessage('تعذر الاتصال بالخادم. تأكد من تشغيل Backend على localhost:4000');
       }
     };
 
