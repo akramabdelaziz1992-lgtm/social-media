@@ -51,9 +51,19 @@ export function useVoiceCall(): VoiceCallHook {
       try {
         console.log('🔧 جاري تهيئة Twilio Device...');
 
+        // Check microphone permission
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(track => track.stop());
+          console.log('🎤 تم السماح بالوصول للميكروفون');
+        } catch (micError: any) {
+          console.error('❌ لم يتم السماح بالوصول للميكروفون:', micError);
+          throw new Error('يرجى السماح بالوصول للميكروفون لإجراء المكالمات');
+        }
+
         const response = await fetch(`${apiUrl}/api/calls/token?identity=agent`);
         if (!response.ok) {
-          throw new Error('فشل الحصول على access token');
+          throw new Error('فشل الحصول على access token من الخادم');
         }
 
         const { token } = await response.json();

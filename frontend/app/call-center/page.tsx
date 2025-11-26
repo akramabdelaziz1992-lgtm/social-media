@@ -84,14 +84,48 @@ export default function CallCenterPage() {
             </h1>
             <div className="flex items-center gap-3">
               <div className={`px-3 py-1 rounded-full text-sm font-medium backdrop-blur-md ${
-                voiceCall.isActive 
+                voiceCall.isDeviceReady && voiceCall.isActive 
                   ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/50'
-                  : 'bg-white/10 text-cyan-200 border border-white/20'
+                  : voiceCall.isDeviceReady
+                  ? 'bg-blue-500/30 text-blue-200 border border-blue-400/50'
+                  : 'bg-yellow-500/30 text-yellow-200 border border-yellow-400/50'
               }`}>
-                {voiceCall.isActive ? 'متصل' : 'جاهز'}
+                {voiceCall.isActive ? '📞 متصل' : voiceCall.isDeviceReady ? '✅ جاهز' : '⏳ جاري التهيئة...'}
               </div>
             </div>
           </div>
+
+          {/* Error Alert */}
+          {voiceCall.error && (
+            <div className="mt-4 bg-red-500/20 border border-red-500/50 rounded-lg p-4 backdrop-blur-md">
+              <div className="flex items-start gap-3">
+                <div className="text-red-400 text-xl">⚠️</div>
+                <div className="flex-1">
+                  <h4 className="text-red-200 font-semibold mb-1">خطأ في النظام</h4>
+                  <p className="text-red-300 text-sm">{voiceCall.error}</p>
+                  <p className="text-red-400 text-xs mt-2">
+                    تأكد من:
+                    <br />• السماح بالوصول للميكروفون
+                    <br />• تكوين Twilio بشكل صحيح
+                    <br />• اتصالك بالإنترنت
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Device Not Ready Warning */}
+          {!voiceCall.isDeviceReady && !voiceCall.error && (
+            <div className="mt-4 bg-blue-500/20 border border-blue-500/50 rounded-lg p-4 backdrop-blur-md">
+              <div className="flex items-start gap-3">
+                <div className="text-blue-400 text-xl animate-pulse">🔄</div>
+                <div className="flex-1">
+                  <h4 className="text-blue-200 font-semibold mb-1">جاري تهيئة نظام الاتصالات...</h4>
+                  <p className="text-blue-300 text-sm">يرجى الانتظار حتى يتم تجهيز Twilio Device</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Navigation Tabs */}
           <div className="flex gap-2 mt-4">
