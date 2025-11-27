@@ -103,13 +103,115 @@ export class TestTwilioController {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const phoneNumber = process.env.TWILIO_PHONE_NUMBER;
     const twimlAppSid = process.env.TWILIO_TWIML_APP_SID;
+    const apiKey = process.env.TWILIO_API_KEY;
+    const apiSecret = process.env.TWILIO_API_SECRET;
 
     return {
       accountSid: accountSid ? `${accountSid.substring(0, 10)}...` : '❌ مفقود',
       authToken: authToken ? `${authToken.substring(0, 10)}... ✅` : '❌ مفقود',
       phoneNumber: phoneNumber || '❌ مفقود',
       twimlAppSid: twimlAppSid ? `${twimlAppSid.substring(0, 10)}...` : '❌ مفقود',
-      allConfigured: !!(accountSid && authToken && phoneNumber),
+      apiKey: apiKey ? `${apiKey.substring(0, 10)}... ✅` : '❌ مفقود',
+      apiSecret: apiSecret ? `${apiSecret.substring(0, 10)}... ✅` : '❌ مفقود',
+      allConfigured: !!(accountSid && authToken && phoneNumber && twimlAppSid && apiKey && apiSecret),
     };
+  }
+
+  /**
+   * اختبار توليد Token وفحص صحته
+   */
+  @Get('test-token')
+  async testToken() {
+    try {
+      this.logger.log('🔑 Testing token generation...');
+      
+      // توليد Token
+      const token = this.twilioService.generateVoiceToken('test-agent');
+      
+      this.logger.log(`✅ Token generated: ${token.substring(0, 50)}...`);
+      
+      // فك تشفير Token للتحقق من محتواه
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        return {
+          success: false,
+          error: 'Invalid JWT format',
+        };
+      }
+      
+      // فك Base64 للـ payload
+      const payload = JSON.parse(
+        Buffer.from(tokenParts[1], 'base64').toString()
+      );
+      
+      this.logger.log(`📦 Token payload: ${JSON.stringify(payload, null, 2)}`);
+      
+      return {
+        success: true,
+        token: token,
+        tokenLength: token.length,
+        payload: payload,
+        message: 'Token generated successfully',
+        note: 'استخدم هذا Token في المتصفح للاختبار',
+      };
+    } catch (error) {
+      this.logger.error(`❌ Error: ${error.message}`);
+      this.logger.error(error.stack);
+      
+      return {
+        success: false,
+        error: error.message,
+        stack: error.stack,
+      };
+    }
+  }
+
+  /**
+   * التحقق من صحة الـ API Key عن طريق استدعاء Twilio API
+   */
+  @Get('verify-api-key')
+  async verifyApiKey() {
+    try {
+      this.logger.log('🔍 Verifying Twilio API Key...');
+      
+      const twilio = require('twilio');
+      
+      // استخدام API Key للاتصال بـ Twilio
+      const client = twilio(
+        process.env.TWILIO_API_KEY,
+        process.env.TWILIO_API_SECRET,
+        { accountSid: process.env.TWILIO_ACCOUNT_SID }
+      );
+      
+      // محاولة جلب معلومات الحساب
+      const account = await client.api.accounts(process.env.TWILIO_ACCOUNT_SID).fetch();
+      
+      this.logger.log(`✅ API Key is valid!`);
+      this.logger.log(`Account: ${account.friendlyName}`);
+      this.logger.log(`Status: ${account.status}`);
+      
+      return {
+        success: true,
+        message: 'API Key is valid and working',
+        accountInfo: {
+          friendlyName: account.friendlyName,
+          status: account.status,
+          type: account.type,
+        },
+      };
+    } catch (error) {
+      this.logger.error(`❌ API Key verification failed: ${error.message}`);
+      this.logger.error(`Error code: ${error.code}`);
+      this.logger.error(`More info: ${error.moreInfo}`);
+      
+      return {
+        success: false,
+        error: error.message,
+        code: error.code,
+        moreInfo: error.moreInfo,
+        message: 'API Key is invalid or expired',
+        solution: 'يجب إنشاء API Key جديد من Twilio Console',
+      };
+    }
   }
 }

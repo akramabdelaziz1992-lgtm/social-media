@@ -262,7 +262,7 @@ export class CallsController {
   }
 
   /**
-   * TwiML للمكالمات الصادرة من المتصفح (WebRTC) - مباشرة بدون رن على التليفون
+   * TwiML للمكالمات الصادرة من المتصفح (WebRTC) - اتصال مباشر WebRTC
    */
   @Post('twiml/outbound')
   async handleOutboundCall(
@@ -271,38 +271,63 @@ export class CallsController {
   ) {
     try {
       const toNumber = twilioData.To;
-      this.logger.log(`📞 WebRTC outbound call to: ${toNumber}`);
+      const callSid = twilioData.CallSid;
+      const fromClient = twilioData.From; // client:mobile-agent-xxx
+      
+      this.logger.log(`📞 WebRTC Direct Call to: ${toNumber}`);
+      this.logger.log(`From (Client): ${fromClient}`);
+      this.logger.log(`Call SID: ${callSid}`);
+      
+      // حفظ المكالمة في Database أول ما تبدأ
+      try {
+        const { CallDirection } = await import('./entities/call.entity');
+        await this.callsService.createCall({
+          twilioCallSid: callSid,
+          fromNumber: fromClient,
+          toNumber: toNumber,
+          direction: CallDirection.OUTBOUND,
+          status: CallStatus.INITIATED,
+          agentId: fromClient.replace('client:', ''),
+          agentName: 'Mobile Agent',
+        });
+        this.logger.log(`✅ Call saved to database: ${callSid}`);
+      } catch (dbError) {
+        this.logger.error(`⚠️ Error saving call to DB: ${dbError.message}`);
+        // نكمل حتى لو فشل حفظ الـ Database
+      }
       
       const twiml = new (require('twilio').twiml.VoiceResponse)();
       
-      // الاتصال مباشرة بالعميل
+      // الاتصال مباشرة بالرقم من المتصفح (WebRTC to PSTN)
       const dial = twiml.dial({
         callerId: process.env.TWILIO_PHONE_NUMBER || '+18154860356',
-        timeout: 30,
-        record: 'record-from-answer', // تسجيل من لحظة الرد
+        timeout: 60, // وقت أطول للانتظار
+        record: 'record-from-answer-dual', // تسجيل الصوت من الجهتين
         recordingStatusCallback: `${process.env.BACKEND_URL || 'https://unacetic-nearly-tawanna.ngrok-free.dev'}/api/calls/webhook/recording`,
+        recordingStatusCallbackEvent: ['completed'],
+        trim: 'trim-silence',
       });
       
-      dial.number(toNumber);
+      // الاتصال مباشرة بالرقم
+      dial.number({
+        statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
+        statusCallback: `${process.env.BACKEND_URL || 'https://unacetic-nearly-tawanna.ngrok-free.dev'}/api/calls/webhook/status`,
+      }, toNumber);
       
-      // لو محدش رد
-      twiml.say(
-        {
-          voice: 'Polly.Zeina',
-          language: 'ar-AE',
-        },
-        'لم يتم الرد على المكالمة',
-      );
+      // لا نضيف أي رسالة بعد المكالمة - فقط نغلق
+      // المكالمة تنتهي تلقائياً بدون رسائل
       
+      this.logger.log(`📤 Sending TwiML for WebRTC direct call`);
       res.type('text/xml');
       res.send(twiml.toString());
       
     } catch (error) {
       this.logger.error(`❌ Error in outbound TwiML: ${error.message}`);
+      this.logger.error(error.stack);
       
       const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Zeina" language="ar-AE">حدث خطأ في الاتصال</Say>
+  <Say voice="Polly.Zeina" language="ar-AE">عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى</Say>
   <Hangup/>
 </Response>`;
       

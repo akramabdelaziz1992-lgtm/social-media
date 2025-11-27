@@ -63,16 +63,20 @@ export default function TestTwilioPage() {
         });
 
         device.on('error', (error) => {
-          setDeviceStatus(`❌ خطأ في Device: ${error.message}`);
+          const errorMsg = error?.message || error?.toString() || 'خطأ غير معروف';
+          setDeviceStatus(`❌ خطأ في Device: ${errorMsg}`);
           setStatus('❌ فشل الاختبار: مشكلة في Twilio Device');
+          console.error('Twilio Device Error:', error);
         });
 
         await device.register();
         setDeviceStatus('⏳ جاري تسجيل Twilio Device...');
 
       } catch (error: any) {
-        setDeviceStatus(`❌ فشل: ${error.message}`);
+        const errorMsg = error?.message || error?.toString() || 'خطأ غير معروف';
+        setDeviceStatus(`❌ فشل: ${errorMsg}`);
         setStatus('❌ فشل الاختبار: مشكلة في تهيئة Twilio Device');
+        console.error('Device Initialization Error:', error);
       }
     };
 

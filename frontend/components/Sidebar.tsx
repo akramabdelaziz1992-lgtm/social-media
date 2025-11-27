@@ -198,6 +198,32 @@ export default function Sidebar() {
           </div>
         </Link>
 
+        {/* Mobile Call - Egypt to Saudi Arabia */}
+        <Link
+          href="/mobile-call"
+          className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+            pathname === '/mobile-call'
+              ? 'bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-sm border border-blue-400/30 shadow-lg shadow-blue-500/20' 
+              : 'text-slate-300 hover:bg-white/5 hover:border-blue-400/20 border border-transparent'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+            pathname === '/mobile-call'
+              ? 'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg' 
+              : 'bg-white/10 group-hover:bg-white/15'
+          }`}>
+            <span className="text-xl">📱</span>
+          </div>
+          <div className="flex-1 flex items-center justify-between">
+            <span className={`font-semibold ${pathname === '/mobile-call' ? 'text-white' : 'text-slate-300'}`}>
+              موبايل كول
+            </span>
+            <span className="px-2 py-0.5 bg-gradient-to-r from-blue-400 to-cyan-500 text-white text-[10px] rounded-full font-bold shadow-md">
+              🇪🇬→🇸🇦
+            </span>
+          </div>
+        </Link>
+
         {/* Customers */}
         <Link
           href="/customers"

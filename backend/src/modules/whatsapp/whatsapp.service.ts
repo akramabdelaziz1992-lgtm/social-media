@@ -19,9 +19,12 @@ export class WhatsAppService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    // تهيئة WhatsApp عند بدء التطبيق
-    this.logger.log('🚀 WhatsApp Module initialized, starting client...');
-    await this.initialize();
+    // تهيئة WhatsApp عند بدء التطبيق (بدون blocking)
+    this.logger.log('🚀 WhatsApp Module initialized, will start client in background...');
+    // تشغيل WhatsApp في الخلفية بدون blocking للـ app
+    this.initialize().catch(err => {
+      this.logger.error('❌ WhatsApp initialization failed (non-blocking):', err.message);
+    });
   }
 
   async initialize() {

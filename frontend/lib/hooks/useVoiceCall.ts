@@ -86,9 +86,16 @@ export function useVoiceCall(): VoiceCallHook {
         device.on('error', (error) => {
           console.error('❌ خطأ في Twilio Device:', error);
           if (mounted) {
+            let errorMessage = error?.message || 'خطأ في الجهاز';
+            
+            // إذا كان الخطأ JWT Invalid
+            if (error?.message?.includes('JWT') || error?.message?.includes('AccessToken') || error?.code === 20101) {
+              errorMessage = '❌ خطأ في Token المكالمات. الـ API Key غير صالح. راجع ملف FIX_TWILIO_API_KEY.md';
+            }
+            
             setState(prev => ({ 
               ...prev, 
-              error: error?.message || 'خطأ في الجهاز',
+              error: errorMessage,
               isDeviceReady: false,
             }));
           }
