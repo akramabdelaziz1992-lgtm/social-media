@@ -391,21 +391,6 @@ export default function CallCenterPage() {
                 <Activity size={20} />
                 <span>تحديث</span>
               </button>
-              <button 
-                onClick={() => setShowNewCallModal(true)}
-                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
-              >
-                <PhoneCall size={20} />
-                <span>اتصال جديد</span>
-              </button>
-              <button 
-                onClick={openSoftphone}
-                className={`px-6 py-3 ${isSoftphoneRunning ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-cyan-600'} text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2`}
-                title={isSoftphoneRunning ? 'تطبيق موبايل كول يعمل' : 'فتح تطبيق موبايل كول'}
-              >
-                <Headphones size={20} />
-                <span>{isSoftphoneRunning ? '✅ موبايل كول' : 'موبايل كول'}</span>
-              </button>
             </div>
           </div>
         </div>
