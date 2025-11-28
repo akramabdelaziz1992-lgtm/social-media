@@ -100,19 +100,37 @@ export default function InboxPage() {
       setUser(savedUser);
     }
 
-    // Check if WhatsApp is connected
-    const whatsappConnected = localStorage.getItem('whatsapp_connected');
-    if (whatsappConnected === 'true') {
-      setIsWhatsAppConnected(true);
-      setConnectionStatus('connected');
-      loadData();
-      initializeWebSocket();
-    } else {
+    // Check WhatsApp status from backend
+    checkWhatsAppStatus();
+  }, []);
+
+  // Check WhatsApp status from backend
+  const checkWhatsAppStatus = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/whatsapp/status`);
+      const data = await response.json();
+      
+      if (data.isReady) {
+        // WhatsApp is connected
+        setIsWhatsAppConnected(true);
+        setConnectionStatus('connected');
+        localStorage.setItem('whatsapp_connected', 'true');
+        loadData();
+        initializeWebSocket();
+      } else {
+        // WhatsApp is not connected
+        setIsWhatsAppConnected(false);
+        setConnectionStatus('disconnected');
+        localStorage.removeItem('whatsapp_connected');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error checking WhatsApp status:', error);
       setIsWhatsAppConnected(false);
       setConnectionStatus('disconnected');
       setLoading(false);
     }
-  }, []);
+  };
 
   // Initialize WebSocket for WhatsApp
   const initializeWebSocket = async () => {
@@ -274,10 +292,21 @@ export default function InboxPage() {
     setLoading(true);
     try {
       // أولاً: فحص حالة الاتصال
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
       const statusResponse = await fetch(`${apiUrl}/api/whatsapp/status`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
+      
+      if (!statusResponse.ok) {
+        throw new Error(`Backend returned ${statusResponse.status}`);
+      }
+      
       const statusData = await statusResponse.json();
       
       console.log('WhatsApp Status:', statusData);
@@ -353,12 +382,20 @@ export default function InboxPage() {
       setChannels([
         { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
       ]);
-    } catch (apiError) {
-      console.error('Error loading WhatsApp data:', apiError);
+    } catch (apiError: any) {
+      // Check if backend is down
+      if (apiError.name === 'AbortError' || apiError.message?.includes('Failed to fetch')) {
+        console.warn('⚠️ Backend غير متاح - تأكد من تشغيل Backend على المنفذ 4000');
+        setConnectionStatus('disconnected');
+        setIsWhatsAppConnected(false);
+      } else {
+        console.error('Error loading WhatsApp data:', apiError.message || apiError);
+      }
+      
       // في حالة الخطأ، اعرض قائمة فارغة
       setConversations([]);
       setChannels([
-        { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
+        { id: '1', name: 'واتساب', status: 'disconnected', type: 'whatsapp' },
       ]);
     }
     
@@ -370,7 +407,21 @@ export default function InboxPage() {
     if (!selectedConversation || selectedConversation.channel?.type !== 'whatsapp') return;
     
     try {
-      const response = await fetch(`${apiUrl}/api/whatsapp/messages/${selectedConversation.id}`);
+      // Check if backend is available first
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch(`${apiUrl}/api/whatsapp/messages/${selectedConversation.id}`, {
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch messages:', response.status, response.statusText);
+        return;
+      }
+      
       const data = await response.json();
       
       if (data.success && data.messages) {
@@ -407,8 +458,12 @@ export default function InboxPage() {
           );
         });
       }
-    } catch (error) {
-      console.error('Error refreshing messages:', error);
+    } catch (error: any) {
+      // Silently ignore network errors - backend might be down
+      // No need to spam console with errors during polling
+      if (error.name !== 'AbortError' && error.message !== 'Failed to fetch') {
+        console.warn('Error refreshing messages:', error.message || error);
+      }
     }
   };
 
@@ -417,7 +472,21 @@ export default function InboxPage() {
     try {
       // إذا كانت محادثة WhatsApp، جلب الرسائل من API الخاص بها
       if (conv.channel?.type === 'whatsapp') {
-        const response = await fetch(`${apiUrl}/api/whatsapp/messages/${conv.id}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(`${apiUrl}/api/whatsapp/messages/${conv.id}`, {
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          console.error('Failed to fetch messages:', response.status);
+          setMessages([]);
+          return;
+        }
+        
         const data = await response.json();
         
         if (data.success && data.messages) {
@@ -436,8 +505,11 @@ export default function InboxPage() {
       // محاولة جلب الرسائل من الـ API العادي
       const realMessages = await messagesApi.getAll(conv.id);
       setMessages(realMessages);
-    } catch (error) {
-      console.log('No messages found for this conversation');
+    } catch (error: any) {
+      // Silently handle - no need to spam console
+      if (error.name !== 'AbortError' && error.message !== 'Failed to fetch') {
+        console.debug('No messages available:', error.message || error);
+      }
       // لا توجد رسائل - اعرض قائمة فارغة
       setMessages([]);
     }
