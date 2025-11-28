@@ -31,9 +31,15 @@ const COLORS = ['#06B6D4', '#10B981', '#8B5CF6'];
 
 export default function DashboardContent() {
   const [mounted, setMounted] = useState(false);
+  const [chartsReady, setChartsReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Delay charts rendering to ensure proper hydration
+    const timer = setTimeout(() => {
+      setChartsReady(true);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!mounted) {
@@ -165,86 +171,100 @@ export default function DashboardContent() {
               </div>
               <h3 className="text-xl font-bold text-white">نمو المشتركين (آخر 30 يومًا)</h3>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={subscriberGrowthData}>
-                <defs>
-                  <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.1}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="day" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-                <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '12px',
-                    backdropFilter: 'blur(10px)'
-                  }}
-                  labelStyle={{ color: '#FFF', fontWeight: 'bold' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="growth" 
-                  stroke="#06B6D4" 
-                  strokeWidth={3} 
-                  dot={{ fill: '#06B6D4', r: 5 }}
-                  activeDot={{ r: 8, fill: '#22D3EE' }}
-                  fill="url(#colorGrowth)"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {chartsReady ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={subscriberGrowthData}>
+                  <defs>
+                    <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis dataKey="day" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
+                  <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: '12px',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                    labelStyle={{ color: '#FFF', fontWeight: 'bold' }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="growth" 
+                    stroke="#06B6D4" 
+                    strokeWidth={3} 
+                    dot={{ fill: '#06B6D4', r: 5 }}
+                    activeDot={{ r: 8, fill: '#22D3EE' }}
+                    fill="url(#colorGrowth)"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center">
+                <div className="text-cyan-300">جاري تحميل الرسم البياني...</div>
+              </div>
+            )}
           </div>
 
           {/* Subscriber Distribution */}
           <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-400">
             <h3 className="text-xl font-bold text-white mb-6">مقارنة المشتركين</h3>
             <div className="flex flex-col items-center">
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={COLORS[index]} 
-                        className="hover:opacity-80 transition-opacity cursor-pointer"
+              {chartsReady ? (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={COLORS[index]} 
+                            className="hover:opacity-80 transition-opacity cursor-pointer"
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '12px'
+                        }}
                       />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      borderRadius: '12px'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="text-center mt-6">
-                <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">3</div>
-                <div className="text-sm text-cyan-200 mt-1">المشتركين هذا الأسبوع</div>
-              </div>
-              <div className="mt-4 space-y-2 w-full">
-                {pieData.map((entry, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
-                      <span className="text-white">{entry.name}</span>
-                    </div>
-                    <span className="text-cyan-200 font-semibold">{entry.value}</span>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="text-center mt-6">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">3</div>
+                    <div className="text-sm text-cyan-200 mt-1">المشتركين هذا الأسبوع</div>
                   </div>
-                ))}
-              </div>
+                  <div className="mt-4 space-y-2 w-full">
+                    {pieData.map((entry, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
+                          <span className="text-white">{entry.name}</span>
+                        </div>
+                        <span className="text-cyan-200 font-semibold">{entry.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center">
+                  <div className="text-cyan-300">جاري تحميل الرسم البياني...</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
