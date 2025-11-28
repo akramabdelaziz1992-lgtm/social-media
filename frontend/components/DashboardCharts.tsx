@@ -24,7 +24,7 @@ const COLORS = ['#06B6D4', '#10B981', '#8B5CF6'];
 
 export function LineChartComponent() {
   return (
-    <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-300">
+    <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
           <TrendingUp className="w-5 h-5 text-white" />
@@ -68,7 +68,7 @@ export function LineChartComponent() {
 
 export function PieChartComponent() {
   return (
-    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-400">
+    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300">
       <h3 className="text-xl font-bold text-white mb-6">مقارنة المشتركين</h3>
       <div className="flex flex-col items-center">
         <ResponsiveContainer width="100%" height={200}>
