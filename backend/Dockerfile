@@ -18,6 +18,10 @@ RUN npm install --production
 # copy built files from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./package.json
+# copy user management scripts
+COPY --from=builder /app/create-user.js ./create-user.js
+COPY --from=builder /app/create-admin.js ./create-admin.js
+COPY --from=builder /app/seed-data.js ./seed-data.js
 
 ENV NODE_ENV=production
 EXPOSE 4000
