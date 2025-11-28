@@ -270,7 +270,29 @@ export default function InboxPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // جلب محادثات WhatsApp
+      // أولاً: فحص حالة الاتصال
+      const statusResponse = await fetch(`${apiUrl}/api/whatsapp/status`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const statusData = await statusResponse.json();
+      
+      console.log('WhatsApp Status:', statusData);
+      
+      // إذا WhatsApp غير متصل، اعرض رسالة
+      if (!statusData.isReady) {
+        console.warn('⚠️ WhatsApp is not connected on backend');
+        setConversations([]);
+        setChannels([
+          { id: '1', name: 'واتساب', status: 'disconnected', type: 'whatsapp' },
+        ]);
+        setLoading(false);
+        // يمكننا إعادة محاولة الاتصال
+        await handleConnectWhatsApp();
+        return;
+      }
+      
+      // ثانياً: جلب محادثات WhatsApp
       const whatsappResponse = await fetch(`${apiUrl}/api/whatsapp/chats`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },

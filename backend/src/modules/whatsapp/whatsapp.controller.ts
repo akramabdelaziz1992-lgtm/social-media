@@ -63,7 +63,14 @@ export class WhatsAppController {
    */
   @Get('status')
   getStatus() {
-    return this.whatsappService.getConnectionStatus();
+    const status = this.whatsappService.getConnectionStatus();
+    this.logger.log(`📊 WhatsApp Status: ${JSON.stringify(status)}`);
+    return {
+      ...status,
+      message: status.isReady 
+        ? 'WhatsApp متصل وجاهز' 
+        : 'WhatsApp غير متصل - يحتاج إعادة مسح QR Code',
+    };
   }
 
   /**
