@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const db = new sqlite3('almasar.db');
 
 try {
-  const hashedPassword = bcrypt.hashSync('Admin@123', 10);
+  const hashedPassword = bcrypt.hashSync('Aazxc', 10);
   
   const stmt = db.prepare(`
     INSERT INTO "user" ("email", "name", "passwordHash", "role", "department", "isActive", "createdAt", "updatedAt") 
@@ -12,8 +12,8 @@ try {
   `);
   
   stmt.run(
-    'admin@elmasarelsa5en.com',
-    'Admin User',
+    'akram',
+    'Akram Admin',
     hashedPassword,
     'admin',
     'Admin',
@@ -23,8 +23,8 @@ try {
   );
   
   console.log('✅ User created successfully!');
-  console.log('Email: admin@elmasarelsa5en.com');
-  console.log('Password: Admin@123');
+  console.log('Username: akram');
+  console.log('Password: Aazxc');
 } catch (err) {
   console.log('User might already exist. Error:', err.message);
 }
