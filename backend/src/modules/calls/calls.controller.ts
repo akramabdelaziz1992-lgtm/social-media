@@ -149,6 +149,56 @@ export class CallsController {
   }
 
   /**
+   * جلب وتحديث Recordings من Twilio
+   */
+  @Post('sync-recordings')
+  async syncRecordings() {
+    try {
+      this.logger.log('🔄 Syncing recordings from Twilio...');
+      
+      // جلب كل المكالمات من Database
+      const calls = await this.callsService.getAllCalls();
+      let updated = 0;
+      
+      for (const call of calls) {
+        if (!call.recordingUrl && call.twilioCallSid) {
+          try {
+            // جلب الـ Recordings من Twilio
+            const recordings = await this.twilioService.getRecordings(call.twilioCallSid);
+            
+            if (recordings && recordings.length > 0) {
+              const recording = recordings[0];
+              const recordingUrl = `https://api.twilio.com${recording.uri.replace('.json', '.mp3')}`;
+              
+              // تحديث المكالمة
+              await this.callsService.updateCallStatus(call.twilioCallSid, null, {
+                recordingUrl: recordingUrl,
+                recordingSid: recording.sid,
+                recordingDuration: recording.duration,
+              });
+              
+              updated++;
+              this.logger.log(`✅ Updated recording for call: ${call.twilioCallSid}`);
+            }
+          } catch (error) {
+            this.logger.warn(`⚠️ Could not get recording for ${call.twilioCallSid}: ${error.message}`);
+          }
+        }
+      }
+      
+      return {
+        success: true,
+        message: `Synced ${updated} recordings`,
+        updated,
+        total: calls.length,
+      };
+    } catch (error) {
+      this.logger.error(`❌ Error syncing recordings: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * إجراء مكالمة Click-to-Call (يتصل بالموظف أولاً ثم بالعميل)
    */
   @Post('make-call')
