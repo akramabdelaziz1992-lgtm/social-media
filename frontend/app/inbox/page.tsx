@@ -11,13 +11,21 @@ import {
   Send, Paperclip, Smile, MoreVertical, Phone, Video,
   Tag, Clock, User, CheckCheck, AlertCircle, Mail, Building2,
   UserCircle, ChevronDown, X, Plus, History, Image, FileText,
-  Menu, ChevronLeft, ChevronRight
+  Menu, ChevronLeft, ChevronRight, LogOut
 } from 'lucide-react';
 
 export default function InboxPage() {
   const router = useRouter();
   const { user, setUser, logout } = useAuthStore();
   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+  
+  // WhatsApp Connection States
+  const [isWhatsAppConnected, setIsWhatsAppConnected] = useState(false);
+  const [qrCode, setQrCode] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'qr' | 'connecting' | 'connected'>('disconnected');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [connectionMethod, setConnectionMethod] = useState<'qr' | 'phone'>('qr');
+  
   const [conversations, setConversations] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -84,7 +92,7 @@ export default function InboxPage() {
   // Bot conversation states (tracks which question each conversation is on)
   const [conversationStates, setConversationStates] = useState<{ [conversationId: string]: string }>({});
 
-  // Initial load + WebSocket connection (مرة واحدة فقط)
+  // Check WhatsApp Connection Status on mount
   useEffect(() => {
     // Load user data if available
     const savedUser = authStorage.getUser();
@@ -92,49 +100,80 @@ export default function InboxPage() {
       setUser(savedUser);
     }
 
-    loadData();
+    // Check if WhatsApp is connected
+    const whatsappConnected = localStorage.getItem('whatsapp_connected');
+    if (whatsappConnected === 'true') {
+      setIsWhatsAppConnected(true);
+      setConnectionStatus('connected');
+      loadData();
+      initializeWebSocket();
+    } else {
+      setIsWhatsAppConnected(false);
+      setConnectionStatus('disconnected');
+      setLoading(false);
+    }
+  }, []);
 
-    // اتصال WebSocket لاستقبال الرسائل الجديدة (Dynamic Import)
-    const initSocket = async () => {
-      try {
-        const { io } = await import('socket.io-client');
-        socketRef.current = io(`${apiUrl}/whatsapp`);
+  // Initialize WebSocket for WhatsApp
+  const initializeWebSocket = async () => {
+    try {
+      const { io } = await import('socket.io-client');
+      socketRef.current = io(`${apiUrl}/whatsapp`);
+      
+      socketRef.current.on('connect', () => {
+        console.log('✅ WebSocket متصل - جاهز لاستقبال الرسائل');
+      });
+
+      socketRef.current.on('qr', (qr: string) => {
+        console.log('📱 QR Code جاهز');
+        setQrCode(qr);
+        setConnectionStatus('qr');
+      });
+
+      socketRef.current.on('ready', () => {
+        console.log('✅ WhatsApp متصل بنجاح');
+        setConnectionStatus('connected');
+        setIsWhatsAppConnected(true);
+        localStorage.setItem('whatsapp_connected', 'true');
+        loadData();
+      });
+
+      socketRef.current.on('disconnected', () => {
+        console.log('❌ WhatsApp منفصل');
+        setConnectionStatus('disconnected');
+        setIsWhatsAppConnected(false);
+        localStorage.removeItem('whatsapp_connected');
+      });
+
+      socketRef.current.on('new-message', (data: any) => {
+        console.log('📩 رسالة جديدة من WhatsApp:', data);
+        loadData();
         
-        socketRef.current.on('connect', () => {
-          console.log('✅ WebSocket متصل - جاهز لاستقبال الرسائل');
-        });
+        const newMessage = {
+          id: data.id,
+          text: data.body,
+          senderType: 'user',
+          createdAt: new Date(data.timestamp * 1000).toISOString(),
+        };
+        
+        setMessages(prev => [...prev, newMessage]);
+      });
+    } catch (error) {
+      console.error('WebSocket connection failed:', error);
+    }
+  };
 
-        socketRef.current.on('new-message', (data: any) => {
-          console.log('📩 رسالة جديدة من WhatsApp:', data);
-          
-          // تحديث قائمة المحادثات
-          loadData();
-          
-          // إذا الرسالة من المحادثة المفتوحة، تحديث الرسائل
-          const newMessage = {
-            id: data.id,
-            text: data.body,
-            senderType: 'user',
-            createdAt: new Date(data.timestamp * 1000).toISOString(),
-          };
-          
-          setMessages(prev => [...prev, newMessage]);
-          
-          // Bot will auto-reply via the useEffect hook that watches messages
-        });
-      } catch (error) {
-        console.error('WebSocket connection failed:', error);
-      }
-    };
-
-    initSocket();
-
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
       }
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
     };
-  }, []); // مرة واحدة فقط
+  }, []);
 
   // Bot auto-reply effect - responds automatically to new user messages
   useEffect(() => {
@@ -502,6 +541,89 @@ export default function InboxPage() {
     setMessageText(text);
   };
 
+  // Handle WhatsApp Connection
+  const handleConnectWhatsApp = async () => {
+    setConnectionStatus('connecting');
+    setLoading(true);
+
+    try {
+      if (connectionMethod === 'qr') {
+        // Initialize WhatsApp with QR Code
+        const response = await fetch(`${apiUrl}/api/whatsapp/initialize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          initializeWebSocket();
+        } else {
+          alert('فشل بدء الاتصال. حاول مرة أخرى.');
+          setConnectionStatus('disconnected');
+        }
+      } else {
+        // Connect with phone number
+        if (!phoneNumber.trim()) {
+          alert('الرجاء إدخال رقم الهاتف');
+          setConnectionStatus('disconnected');
+          return;
+        }
+
+        const response = await fetch(`${apiUrl}/api/whatsapp/connect-phone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneNumber }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setConnectionStatus('connected');
+          setIsWhatsAppConnected(true);
+          localStorage.setItem('whatsapp_connected', 'true');
+          loadData();
+        } else {
+          alert('فشل الربط برقم الهاتف. حاول مرة أخرى.');
+          setConnectionStatus('disconnected');
+        }
+      }
+    } catch (error) {
+      console.error('Connection error:', error);
+      alert('حدث خطأ أثناء الاتصال');
+      setConnectionStatus('disconnected');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle WhatsApp Disconnect (Logout)
+  const handleDisconnectWhatsApp = async () => {
+    if (confirm('هل تريد تسجيل خروج من WhatsApp؟')) {
+      try {
+        await fetch(`${apiUrl}/api/whatsapp/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+
+      // Clear local state
+      setIsWhatsAppConnected(false);
+      setConnectionStatus('disconnected');
+      setQrCode('');
+      setConversations([]);
+      setSelectedConversation(null);
+      setMessages([]);
+      localStorage.removeItem('whatsapp_connected');
+
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    }
+  };
+
   // Bot auto-reply handler using Questions Tree
   const handleBotAutoReply = async (userMessage: string) => {
     if (!botEnabled || !selectedConversation) {
@@ -673,12 +795,229 @@ export default function InboxPage() {
     }
   };
 
+  // WhatsApp Connection Screen
+  if (!isWhatsAppConnected) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 -left-4 w-72 h-72 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+          <div className="absolute top-0 -right-4 w-72 h-72 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        </div>
+
+        {/* Header */}
+        <header className="relative bg-gradient-to-r from-emerald-600/20 via-green-600/20 to-emerald-600/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                <MessageSquare className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-200 to-green-200 bg-clip-text text-transparent">
+                  واتساب ويب - Almasar
+                </h1>
+                <p className="text-sm text-emerald-200">ربط حسابك على WhatsApp</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => router.push('/dashboard')}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-emerald-300 rounded-lg transition-all border border-white/20 flex items-center gap-2"
+            >
+              <span>← لوحة التحكم</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Connection Area */}
+        <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-6">
+          <div className="max-w-4xl w-full">
+            <div className="relative bg-white/5 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+              <div className="grid md:grid-cols-2 gap-0">
+                {/* Left Side - Info */}
+                <div className="p-8 md:p-12 bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-l border-white/10">
+                  <div className="mb-8">
+                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 animate-pulse">
+                      <MessageSquare className="w-10 h-10 text-white" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-white mb-3">
+                      استخدم WhatsApp على جهازك
+                    </h2>
+                    <p className="text-emerald-200 leading-relaxed">
+                      ابدأ بإرسال واستقبال الرسائل من خلال ربط حسابك على WhatsApp
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
+                        <span className="text-emerald-300 text-xl font-bold">1</span>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-1">افتح WhatsApp على هاتفك</h3>
+                        <p className="text-emerald-200/70 text-sm">اذهب إلى الإعدادات ثم اختر "الأجهزة المرتبطة"</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
+                        <span className="text-emerald-300 text-xl font-bold">2</span>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-1">امسح رمز QR</h3>
+                        <p className="text-emerald-200/70 text-sm">اضغط على "ربط جهاز" وامسح الرمز الموجود على الشاشة</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
+                        <span className="text-emerald-300 text-xl font-bold">3</span>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-1">ابدأ المحادثة</h3>
+                        <p className="text-emerald-200/70 text-sm">ستظهر جميع محادثاتك تلقائياً بعد الربط</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 p-4 bg-emerald-500/10 rounded-xl border border-emerald-400/30">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-emerald-300 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-emerald-200/80 leading-relaxed">
+                        <strong className="text-white">ملاحظة:</strong> جميع رسائلك الشخصية محمية بالتشفير التام من الطرف إلى الطرف ولن يتم مشاركتها
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side - QR Code / Phone Input */}
+                <div className="p-8 md:p-12 flex flex-col items-center justify-center">
+                  {/* Connection Method Tabs */}
+                  <div className="flex gap-2 mb-6 w-full max-w-sm">
+                    <button
+                      onClick={() => setConnectionMethod('qr')}
+                      className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
+                        connectionMethod === 'qr'
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg'
+                          : 'bg-white/10 text-emerald-200 hover:bg-white/20 border border-white/20'
+                      }`}
+                    >
+                      📱 مسح QR
+                    </button>
+                    <button
+                      onClick={() => setConnectionMethod('phone')}
+                      className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
+                        connectionMethod === 'phone'
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg'
+                          : 'bg-white/10 text-emerald-200 hover:bg-white/20 border border-white/20'
+                      }`}
+                    >
+                      🔢 رقم الهاتف
+                    </button>
+                  </div>
+
+                  {connectionMethod === 'qr' ? (
+                    // QR Code Method
+                    <div className="flex flex-col items-center">
+                      {connectionStatus === 'disconnected' && (
+                        <div className="text-center">
+                          <div className="w-64 h-64 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border-2 border-dashed border-white/20">
+                            <div className="text-center">
+                              <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span className="text-4xl">📱</span>
+                              </div>
+                              <p className="text-white font-medium">اضغط على الزر أدناه</p>
+                              <p className="text-emerald-200/70 text-sm mt-1">لعرض رمز QR</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={handleConnectWhatsApp}
+                            className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                          >
+                            <MessageSquare className="w-5 h-5" />
+                            <span>عرض رمز QR</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {connectionStatus === 'connecting' && (
+                        <div className="text-center">
+                          <div className="w-64 h-64 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/20">
+                            <div className="text-center">
+                              <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                              <p className="text-white font-medium">جاري التحميل...</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {connectionStatus === 'qr' && qrCode && (
+                        <div className="text-center">
+                          <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl">
+                            <img 
+                              src={qrCode} 
+                              alt="QR Code" 
+                              className="w-full h-full"
+                            />
+                          </div>
+                          <div className="flex items-center justify-center gap-2 text-emerald-200 mb-4 animate-pulse">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                            <span className="text-sm font-medium">في انتظار المسح...</span>
+                          </div>
+                          <p className="text-white/70 text-sm">امسح الرمز من تطبيق WhatsApp على هاتفك</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // Phone Number Method
+                    <div className="w-full max-w-sm">
+                      <div className="mb-6">
+                        <label className="block text-white font-medium mb-2">رقم الهاتف</label>
+                        <input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="+966 5xx xxx xxx"
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-emerald-300/50"
+                          dir="ltr"
+                        />
+                        <p className="text-emerald-200/60 text-xs mt-2">أدخل رقمك مع رمز الدولة (مثال: +966)</p>
+                      </div>
+
+                      <button
+                        onClick={handleConnectWhatsApp}
+                        disabled={loading || !phoneNumber.trim()}
+                        className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>جاري الربط...</span>
+                          </>
+                        ) : (
+                          <>
+                            <MessageSquare className="w-5 h-5" />
+                            <span>ربط WhatsApp</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-dark-500">جاري التحميل...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-emerald-200">جاري التحميل...</p>
         </div>
       </div>
     );
@@ -733,6 +1072,12 @@ export default function InboxPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {isWhatsAppConnected && (
+              <div className="flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md px-4 py-2 rounded-lg border border-emerald-400/50">
+                <CheckCheck className="w-4 h-4 text-emerald-300" />
+                <span className="text-sm font-medium text-emerald-200">WhatsApp متصل</span>
+              </div>
+            )}
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20">
               <User className="w-4 h-4 text-cyan-200" />
               <span className="text-sm font-medium text-white">{user?.name}</span>
@@ -744,10 +1089,11 @@ export default function InboxPage() {
               لوحة التحكم
             </button>
             <button 
-              onClick={logout} 
-              className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg"
+              onClick={handleDisconnectWhatsApp} 
+              className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2"
             >
-              تسجيل الخروج
+              <LogOut className="w-4 h-4" />
+              <span>تسجيل خروج WhatsApp</span>
             </button>
           </div>
         </div>
