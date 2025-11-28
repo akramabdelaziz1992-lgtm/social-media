@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Settings,
@@ -214,10 +213,10 @@ export default function SettingsPage() {
               {/* Section Items */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {section.items.map((item) => (
-                  <Link
+                  <button
                     key={item.href}
-                    href={item.href}
-                    className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-5 border border-slate-700/50 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20"
+                    onClick={() => alert(`🚧 صفحة "${item.name}" قيد التطوير\n\nسيتم إضافتها قريباً 🔜`)}
+                    className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-5 border border-slate-700/50 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20 text-right w-full"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -240,7 +239,14 @@ export default function SettingsPage() {
                     <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="text-cyan-400">→</span>
                     </div>
-                  </Link>
+                    
+                    {/* Coming Soon Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded-full font-bold border border-yellow-500/30">
+                        قريباً
+                      </span>
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
