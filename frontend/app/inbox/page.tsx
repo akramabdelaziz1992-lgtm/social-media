@@ -320,49 +320,20 @@ export default function InboxPage() {
         return; // نجح جلب البيانات من WhatsApp
       }
       
-      // إذا ما فيش محادثات من WhatsApp، استخدم Mock data
-      console.log('No WhatsApp chats, using mock data');
+      // إذا ما فيش محادثات من WhatsApp، اعرض قائمة فارغة
+      console.log('No WhatsApp chats found');
+      setConversations([]);
+      setChannels([
+        { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
+      ]);
     } catch (apiError) {
       console.error('Error loading WhatsApp data:', apiError);
+      // في حالة الخطأ، اعرض قائمة فارغة
+      setConversations([]);
+      setChannels([
+        { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
+      ]);
     }
-    
-    // Mock data for conversations (fallback)
-    setConversations([
-      {
-        id: '1',
-        customerProfile: { name: 'أحمد محمد', phone: '+201234567890' },
-        channel: { name: 'واتساب', type: 'whatsapp' },
-        department: 'المبيعات',
-        status: 'active',
-        lastMessageAt: new Date().toISOString(),
-        unreadCount: 3,
-      },
-      {
-        id: '2',
-        customerProfile: { name: 'فاطمة علي', phone: '+201234567891' },
-        channel: { name: 'فيسبوك', type: 'facebook' },
-        department: 'الدعم الفني',
-        status: 'active',
-        lastMessageAt: new Date(Date.now() - 3600000).toISOString(),
-        unreadCount: 1,
-      },
-      {
-        id: '3',
-        customerProfile: { name: 'محمود سعيد', phone: '+201234567892' },
-        channel: { name: 'تيليجرام', type: 'telegram' },
-        department: 'خدمة العملاء',
-        status: 'archived',
-        lastMessageAt: new Date(Date.now() - 7200000).toISOString(),
-        unreadCount: 0,
-      },
-    ]);
-    
-    // Mock data for channels
-    setChannels([
-      { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
-      { id: '2', name: 'فيسبوك', status: 'connected', type: 'facebook' },
-      { id: '3', name: 'تيليجرام', status: 'connected', type: 'telegram' },
-    ]);
     
     // ALWAYS set loading to false
     setLoading(false);
@@ -435,33 +406,13 @@ export default function InboxPage() {
         }
       }
       
-      // الطريقة القديمة
+      // محاولة جلب الرسائل من الـ API العادي
       const realMessages = await messagesApi.getAll(conv.id);
       setMessages(realMessages);
     } catch (error) {
-      console.log('Using mock messages');
-      // Mock messages based on conversation
-      const mockMessages = [
-        {
-          id: 'msg1',
-          text: 'مرحباً! كيف يمكنني مساعدتك اليوم؟ 😊',
-          senderType: 'agent',
-          createdAt: new Date(Date.now() - 60000 * 10).toISOString(),
-        },
-        {
-          id: 'msg2',
-          text: `أهلاً، أنا ${conv.customerProfile.name}. لدي استفسار عن خدماتكم.`,
-          senderType: 'user',
-          createdAt: new Date(Date.now() - 60000 * 9).toISOString(),
-        },
-        {
-          id: 'msg3',
-          text: 'بالتأكيد! يسعدني مساعدتك. ما هو استفسارك؟',
-          senderType: 'agent',
-          createdAt: new Date(Date.now() - 60000 * 8).toISOString(),
-        },
-      ];
-      setMessages(mockMessages);
+      console.log('No messages found for this conversation');
+      // لا توجد رسائل - اعرض قائمة فارغة
+      setMessages([]);
     }
   };
 
