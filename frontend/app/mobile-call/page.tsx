@@ -253,78 +253,78 @@ export default function MobileCallPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-2 sm:p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-2xl p-6 shadow-2xl">
-          <h1 className="text-3xl font-bold text-white text-center">📞 موبايل كول</h1>
-          <p className="text-blue-100 text-center mt-2">نظام المكالمات الصوتية - المسار الساخن</p>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 shadow-2xl">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center">📞 موبايل كول</h1>
+          <p className="text-sm sm:text-base text-blue-100 text-center mt-1 sm:mt-2">نظام المكالمات الصوتية - المسار الساخن</p>
         </div>
 
-        <div className="bg-white rounded-b-2xl shadow-2xl overflow-hidden">
-          <div className="flex">
+        <div className="bg-white rounded-b-xl sm:rounded-b-2xl shadow-2xl overflow-hidden">
+          <div className="flex flex-col md:flex-row">
             {/* Sidebar */}
-            <div className="w-24 bg-gradient-to-b from-blue-600 to-blue-800 flex flex-col items-center py-8 space-y-8">
+            <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-blue-600 to-blue-800 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
               <button
                 onClick={() => setCurrentView('dialpad')}
-                className={`p-4 rounded-lg transition ${
+                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
                   currentView === 'dialpad' ? 'bg-white/20' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-3xl">📱</span>
+                <span className="text-2xl sm:text-3xl">📱</span>
               </button>
               <button
                 onClick={() => setCurrentView('contacts')}
-                className={`p-4 rounded-lg transition ${
+                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
                   currentView === 'contacts' ? 'bg-white/20' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-3xl">👥</span>
+                <span className="text-2xl sm:text-3xl">👥</span>
               </button>
               <button
                 onClick={() => setCurrentView('history')}
-                className={`p-4 rounded-lg transition ${
+                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
                   currentView === 'history' ? 'bg-white/20' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-3xl">📋</span>
+                <span className="text-2xl sm:text-3xl">📋</span>
               </button>
               <button
                 onClick={() => setCurrentView('settings')}
-                className={`p-4 rounded-lg transition ${
+                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
                   currentView === 'settings' ? 'bg-white/20' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-3xl">⚙️</span>
+                <span className="text-2xl sm:text-3xl">⚙️</span>
               </button>
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 p-8">
+            <div className="flex-1 p-4 sm:p-6 md:p-8">
               {/* Dialpad View */}
               {currentView === 'dialpad' && !isInCall && (
                 <div className="max-w-md mx-auto">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">لوحة الاتصال</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">لوحة الاتصال</h2>
                   
                   {/* Phone number display */}
-                  <div className="bg-gray-100 rounded-xl p-6 mb-6">
+                  <div className="bg-gray-100 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
                     <input
                       type="text"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       placeholder="أدخل رقم الهاتف"
-                      className="w-full text-3xl text-center bg-transparent border-none outline-none text-gray-800"
+                      className="w-full text-2xl sm:text-3xl text-center bg-transparent border-none outline-none text-gray-800"
                       dir="ltr"
                     />
                   </div>
 
                   {/* Dialpad */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
                     {dialpadButtons.map((digit) => (
                       <button
                         key={digit}
                         onClick={() => handleNumberClick(digit)}
-                        className="bg-blue-50 hover:bg-blue-100 text-2xl font-bold text-blue-900 py-6 rounded-xl transition shadow-md hover:shadow-lg"
+                        className="bg-blue-50 hover:bg-blue-100 text-xl sm:text-2xl font-bold text-blue-900 py-4 sm:py-5 md:py-6 rounded-xl transition shadow-md hover:shadow-lg active:scale-95"
                       >
                         {digit}
                       </button>
@@ -332,17 +332,17 @@ export default function MobileCallPage() {
                   </div>
 
                   {/* Action buttons */}
-                  <div className="flex gap-4">
+                  <div className="flex gap-2 sm:gap-3 md:gap-4">
                     <button
                       onClick={handleBackspace}
-                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 rounded-xl font-bold transition"
+                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 sm:py-4 rounded-xl font-bold transition active:scale-95 text-sm sm:text-base"
                     >
                       ⌫ مسح
                     </button>
                     <button
                       onClick={handleCall}
                       disabled={!phoneNumber}
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-bold transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 sm:py-4 rounded-xl font-bold transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-sm sm:text-base"
                     >
                       📞 اتصال
                     </button>
@@ -353,32 +353,32 @@ export default function MobileCallPage() {
               {/* In Call View */}
               {isInCall && (
                 <div className="max-w-md mx-auto text-center">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-8">مكالمة جارية</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 sm:mb-8">مكالمة جارية</h2>
                   
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-12 mb-8">
-                    <div className="text-5xl mb-4">📞</div>
-                    <div className="text-3xl font-bold text-blue-900 mb-4" dir="ltr">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 sm:p-10 md:p-12 mb-6 sm:mb-8">
+                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">📞</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-900 mb-3 sm:mb-4" dir="ltr">
                       {phoneNumber}
                     </div>
-                    <div className="text-6xl font-mono text-blue-700">
+                    <div className="text-4xl sm:text-5xl md:text-6xl font-mono text-blue-700">
                       {formatCallDuration()}
                     </div>
                   </div>
 
-                  <div className="flex gap-4 justify-center">
+                  <div className="flex gap-3 sm:gap-4 justify-center">
                     <button
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`p-6 rounded-full transition ${
+                      className={`p-4 sm:p-5 md:p-6 rounded-full transition active:scale-95 ${
                         isMuted ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'
                       }`}
                     >
-                      <span className="text-3xl">{isMuted ? '🔇' : '🔊'}</span>
+                      <span className="text-2xl sm:text-3xl">{isMuted ? '🔇' : '🔊'}</span>
                     </button>
                     <button
                       onClick={handleEndCall}
-                      className="px-12 py-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full font-bold transition shadow-lg hover:shadow-xl"
+                      className="px-8 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full font-bold transition shadow-lg hover:shadow-xl active:scale-95 text-base sm:text-lg md:text-xl"
                     >
-                      <span className="text-2xl">📵 إنهاء</span>
+                      <span className="text-xl sm:text-2xl">📵 إنهاء</span>
                     </button>
                   </div>
                 </div>
@@ -387,27 +387,27 @@ export default function MobileCallPage() {
               {/* Contacts View */}
               {currentView === 'contacts' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">جهات الاتصال</h2>
-                  <div className="space-y-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">جهات الاتصال</h2>
+                  <div className="space-y-2 sm:space-y-3">
                     {contacts.map((contact) => (
                       <div
                         key={contact.id}
-                        className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-4 rounded-xl transition cursor-pointer"
+                        className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 sm:p-4 rounded-xl transition cursor-pointer active:scale-98"
                         onClick={() => {
                           setPhoneNumber(contact.phone);
                           setCurrentView('dialpad');
                         }}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg sm:text-xl">
                             👤
                           </div>
                           <div>
-                            <div className="font-bold text-gray-800">{contact.name}</div>
-                            <div className="text-gray-600 text-sm" dir="ltr">{contact.phone}</div>
+                            <div className="font-bold text-gray-800 text-sm sm:text-base">{contact.name}</div>
+                            <div className="text-gray-600 text-xs sm:text-sm" dir="ltr">{contact.phone}</div>
                           </div>
                         </div>
-                        <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition">
+                        <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs sm:text-sm">
                           📞 اتصال
                         </button>
                       </div>
@@ -419,40 +419,40 @@ export default function MobileCallPage() {
               {/* History View */}
               {currentView === 'history' && (
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">سجل المكالمات</h2>
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">سجل المكالمات</h2>
                     <button
                       onClick={loadCallHistory}
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs sm:text-sm"
                     >
                       🔄 تحديث
                     </button>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {callHistory.length === 0 ? (
-                      <div className="text-center text-gray-500 py-12">
-                        <div className="text-6xl mb-4">📭</div>
-                        <p>لا توجد مكالمات بعد</p>
+                      <div className="text-center text-gray-500 py-8 sm:py-12">
+                        <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">📭</div>
+                        <p className="text-sm sm:text-base">لا توجد مكالمات بعد</p>
                       </div>
                     ) : (
                       callHistory.map((call) => (
                         <div
                           key={call.id}
-                          className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-4 rounded-xl transition"
+                          className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 sm:p-4 rounded-xl transition"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className={`text-2xl ${
+                          <div className="flex items-center gap-3 sm:gap-4">
+                            <div className={`text-xl sm:text-2xl ${
                               call.type === 'outgoing' ? 'text-green-500' : 
                               call.type === 'incoming' ? 'text-blue-500' : 'text-red-500'
                             }`}>
                               {call.type === 'outgoing' ? '📞' : call.type === 'incoming' ? '📲' : '📵'}
                             </div>
                             <div>
-                              <div className="font-bold text-gray-800" dir="ltr">{call.phone}</div>
-                              <div className="text-gray-600 text-sm">{call.time}</div>
+                              <div className="font-bold text-gray-800 text-sm sm:text-base" dir="ltr">{call.phone}</div>
+                              <div className="text-gray-600 text-xs sm:text-sm">{call.time}</div>
                             </div>
                           </div>
-                          <div className="text-gray-600">{call.duration}</div>
+                          <div className="text-gray-600 text-xs sm:text-sm">{call.duration}</div>
                         </div>
                       ))
                     )}
@@ -463,24 +463,24 @@ export default function MobileCallPage() {
               {/* Settings View */}
               {currentView === 'settings' && (
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">⚙️ الإعدادات</h2>
-                  <div className="space-y-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">⚙️ الإعدادات</h2>
+                  <div className="space-y-4 sm:space-y-6">
                     
                     {/* Server Settings */}
-                    <div className="bg-white border border-gray-200 rounded-xl p-6">
-                      <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <span className="text-xl">🌐</span> إعدادات الخادم
+                    <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
+                      <h3 className="font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                        <span className="text-lg sm:text-xl">🌐</span> إعدادات الخادم
                       </h3>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         <div>
-                          <label className="block text-gray-700 font-semibold mb-2">
+                          <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
                             عنوان Backend API
                           </label>
                           <input
                             type="text"
                             value={serverUrl}
                             onChange={(e) => setServerUrl(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
                             dir="ltr"
                             placeholder="https://api.example.com"
                           />
@@ -489,51 +489,51 @@ export default function MobileCallPage() {
                     </div>
 
                     {/* SIP Account Settings */}
-                    <div className="bg-white border border-gray-200 rounded-xl p-6">
-                      <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <span className="text-xl">📞</span> حساب SIP
+                    <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
+                      <h3 className="font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                        <span className="text-lg sm:text-xl">📞</span> حساب SIP
                       </h3>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         <div>
-                          <label className="block text-gray-700 font-semibold mb-2">
+                          <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
                             اسم المستخدم
                           </label>
                           <input
                             type="text"
                             value={sipAccount}
                             onChange={(e) => setSipAccount(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
                             dir="ltr"
                             placeholder="username@sip.example.com"
                           />
                         </div>
                         <div>
-                          <label className="block text-gray-700 font-semibold mb-2">
+                          <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
                             كلمة المرور
                           </label>
                           <input
                             type="password"
                             value={sipPassword}
                             onChange={(e) => setSipPassword(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
                             dir="ltr"
                             placeholder="••••••••"
                           />
                         </div>
                         <div>
-                          <label className="block text-gray-700 font-semibold mb-2">
+                          <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
                             خادم SIP
                           </label>
                           <input
                             type="text"
                             value={sipServer}
                             onChange={(e) => setSipServer(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
                             dir="ltr"
                             placeholder="sip.example.com"
                           />
                         </div>
-                        <button className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition">
+                        <button className="w-full py-2 sm:py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm sm:text-base">
                           💾 حفظ إعدادات SIP
                         </button>
                       </div>
