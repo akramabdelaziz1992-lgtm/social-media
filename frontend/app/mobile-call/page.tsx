@@ -154,7 +154,7 @@ export default function MobileCallPage() {
       // إنشاء Twilio Device
       const device = new Device(token, {
         logLevel: 1,
-        codecPreferences: ['opus', 'pcmu'],
+        codecPreferences: ['opus', 'pcmu'] as any,
       });
       
       // تسجيل Device
