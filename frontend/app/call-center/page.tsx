@@ -7,6 +7,7 @@ import Dialpad from '@/components/Dialpad';
 import ContactsList, { Contact } from '@/components/ContactsList';
 import CallHistory from '@/components/CallHistory';
 import { useVoiceCall } from '@/lib/hooks/useVoiceCall';
+import { authStorage } from '@/lib/auth';
 
 export default function CallCenterPage() {
   const router = useRouter();
@@ -18,16 +19,16 @@ export default function CallCenterPage() {
   
   // Check authentication on mount
   useEffect(() => {
-    const token = localStorage.getItem('call_center_token');
-    const userData = localStorage.getItem('call_center_user');
+    const token = authStorage.getAccessToken();
+    const userData = authStorage.getUser();
     
     if (!token || !userData) {
-      router.push('/call-center/login');
+      router.push('/login');
       return;
     }
     
     setIsAuthenticated(true);
-    setUser(JSON.parse(userData));
+    setUser(userData);
   }, [router]);
   
   // Real voice call hook
@@ -86,9 +87,8 @@ export default function CallCenterPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('call_center_token');
-    localStorage.removeItem('call_center_user');
-    router.push('/call-center/login');
+    authStorage.clearAuth();
+    router.push('/login');
   };
 
   if (!isAuthenticated) {

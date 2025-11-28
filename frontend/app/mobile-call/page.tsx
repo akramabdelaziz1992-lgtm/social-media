@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { authStorage } from '@/lib/auth';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
 
@@ -16,9 +18,12 @@ interface CallRecord {
   duration: string;
   time: string;
   type: 'outgoing' | 'incoming' | 'missed';
+  employeeName?: string;
 }
 
 export default function MobileCallPage() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentView, setCurrentView] = useState<'dialpad' | 'contacts' | 'history' | 'settings'>('dialpad');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isInCall, setIsInCall] = useState(false);
@@ -49,6 +54,19 @@ export default function MobileCallPage() {
   const [micVolume, setMicVolume] = useState(100);
   const [ringtoneVolume, setRingtoneVolume] = useState(70);
   
+  // Check authentication on mount
+  useEffect(() => {
+    const user = authStorage.getUser();
+    const token = authStorage.getAccessToken();
+    
+    if (!user || !token) {
+      router.push('/login');
+      return;
+    }
+    
+    setCurrentUser(user);
+  }, [router]);
+
   // Call timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -62,8 +80,10 @@ export default function MobileCallPage() {
 
   // Load call history from backend
   useEffect(() => {
-    loadCallHistory();
-  }, []);
+    if (currentUser) {
+      loadCallHistory();
+    }
+  }, [currentUser]);
 
   const loadCallHistory = async () => {
     try {
@@ -108,10 +128,18 @@ export default function MobileCallPage() {
 
   const handleCall = async () => {
     if (!phoneNumber) return;
+    if (!currentUser) {
+      alert('الرجاء تسجيل الدخول أولاً');
+      router.push('/login');
+      return;
+    }
     
     try {
       setIsInCall(true);
       setCallDuration(0);
+      
+      // تسجيل بيانات الموظف الذي يقوم بالمكالمة
+      console.log('Call initiated by:', currentUser.name, '(' + currentUser.email + ')');
       
       // تنسيق الرقم بالصيغة الدولية
       let formattedNumber = phoneNumber.trim();
@@ -152,8 +180,9 @@ export default function MobileCallPage() {
       // استخدام WebRTC للاتصال المباشر من المتصفح
       const { Device } = await import('@twilio/voice-sdk');
       
-      // الحصول على Token من Backend
-      const tokenResponse = await fetch(`${serverUrl}/api/calls/token?identity=mobile-agent-${Date.now()}`);
+      // الحصول على Token من Backend مع معلومات الموظف
+      const identity = `${currentUser.name}-${Date.now()}`;
+      const tokenResponse = await fetch(`${serverUrl}/api/calls/token?identity=${encodeURIComponent(identity)}&employeeName=${encodeURIComponent(currentUser.name)}&employeeEmail=${encodeURIComponent(currentUser.email)}&department=${encodeURIComponent(currentUser.department || 'N/A')}`);
       const { token } = await tokenResponse.json();
       
       // إنشاء Twilio Device
@@ -290,11 +319,21 @@ export default function MobileCallPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 shadow-2xl">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <img src="/logo.png" alt="المسار الساخن" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">📞 موبايل كول</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="المسار الساخن" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
+              <div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">📞 موبايل كول</h1>
+                <p className="text-sm sm:text-base text-blue-100">المسار الساخن للسفر والسياحة</p>
+              </div>
+            </div>
+            {currentUser && (
+              <div className="hidden sm:block text-right">
+                <div className="text-white font-bold">{currentUser.name}</div>
+                <div className="text-blue-200 text-sm">{currentUser.department || currentUser.role}</div>
+              </div>
+            )}
           </div>
-          <p className="text-sm sm:text-base text-blue-100 text-center">المسار الساخن للسفر والسياحة</p>
         </div>
 
         <div className="bg-white rounded-b-xl sm:rounded-b-2xl shadow-2xl overflow-hidden">
@@ -558,6 +597,11 @@ export default function MobileCallPage() {
                             <div className="flex-1">
                               <div className="font-bold text-gray-800 text-sm sm:text-base" dir="ltr">{call.phone}</div>
                               <div className="text-gray-600 text-xs sm:text-sm">{call.time}</div>
+                              {call.employeeName && (
+                                <div className="text-blue-600 text-xs mt-1">
+                                  👤 {call.employeeName}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 sm:gap-3">

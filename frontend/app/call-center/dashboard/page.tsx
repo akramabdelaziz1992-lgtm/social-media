@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { authStorage } from '@/lib/auth';
 import { 
   Phone, Users, History, TrendingUp, Clock, 
   PhoneIncoming, PhoneOutgoing, PhoneMissed,
@@ -51,15 +52,15 @@ export default function CallCenterDashboard() {
 
   useEffect(() => {
     // Check authentication
-    const token = localStorage.getItem('call_center_token');
-    const userData = localStorage.getItem('call_center_user');
+    const token = authStorage.getAccessToken();
+    const userData = authStorage.getUser();
     
     if (!token || !userData) {
-      router.push('/call-center/login');
+      router.push('/login');
       return;
     }
 
-    setUser(JSON.parse(userData));
+    setUser(userData);
     loadDashboardData(token);
   }, [timeFilter]);
 
@@ -91,9 +92,8 @@ export default function CallCenterDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('call_center_token');
-    localStorage.removeItem('call_center_user');
-    router.push('/call-center/login');
+    authStorage.clearAuth();
+    router.push('/login');
   };
 
   const formatDuration = (seconds: number) => {
