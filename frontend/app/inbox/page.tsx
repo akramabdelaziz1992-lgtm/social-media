@@ -362,7 +362,7 @@ export default function InboxPage() {
           
           // أضف أي رسائل bot جديدة (تبدأ بـ bot-) لم تأتِ من الـ API
           const botMessages = prevMessages.filter(msg => 
-            msg.id.startsWith('bot-') && !whatsappMessages.find(wm => wm.id === msg.id)
+            msg.id.startsWith('bot-') && !whatsappMessages.find((wm: any) => wm.id === msg.id)
           );
           
           return [...mergedMessages, ...botMessages].sort((a, b) => 
