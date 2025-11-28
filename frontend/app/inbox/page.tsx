@@ -124,9 +124,10 @@ export default function InboxPage() {
         console.log('✅ WebSocket متصل - جاهز لاستقبال الرسائل');
       });
 
-      socketRef.current.on('qr', (qr: string) => {
-        console.log('📱 QR Code جاهز');
-        setQrCode(qr);
+      socketRef.current.on('qr', (data: any) => {
+        console.log('📱 QR Code جاهز:', data);
+        const qrCode = typeof data === 'string' ? data : data.qr;
+        setQrCode(qrCode);
         setConnectionStatus('qr');
       });
 
@@ -523,7 +524,13 @@ export default function InboxPage() {
 
     try {
       if (connectionMethod === 'qr') {
-        // Initialize WhatsApp with QR Code
+        // Initialize WebSocket FIRST to receive QR code
+        initializeWebSocket();
+        
+        // Wait a bit for WebSocket to connect
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Then initialize WhatsApp to generate QR Code
         const response = await fetch(`${apiUrl}/api/whatsapp/initialize`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -531,9 +538,7 @@ export default function InboxPage() {
         
         const result = await response.json();
         
-        if (result.success) {
-          initializeWebSocket();
-        } else {
+        if (!result.success) {
           alert('فشل بدء الاتصال. حاول مرة أخرى.');
           setConnectionStatus('disconnected');
         }
@@ -918,9 +923,10 @@ export default function InboxPage() {
                       {connectionStatus === 'connecting' && (
                         <div className="text-center">
                           <div className="w-64 h-64 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/20">
-                            <div className="text-center">
+                            <div className="text-center px-4">
                               <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                              <p className="text-white font-medium">جاري التحميل...</p>
+                              <p className="text-white font-medium mb-2">جاري الاتصال...</p>
+                              <p className="text-emerald-200/70 text-sm">انتظر قليلاً لتوليد QR Code</p>
                             </div>
                           </div>
                         </div>
