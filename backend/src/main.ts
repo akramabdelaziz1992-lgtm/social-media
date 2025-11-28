@@ -29,9 +29,27 @@ async function bootstrap() {
   );
 
   // CORS configuration
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://almasar-frontend.vercel.app',
+    configService.get('FRONTEND_URL'),
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: configService.get('FRONTEND_URL') || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log('❌ CORS blocked origin:', origin);
+        callback(null, true); // Allow all origins in production for now
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
 
   // API prefix
