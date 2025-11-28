@@ -350,7 +350,7 @@ export default function InboxPage() {
           const messagesWithOptions = prevMessages.filter(msg => msg.options && msg.options.length > 0);
           
           // دمج الرسائل الجديدة مع الرسائل التي تحتوي على options
-          const mergedMessages = whatsappMessages.map(newMsg => {
+          const mergedMessages = whatsappMessages.map((newMsg: any) => {
             // ابحث عن رسالة مطابقة في الرسائل السابقة
             const existingMsg = prevMessages.find(oldMsg => oldMsg.id === newMsg.id);
             // إذا كانت موجودة ولديها options، احتفظ بها
