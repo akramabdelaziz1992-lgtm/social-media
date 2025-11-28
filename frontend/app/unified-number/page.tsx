@@ -85,11 +85,11 @@ export default function CallCenterPage() {
     loadCallRecords();
     checkSoftphoneStatus();
     
-    // Refresh every 10 seconds for real-time updates
+    // Refresh every 5 seconds for real-time updates
     const interval = setInterval(() => {
       loadCallRecords();
       checkSoftphoneStatus();
-    }, 10000); // تحديث كل 10 ثواني بدلاً من 30
+    }, 5000); // تحديث كل 5 ثواني للاستجابة الفورية
     return () => clearInterval(interval);
   }, []);
 
@@ -104,12 +104,20 @@ export default function CallCenterPage() {
           // تحديد الحالة بشكل صحيح
           let callStatus: 'completed' | 'missed' | 'ongoing' = 'completed';
           
+          // التحقق من وقت المكالمة - إذا مر أكثر من دقيقتين، تعتبر منتهية
+          const callAge = Date.now() - new Date(call.createdAt).getTime();
+          const twoMinutes = 2 * 60 * 1000;
+          
           if (call.status === 'completed') {
             callStatus = 'completed';
           } else if (call.status === 'failed' || call.status === 'no-answer' || call.status === 'busy' || call.status === 'cancelled') {
             callStatus = 'missed';
-          } else if (call.status === 'in-progress' || call.status === 'ringing' || call.status === 'initiated') {
+          } else if ((call.status === 'in-progress' || call.status === 'ringing' || call.status === 'initiated') && callAge < twoMinutes) {
+            // فقط إذا كانت المكالمة حديثة (أقل من دقيقتين)
             callStatus = 'ongoing';
+          } else if (callAge >= twoMinutes) {
+            // إذا مر وقت طويل ولم يتم التحديث، تعتبر منتهية
+            callStatus = call.durationSeconds > 0 ? 'completed' : 'missed';
           }
           
           return {
@@ -852,9 +860,16 @@ export default function CallCenterPage() {
                                 ></div>
                               </div>
                             </div>
-                            <button className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition">
+                            <a
+                              href={call.recordingUrl}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition"
+                              title="تحميل التسجيل"
+                            >
                               <Download size={20} />
-                            </button>
+                            </a>
                           </div>
                         </div>
                       )}
