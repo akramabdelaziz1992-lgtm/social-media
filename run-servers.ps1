@@ -21,14 +21,14 @@ param(
 
 function Wait-Port {
   param(
-    [string]$Host = '127.0.0.1',
+    [string]$HostName = '127.0.0.1',
     [int]$Port = 3000,
     [int]$TimeoutSec = 60
   )
   $start = Get-Date
   while ((Get-Date) - $start -lt ([TimeSpan]::FromSeconds($TimeoutSec))) {
     try {
-      $t = Test-NetConnection -ComputerName $Host -Port $Port -WarningAction SilentlyContinue
+      $t = Test-NetConnection -ComputerName $HostName -Port $Port -WarningAction SilentlyContinue
       if ($t.TcpTestSucceeded) { return $true }
     } catch { }
     Start-Sleep -Milliseconds 500
@@ -59,16 +59,16 @@ Write-Host "Starting frontend in a new window: $frontendPath" -ForegroundColor C
 Start-Process powershell -ArgumentList "-NoExit","-Command cd `"$frontendPath`"; npm run dev" -WorkingDirectory $frontendPath
 
 Write-Host 'Waiting for backend (localhost:4000)...' -ForegroundColor Green
-if (Wait-Port -Host '127.0.0.1' -Port 4000 -TimeoutSec $WaitSeconds) {
+if (Wait-Port -HostName '127.0.0.1' -Port 4000 -TimeoutSec $WaitSeconds) {
   Write-Host 'Backend ready.' -ForegroundColor Green
 } else {
   Write-Host 'Backend did not become ready within timeout.' -ForegroundColor Red
 }
 
 Write-Host 'Waiting for frontend (localhost:3000 or 3001)...' -ForegroundColor Green
-if (Wait-Port -Host '127.0.0.1' -Port 3000 -TimeoutSec 6) {
+if (Wait-Port -HostName '127.0.0.1' -Port 3000 -TimeoutSec 6) {
   $frontendPort = 3000
-} elseif (Wait-Port -Host '127.0.0.1' -Port 3001 -TimeoutSec $WaitSeconds) {
+} elseif (Wait-Port -HostName '127.0.0.1' -Port 3001 -TimeoutSec $WaitSeconds) {
   $frontendPort = 3001
 } else {
   $frontendPort = $null

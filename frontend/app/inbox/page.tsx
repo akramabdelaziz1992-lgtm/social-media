@@ -938,28 +938,28 @@ export default function InboxPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 -left-4 w-72 h-72 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-72 h-72 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+          <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+          <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
         </div>
 
         {/* Header */}
-        <header className="relative bg-gradient-to-r from-emerald-600/20 via-green-600/20 to-emerald-600/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl">
+        <header className="relative bg-gradient-to-r from-[#4a5c3a]/20 via-[#3d4d2f]/20 to-blue-500/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
                 <MessageSquare className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-200 to-green-200 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-[#a8b899] to-[#8fa073] bg-clip-text text-transparent">
                   واتساب ويب - Almasar
                 </h1>
-                <p className="text-sm text-emerald-200">ربط حسابك على WhatsApp</p>
+                <p className="text-sm text-cyan-200">ربط حسابك على WhatsApp</p>
               </div>
             </div>
             <button 
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-emerald-300 rounded-lg transition-all border border-white/20 flex items-center gap-2"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-cyan-200 rounded-lg transition-all border border-white/20 flex items-center gap-2"
             >
               <span>← لوحة التحكم</span>
             </button>
@@ -972,55 +972,55 @@ export default function InboxPage() {
             <div className="relative bg-white/5 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
               <div className="grid md:grid-cols-2 gap-0">
                 {/* Left Side - Info */}
-                <div className="p-8 md:p-12 bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-l border-white/10">
+                <div className="p-8 md:p-12 bg-gradient-to-br from-[#4a5c3a]/10 to-[#3d4d2f]/10 border-l border-white/10">
                   <div className="mb-8">
-                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 animate-pulse">
+                    <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 animate-pulse">
                       <MessageSquare className="w-10 h-10 text-white" />
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-3">
                       استخدم WhatsApp على جهازك
                     </h2>
-                    <p className="text-emerald-200 leading-relaxed">
+                    <p className="text-cyan-200 leading-relaxed">
                       ابدأ بإرسال واستقبال الرسائل من خلال ربط حسابك على WhatsApp
                     </p>
                   </div>
 
                   <div className="space-y-6">
                     <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
-                        <span className="text-emerald-300 text-xl font-bold">1</span>
+                      <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30">
+                        <span className="text-cyan-200 text-xl font-bold">1</span>
                       </div>
                       <div>
                         <h3 className="text-white font-semibold mb-1">افتح WhatsApp على هاتفك</h3>
-                        <p className="text-emerald-200/70 text-sm">اذهب إلى الإعدادات ثم اختر "الأجهزة المرتبطة"</p>
+                        <p className="text-cyan-200/70 text-sm">اذهب إلى الإعدادات ثم اختر "الأجهزة المرتبطة"</p>
                       </div>
                     </div>
 
                     <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
-                        <span className="text-emerald-300 text-xl font-bold">2</span>
+                      <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30">
+                        <span className="text-cyan-200 text-xl font-bold">2</span>
                       </div>
                       <div>
                         <h3 className="text-white font-semibold mb-1">امسح رمز QR</h3>
-                        <p className="text-emerald-200/70 text-sm">اضغط على "ربط جهاز" وامسح الرمز الموجود على الشاشة</p>
+                        <p className="text-cyan-200/70 text-sm">اضغط على "ربط جهاز" وامسح الرمز الموجود على الشاشة</p>
                       </div>
                     </div>
 
                     <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
-                        <span className="text-emerald-300 text-xl font-bold">3</span>
+                      <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-400/30">
+                        <span className="text-cyan-200 text-xl font-bold">3</span>
                       </div>
                       <div>
                         <h3 className="text-white font-semibold mb-1">ابدأ المحادثة</h3>
-                        <p className="text-emerald-200/70 text-sm">ستظهر جميع محادثاتك تلقائياً بعد الربط</p>
+                        <p className="text-cyan-200/70 text-sm">ستظهر جميع محادثاتك تلقائياً بعد الربط</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-8 p-4 bg-emerald-500/10 rounded-xl border border-emerald-400/30">
+                  <div className="mt-8 p-4 bg-cyan-500/10 rounded-xl border border-cyan-400/30">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-emerald-300 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-emerald-200/80 leading-relaxed">
+                      <AlertCircle className="w-5 h-5 text-cyan-200 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-cyan-200/80 leading-relaxed">
                         <strong className="text-white">ملاحظة:</strong> جميع رسائلك الشخصية محمية بالتشفير التام من الطرف إلى الطرف ولن يتم مشاركتها
                       </p>
                     </div>
@@ -1035,8 +1035,8 @@ export default function InboxPage() {
                       onClick={() => setConnectionMethod('qr')}
                       className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
                         connectionMethod === 'qr'
-                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg'
-                          : 'bg-white/10 text-emerald-200 hover:bg-white/20 border border-white/20'
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg'
+                          : 'bg-white/10 text-cyan-200 hover:bg-white/20 border border-white/20'
                       }`}
                     >
                       📱 مسح QR
@@ -1045,8 +1045,8 @@ export default function InboxPage() {
                       onClick={() => setConnectionMethod('phone')}
                       className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
                         connectionMethod === 'phone'
-                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg'
-                          : 'bg-white/10 text-emerald-200 hover:bg-white/20 border border-white/20'
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg'
+                          : 'bg-white/10 text-cyan-200 hover:bg-white/20 border border-white/20'
                       }`}
                     >
                       🔢 رقم الهاتف
@@ -1215,8 +1215,8 @@ export default function InboxPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-emerald-200">جاري التحميل...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <p className="text-cyan-200">جاري التحميل...</p>
         </div>
       </div>
     );
@@ -1240,18 +1240,18 @@ export default function InboxPage() {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
       {/* Header */}
-      <header className="relative bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-cyan-600/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl">
+      <header className="relative bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-cyan-600/20 backdrop-blur-md border-b border-cyan-500/20 px-6 py-4 shadow-2xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
+              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/50 animate-pulse">
                 <MessageSquare className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-[#9acd32] to-[#8fbc8f] bg-clip-text text-transparent drop-shadow-lg">
                   صندوق الوارد الموحد
                 </h1>
-                <p className="text-sm text-cyan-200">إدارة جميع المحادثات من مكان واحد</p>
+                <p className="text-sm text-cyan-200 font-medium">إدارة جميع المحادثات من مكان واحد</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -1277,13 +1277,13 @@ export default function InboxPage() {
                 <span className="text-sm font-medium text-emerald-200">WhatsApp متصل</span>
               </div>
             )}
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20">
-              <User className="w-4 h-4 text-cyan-200" />
-              <span className="text-sm font-medium text-white">{user?.name}</span>
+            <div className="flex items-center gap-2 bg-cyan-500/20 backdrop-blur-md px-4 py-2 rounded-lg border-2 border-cyan-400/40">
+              <User className="w-4 h-4 text-cyan-300" />
+              <span className="text-sm font-semibold text-white">{user?.name}</span>
             </div>
             <button 
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg text-sm font-medium transition-all shadow-lg hover:shadow-xl text-white"
+              className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-lg text-sm font-bold transition-all shadow-lg shadow-cyan-500/50 hover:shadow-xl text-white"
             >
               لوحة التحكم
             </button>
@@ -1327,8 +1327,8 @@ export default function InboxPage() {
                 onClick={() => setActiveTab('all')}
                 className={`flex-1 px-2 py-2.5 text-xs font-medium transition-all border-b-2 ${
                   activeTab === 'all'
-                    ? 'border-cyan-500 text-cyan-200 bg-cyan-500/10'
-                    : 'border-transparent text-cyan-300/70 hover:text-cyan-200 hover:bg-white/5'
+                    ? 'border-cyan-400 text-cyan-200 bg-cyan-500/10'
+                    : 'border-transparent text-cyan-200/70 hover:text-cyan-200 hover:bg-white/5'
                 }`}
               >
                 <div className="flex items-center justify-center gap-1.5">
@@ -1343,8 +1343,8 @@ export default function InboxPage() {
                 onClick={() => setActiveTab('mine')}
                 className={`flex-1 px-2 py-2.5 text-xs font-medium transition-all border-b-2 ${
                   activeTab === 'mine'
-                    ? 'border-cyan-500 text-cyan-200 bg-cyan-500/10'
-                    : 'border-transparent text-cyan-300/70 hover:text-cyan-200 hover:bg-white/5'
+                    ? 'border-cyan-400 text-cyan-200 bg-cyan-500/10'
+                    : 'border-transparent text-cyan-200/70 hover:text-cyan-200 hover:bg-white/5'
                 }`}
               >
                 <div className="flex items-center justify-center gap-1.5">
@@ -1357,8 +1357,8 @@ export default function InboxPage() {
                 onClick={() => setActiveTab('unassigned')}
                 className={`flex-1 px-2 py-2.5 text-xs font-medium transition-all border-b-2 ${
                   activeTab === 'unassigned'
-                    ? 'border-cyan-500 text-cyan-200 bg-cyan-500/10'
-                    : 'border-transparent text-cyan-300/70 hover:text-cyan-200 hover:bg-white/5'
+                    ? 'border-cyan-400 text-cyan-200 bg-cyan-500/10'
+                    : 'border-transparent text-cyan-200/70 hover:text-cyan-200 hover:bg-white/5'
                 }`}
               >
                 <div className="flex items-center justify-center gap-1.5">
@@ -1375,13 +1375,13 @@ export default function InboxPage() {
           {/* Search & Filter */}
           <div className="p-2 border-b border-white/10 space-y-2">
             <div className="relative">
-              <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-300" />
+              <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-200" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="بحث..."
-                className="w-full pr-8 pl-2 py-2 text-sm bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all text-white placeholder-cyan-300/50"
+                className="w-full pr-8 pl-2 py-2 text-sm bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7a9a6b] transition-all text-white placeholder-[#a8b899]/50"
               />
             </div>
             <div className="flex gap-1">
@@ -1399,8 +1399,8 @@ export default function InboxPage() {
                 onClick={() => setFilterStatus('active')}
                 className={`flex-1 px-2 py-1.5 rounded text-xs font-medium transition-all ${
                   filterStatus === 'active' 
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' 
-                    : 'bg-white/10 text-emerald-200 hover:bg-white/20'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white' 
+                    : 'bg-white/10 text-cyan-200 hover:bg-white/20'
                 }`}
               >
                 محلول
@@ -1421,7 +1421,7 @@ export default function InboxPage() {
           <div className="flex-1 overflow-y-auto">
             {filteredConversations.length === 0 ? (
               <div className="p-4 text-center">
-                <MessageSquare className="w-12 h-12 mx-auto mb-2 text-cyan-500/30" />
+                <MessageSquare className="w-12 h-12 mx-auto mb-2 text-[#6b8a5c]/30" />
                 <p className="text-xs text-cyan-200">لا توجد محادثات</p>
               </div>
             ) : (
@@ -1429,8 +1429,8 @@ export default function InboxPage() {
                 <div
                   key={conv.id}
                   onClick={() => selectConversation(conv)}
-                  className={`p-2 border-b border-white/5 cursor-pointer hover:bg-gradient-to-l hover:from-cyan-500/20 hover:to-transparent transition-all group ${
-                    selectedConversation?.id === conv.id ? 'bg-gradient-to-l from-cyan-500/30 to-transparent border-r-2 border-r-cyan-500' : ''
+                  className={`p-2 border-b border-white/5 cursor-pointer hover:bg-gradient-to-l hover:from-cyan-600/20 hover:to-transparent transition-all group ${
+                    selectedConversation?.id === conv.id ? 'bg-gradient-to-l from-cyan-500/30 to-transparent border-r-2 border-r-[#7a9a6b]' : ''
                   }`}
                 >
                   <div className="flex items-start gap-2">
@@ -1452,7 +1452,7 @@ export default function InboxPage() {
                             </span>
                           )}
                         </div>
-                        <span className="text-xs text-cyan-300 whitespace-nowrap ml-1">
+                        <span className="text-xs text-cyan-200 whitespace-nowrap ml-1">
                           {new Date(conv.lastMessageAt).toLocaleTimeString('ar-EG', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -1497,7 +1497,7 @@ export default function InboxPage() {
                 }`}
                 title="الكل"
               >
-                <MessageSquare className="w-5 h-5 text-cyan-300" />
+                <MessageSquare className="w-5 h-5 text-cyan-200" />
               </button>
               <button
                 onClick={() => setActiveTab('mine')}
@@ -1506,7 +1506,7 @@ export default function InboxPage() {
                 }`}
                 title="محادثاتي"
               >
-                <User className="w-5 h-5 text-cyan-300" />
+                <User className="w-5 h-5 text-cyan-200" />
               </button>
               <button
                 onClick={() => setActiveTab('unassigned')}
@@ -1515,7 +1515,7 @@ export default function InboxPage() {
                 }`}
                 title="غير مسندة"
               >
-                <AlertCircle className="w-5 h-5 text-cyan-300" />
+                <AlertCircle className="w-5 h-5 text-cyan-200" />
               </button>
               <div className="flex-1"></div>
               <div className="text-center">
@@ -1581,7 +1581,7 @@ export default function InboxPage() {
                       }`}
                       title="معلومات جهة الاتصال"
                     >
-                      <UserCircle className={`w-5 h-5 ${showContactInfo ? 'text-cyan-200' : 'text-cyan-300'} group-hover:scale-110 transition-transform`} />
+                      <UserCircle className={`w-5 h-5 ${showContactInfo ? 'text-cyan-200' : 'text-cyan-200'} group-hover:scale-110 transition-transform`} />
                     </button>
                     <button 
                       onClick={() => window.open(`tel:${selectedConversation.customerProfile?.phone}`, '_blank')}
@@ -1592,10 +1592,10 @@ export default function InboxPage() {
                     </button>
                     <button 
                       onClick={() => alert('مكالمة فيديو - قيد التطوير')}
-                      className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-xl transition-all group border border-blue-400/30"
+                      className="p-3 bg-cyan-500/20 hover:bg-blue-500/30 rounded-xl transition-all group border border-cyan-400/30"
                       title="مكالمة فيديو"
                     >
-                      <Video className="w-5 h-5 text-blue-300 group-hover:scale-110 transition-transform" />
+                      <Video className="w-5 h-5 text-cyan-200 group-hover:scale-110 transition-transform" />
                     </button>
                     <button 
                       onClick={() => alert('إضافة علامة')}
@@ -1606,7 +1606,7 @@ export default function InboxPage() {
                     </button>
                     <button 
                       onClick={() => handleArchive(selectedConversation.id)}
-                      className="p-3 bg-cyan-500/20 hover:bg-cyan-500/30 rounded-xl transition-all group border border-cyan-400/30"
+                      className="p-3 bg-cyan-500/30 hover:bg-blue-500/40 rounded-xl transition-all group border border-cyan-400/50"
                       title="أرشفة"
                     >
                       <Archive className="w-5 h-5 text-cyan-300 group-hover:scale-110 transition-transform" />
@@ -1648,25 +1648,25 @@ export default function InboxPage() {
                   )}
                   <button
                     onClick={() => handleQuickReply('✈️ حجوزات')}
-                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/20 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
+                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/30 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
                   >
                     ✈️ حجوزات
                   </button>
                   <button
                     onClick={() => handleQuickReply('ℹ️ استفسارات')}
-                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/20 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
+                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/30 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
                   >
                     ℹ️ استفسارات
                   </button>
                   <button
                     onClick={() => handleQuickReply('⚠️ شكاوى')}
-                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/20 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
+                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/30 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
                   >
                     ⚠️ شكاوى
                   </button>
                   <button
                     onClick={() => handleQuickReply('👤 التحدث مع موظف')}
-                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/20 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
+                    className="px-4 py-2 bg-white/10 hover:bg-cyan-500/30 border border-white/20 hover:border-cyan-400/50 rounded-lg text-sm whitespace-nowrap transition-all text-white"
                   >
                     👤 موظف
                   </button>
@@ -1703,13 +1703,13 @@ export default function InboxPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-slate-900/50 to-slate-800/50">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-[#0d120a]/80 to-[#1a2410]/60">
                 {messages.length === 0 ? (
                   <div className="h-full flex items-center justify-center">
                     <div className="text-center">
-                      <MessageSquare className="w-20 h-20 mx-auto mb-4 text-cyan-500/30" />
-                      <p className="text-cyan-200 font-medium">لا توجد رسائل بعد</p>
-                      <p className="text-sm text-cyan-300/50 mt-1">ابدأ المحادثة الآن</p>
+                      <MessageSquare className="w-20 h-20 mx-auto mb-4 text-[#556b2f]/50" />
+                      <p className="text-cyan-200 font-semibold text-lg">لا توجد رسائل بعد</p>
+                      <p className="text-sm text-cyan-300/60 mt-2 font-medium">ابدأ المحادثة الآن</p>
                     </div>
                   </div>
                 ) : (
@@ -1724,10 +1724,10 @@ export default function InboxPage() {
                         </div>
                       )}
                       <div
-                        className={`max-w-md px-4 py-3 rounded-2xl shadow-lg ${
+                        className={`max-w-md px-4 py-3 rounded-2xl shadow-xl ${
                           msg.senderType === 'user'
-                            ? 'bg-white/10 backdrop-blur-md border border-white/20 rounded-br-sm text-white'
-                            : 'bg-gradient-to-br from-cyan-500 to-blue-500 text-white rounded-bl-sm'
+                            ? 'bg-cyan-500/20 backdrop-blur-md border-2 border-cyan-400/40 rounded-br-sm text-white'
+                            : 'bg-gradient-to-br from-cyan-500 to-blue-500 text-white rounded-bl-sm shadow-cyan-500/50'
                         }`}
                       >
                         {msg.senderType !== 'user' && selectedAgent !== 'غير مسند' && (
@@ -1778,7 +1778,7 @@ export default function InboxPage() {
                         </div>
                       </div>
                       {msg.senderType !== 'user' && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-lg shadow-cyan-500/50">
                           {user?.name?.[0] || 'A'}
                         </div>
                       )}
@@ -1816,14 +1816,14 @@ export default function InboxPage() {
                       }}
                       placeholder="اكتب رسالتك هنا... (Enter للإرسال)"
                       rows={1}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none text-white placeholder-cyan-300/50"
+                      className="w-full px-4 py-3 bg-cyan-500/20 border-2 border-cyan-400/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6b8e23] focus:border-cyan-400 resize-none text-white placeholder-[#c1d9a5]/50 font-medium"
                       style={{ minHeight: '48px', maxHeight: '120px' }}
                     />
                   </div>
                   <button 
                     onClick={sendMessage}
                     disabled={!messageText.trim()}
-                    className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-slate-600 disabled:to-slate-700 text-white rounded-xl transition-all shadow-md hover:shadow-lg disabled:cursor-not-allowed group"
+                    className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-slate-600 disabled:to-slate-700 text-white rounded-xl transition-all shadow-lg shadow-cyan-500/50 hover:shadow-xl disabled:cursor-not-allowed group"
                     title="إرسال"
                   >
                     <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -2137,3 +2137,6 @@ export default function InboxPage() {
     </div>
   );
 }
+
+
+

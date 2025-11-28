@@ -23,6 +23,9 @@ COPY --from=builder /app/create-user.js ./create-user.js
 COPY --from=builder /app/create-admin.js ./create-admin.js
 COPY --from=builder /app/seed-data.js ./seed-data.js
 
+# Create directory for WhatsApp session files (Railway persistent storage)
+RUN mkdir -p ./.wwebjs_auth && chmod 777 ./.wwebjs_auth
+
 ENV NODE_ENV=production
 EXPOSE 4000
 CMD ["node", "dist/main"]
