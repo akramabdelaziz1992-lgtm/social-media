@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
 
 interface Contact {
   id: string;
