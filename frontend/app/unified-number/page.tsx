@@ -85,11 +85,11 @@ export default function CallCenterPage() {
     loadCallRecords();
     checkSoftphoneStatus();
     
-    // Refresh every 30 seconds
+    // Refresh every 10 seconds for real-time updates
     const interval = setInterval(() => {
       loadCallRecords();
       checkSoftphoneStatus();
-    }, 30000);
+    }, 10000); // تحديث كل 10 ثواني بدلاً من 30
     return () => clearInterval(interval);
   }, []);
 
@@ -100,17 +100,37 @@ export default function CallCenterPage() {
         const calls = await response.json();
         
         // Transform backend data to CallRecord format
-        const transformedCalls: CallRecord[] = calls.map((call: any) => ({
-          id: call.id,
-          type: call.direction === 'inbound' ? 'incoming' : 'outgoing',
-          callerName: call.toNumber || 'غير معروف',
-          callerNumber: call.direction === 'inbound' ? call.fromNumber : call.toNumber,
-          employeeName: call.agentName || 'موبايل كول',
-          duration: call.durationSeconds ? `${Math.floor(call.durationSeconds / 60)}:${(call.durationSeconds % 60).toString().padStart(2, '0')}` : '0:00',
-          timestamp: new Date(call.createdAt).toLocaleString('ar-SA'),
-          status: call.status === 'completed' ? 'completed' : call.status === 'failed' ? 'missed' : 'ongoing',
-          recordingUrl: call.recordingUrl
-        }));
+        const transformedCalls: CallRecord[] = calls.map((call: any) => {
+          // تحديد الحالة بشكل صحيح
+          let callStatus: 'completed' | 'missed' | 'ongoing' = 'completed';
+          
+          if (call.status === 'completed') {
+            callStatus = 'completed';
+          } else if (call.status === 'failed' || call.status === 'no-answer' || call.status === 'busy' || call.status === 'cancelled') {
+            callStatus = 'missed';
+          } else if (call.status === 'in-progress' || call.status === 'ringing' || call.status === 'initiated') {
+            callStatus = 'ongoing';
+          }
+          
+          return {
+            id: call.id,
+            type: call.direction === 'inbound' ? 'incoming' : 'outgoing',
+            callerName: call.customerName || call.toNumber || 'غير معروف',
+            callerNumber: call.direction === 'inbound' ? call.fromNumber : call.toNumber,
+            employeeName: call.agentName || 'موبايل كول',
+            duration: call.durationSeconds ? `${Math.floor(call.durationSeconds / 60)}:${(call.durationSeconds % 60).toString().padStart(2, '0')}` : '0:00',
+            timestamp: new Date(call.createdAt).toLocaleString('ar-EG', { 
+              year: 'numeric', 
+              month: '2-digit', 
+              day: '2-digit',
+              hour: '2-digit', 
+              minute: '2-digit',
+              hour12: true 
+            }),
+            status: callStatus,
+            recordingUrl: call.recordingUrl
+          };
+        });
         
         setRealCallRecords(transformedCalls);
       }
@@ -352,6 +372,17 @@ export default function CallCenterPage() {
                 <div className="text-sm text-gray-600">رقم مركز الاتصالات</div>
                 <div className="text-xl font-bold text-green-600 text-center" dir="ltr">0555254915</div>
               </div>
+              <button 
+                onClick={() => {
+                  loadCallRecords();
+                  checkSoftphoneStatus();
+                }}
+                className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
+                title="تحديث سجل المكالمات"
+              >
+                <Activity size={20} />
+                <span>تحديث</span>
+              </button>
               <button 
                 onClick={() => setShowNewCallModal(true)}
                 className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
