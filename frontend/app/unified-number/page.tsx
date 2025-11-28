@@ -880,9 +880,6 @@ export default function CallCenterPage() {
                     </audio>
                   </div>
                 )}
-                    </div>
-                  </div>
-                </div>
               </div>
             ))}
           </div>
