@@ -532,16 +532,6 @@ export default function InboxPage() {
         // Wait a bit for WebSocket to connect
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Set timeout to reset if QR doesn't arrive
-        const qrTimeout = setTimeout(() => {
-          if (connectionStatus === 'connecting') {
-            console.warn('⏱️ QR Code timeout - resetting connection');
-            setConnectionStatus('disconnected');
-            setLoading(false);
-            alert('انتهت المهلة. حاول مرة أخرى.');
-          }
-        }, 15000); // 15 seconds timeout
-        
         // Then initialize WhatsApp to generate QR Code
         const response = await fetch(`${apiUrl}/api/whatsapp/initialize`, {
           method: 'POST',
@@ -551,11 +541,49 @@ export default function InboxPage() {
         const result = await response.json();
         
         if (!result.success) {
-          clearTimeout(qrTimeout);
           alert('فشل بدء الاتصال. حاول مرة أخرى.');
           setConnectionStatus('disconnected');
           setLoading(false);
+          return;
         }
+
+        // Poll for QR Code (Backend needs time to generate it)
+        console.log('🔄 Polling for QR Code...');
+        let attempts = 0;
+        const maxAttempts = 20; // 20 attempts = 20 seconds max
+        
+        const pollQR = setInterval(async () => {
+          attempts++;
+          console.log(`Attempt ${attempts}/${maxAttempts}`);
+          
+          try {
+            const qrResponse = await fetch(`${apiUrl}/api/whatsapp/qr`);
+            const qrData = await qrResponse.json();
+            
+            if (qrData.hasQR && qrData.qr) {
+              console.log('✅ QR Code received from polling!');
+              clearInterval(pollQR);
+              setQrCode(qrData.qr);
+              setConnectionStatus('qr');
+              setLoading(false);
+            } else if (attempts >= maxAttempts) {
+              console.error('⏱️ QR Code timeout after', attempts, 'attempts');
+              clearInterval(pollQR);
+              setConnectionStatus('disconnected');
+              setLoading(false);
+              alert('انتهت المهلة. حاول مرة أخرى.\n\nتأكد من أن Backend يعمل بشكل صحيح.');
+            }
+          } catch (error) {
+            console.error('Error polling QR:', error);
+            if (attempts >= maxAttempts) {
+              clearInterval(pollQR);
+              setConnectionStatus('disconnected');
+              setLoading(false);
+              alert('فشل الحصول على QR Code. حاول مرة أخرى.');
+            }
+          }
+        }, 1000); // Poll every 1 second
+        
       } else {
         // Connect with phone number - BUT WhatsApp requires QR Code
         if (!phoneNumber.trim()) {
@@ -574,16 +602,6 @@ export default function InboxPage() {
         // Show alert that QR is required
         alert(`سيتم ربط WhatsApp للرقم: ${phoneNumber}\n\nملاحظة: WhatsApp Web يتطلب مسح QR Code من التطبيق`);
         
-        // Set timeout for QR
-        const qrTimeout = setTimeout(() => {
-          if (connectionStatus === 'connecting') {
-            console.warn('⏱️ QR Code timeout');
-            setConnectionStatus('disconnected');
-            setLoading(false);
-            alert('انتهت المهلة. حاول مرة أخرى.');
-          }
-        }, 15000);
-        
         // Initialize WhatsApp to generate QR
         const response = await fetch(`${apiUrl}/api/whatsapp/connect-phone`, {
           method: 'POST',
@@ -594,12 +612,46 @@ export default function InboxPage() {
         const result = await response.json();
 
         if (!result.success) {
-          clearTimeout(qrTimeout);
           alert('فشل بدء الاتصال. حاول مرة أخرى.');
           setConnectionStatus('disconnected');
           setLoading(false);
+          return;
         }
-        // If success, wait for QR code from WebSocket
+
+        // Poll for QR Code
+        console.log('🔄 Polling for QR Code...');
+        let attempts = 0;
+        const maxAttempts = 20;
+        
+        const pollQR = setInterval(async () => {
+          attempts++;
+          console.log(`Attempt ${attempts}/${maxAttempts}`);
+          
+          try {
+            const qrResponse = await fetch(`${apiUrl}/api/whatsapp/qr`);
+            const qrData = await qrResponse.json();
+            
+            if (qrData.hasQR && qrData.qr) {
+              console.log('✅ QR Code received!');
+              clearInterval(pollQR);
+              setQrCode(qrData.qr);
+              setConnectionStatus('qr');
+              setLoading(false);
+            } else if (attempts >= maxAttempts) {
+              clearInterval(pollQR);
+              setConnectionStatus('disconnected');
+              setLoading(false);
+              alert('انتهت المهلة. حاول مرة أخرى.');
+            }
+          } catch (error) {
+            if (attempts >= maxAttempts) {
+              clearInterval(pollQR);
+              setConnectionStatus('disconnected');
+              setLoading(false);
+              alert('فشل الحصول على QR Code.');
+            }
+          }
+        }, 1000);
       }
     } catch (error) {
       console.error('Connection error:', error);
