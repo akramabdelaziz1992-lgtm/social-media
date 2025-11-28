@@ -38,30 +38,19 @@ import { Department } from './modules/employees/entities/department.entity';
       envFilePath: '.env',
     }),
 
-    // Database - prefer Postgres in production via DATABASE_URL, fallback to SQLite for local dev
+    // Database - SQLite for all environments (simple and reliable)
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const databaseUrl = configService.get<string>('DATABASE_URL');
+        const databasePath = configService.get<string>('DATABASE_URL') || '/tmp/database.db';
         const isProd = configService.get<string>('NODE_ENV') === 'production';
 
-        if (databaseUrl) {
-          return {
-            type: 'postgres',
-            url: databaseUrl,
-            entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
-            synchronize: !isProd, // avoid auto-sync in production by default
-            logging: false,
-          };
-        }
-
-        // Fallback to SQLite for local development / quick testing
         return {
           type: 'better-sqlite3',
-          database: 'almasar.db',
+          database: databasePath,
           entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
           synchronize: true,
-          logging: true,
+          logging: !isProd,
         };
       },
       inject: [ConfigService],
