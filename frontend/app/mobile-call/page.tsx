@@ -34,6 +34,11 @@ export default function MobileCallPage() {
   const [callHistory, setCallHistory] = useState<CallRecord[]>([]);
   const [serverUrl, setServerUrl] = useState(apiUrl);
   
+  // New contact form states
+  const [showAddContactForm, setShowAddContactForm] = useState(false);
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactPhone, setNewContactPhone] = useState('');
+  
   // Settings states
   const [sipAccount, setSipAccount] = useState('');
   const [sipPassword, setSipPassword] = useState('');
@@ -203,6 +208,34 @@ export default function MobileCallPage() {
     }
   };
 
+  const handleAddContact = () => {
+    if (!newContactName.trim() || !newContactPhone.trim()) {
+      alert('الرجاء إدخال الاسم ورقم الهاتف');
+      return;
+    }
+    
+    const newContact: Contact = {
+      id: Date.now().toString(),
+      name: newContactName.trim(),
+      phone: newContactPhone.trim(),
+    };
+    
+    setContacts([...contacts, newContact]);
+    setNewContactName('');
+    setNewContactPhone('');
+    setShowAddContactForm(false);
+    alert('✅ تم إضافة جهة الاتصال بنجاح!');
+  };
+
+  const handleCallFromHistory = (phone: string) => {
+    setPhoneNumber(phone);
+    setCurrentView('dialpad');
+    // Auto-call after a short delay
+    setTimeout(() => {
+      handleCall();
+    }, 500);
+  };
+
   const handleEndCall = async () => {
     console.log('Ending call manually...');
     
@@ -347,6 +380,67 @@ export default function MobileCallPage() {
                       📞 اتصال
                     </button>
                   </div>
+
+                  {/* Add Contact Button */}
+                  {phoneNumber && (
+                    <button
+                      onClick={() => {
+                        setNewContactPhone(phoneNumber);
+                        setShowAddContactForm(true);
+                      }}
+                      className="w-full mt-3 sm:mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 sm:py-3 rounded-xl font-bold transition active:scale-95 text-sm sm:text-base"
+                    >
+                      👤+ حفظ كجهة اتصال
+                    </button>
+                  )}
+
+                  {/* Add Contact Form */}
+                  {showAddContactForm && (
+                    <div className="mt-4 sm:mt-6 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6">
+                      <h3 className="font-bold text-gray-800 mb-3 sm:mb-4 text-sm sm:text-base">إضافة جهة اتصال جديدة</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-gray-700 font-semibold mb-2 text-xs sm:text-sm">الاسم</label>
+                          <input
+                            type="text"
+                            value={newContactName}
+                            onChange={(e) => setNewContactName(e.target.value)}
+                            placeholder="أدخل اسم جهة الاتصال"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-700 font-semibold mb-2 text-xs sm:text-sm">رقم الهاتف</label>
+                          <input
+                            type="text"
+                            value={newContactPhone}
+                            onChange={(e) => setNewContactPhone(e.target.value)}
+                            placeholder="أدخل رقم الهاتف"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base"
+                            dir="ltr"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleAddContact}
+                            className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 sm:py-3 rounded-lg font-bold transition text-xs sm:text-sm"
+                          >
+                            ✅ حفظ
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowAddContactForm(false);
+                              setNewContactName('');
+                              setNewContactPhone('');
+                            }}
+                            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 sm:py-3 rounded-lg font-bold transition text-xs sm:text-sm"
+                          >
+                            ✖️ إلغاء
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -387,7 +481,18 @@ export default function MobileCallPage() {
               {/* Contacts View */}
               {currentView === 'contacts' && (
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">جهات الاتصال</h2>
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">جهات الاتصال</h2>
+                    <button
+                      onClick={() => {
+                        setCurrentView('dialpad');
+                        setShowAddContactForm(true);
+                      }}
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs sm:text-sm font-bold"
+                    >
+                      👤+ جديد
+                    </button>
+                  </div>
                   <div className="space-y-2 sm:space-y-3">
                     {contacts.map((contact) => (
                       <div
@@ -440,19 +545,28 @@ export default function MobileCallPage() {
                           key={call.id}
                           className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 sm:p-4 rounded-xl transition"
                         >
-                          <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="flex items-center gap-3 sm:gap-4 flex-1">
                             <div className={`text-xl sm:text-2xl ${
                               call.type === 'outgoing' ? 'text-green-500' : 
                               call.type === 'incoming' ? 'text-blue-500' : 'text-red-500'
                             }`}>
                               {call.type === 'outgoing' ? '📞' : call.type === 'incoming' ? '📲' : '📵'}
                             </div>
-                            <div>
+                            <div className="flex-1">
                               <div className="font-bold text-gray-800 text-sm sm:text-base" dir="ltr">{call.phone}</div>
                               <div className="text-gray-600 text-xs sm:text-sm">{call.time}</div>
                             </div>
                           </div>
-                          <div className="text-gray-600 text-xs sm:text-sm">{call.duration}</div>
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="text-gray-600 text-xs sm:text-sm">{call.duration}</div>
+                            <button
+                              onClick={() => handleCallFromHistory(call.phone)}
+                              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs sm:text-sm flex items-center gap-1"
+                            >
+                              <span>📞</span>
+                              <span className="hidden sm:inline">اتصال</span>
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}
