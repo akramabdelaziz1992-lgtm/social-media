@@ -821,41 +821,36 @@ export default function CallCenterPage() {
 
                       {/* Recording Player */}
                       {call.recordingUrl && (
-                        <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => togglePlayRecording(call.id)}
-                              className="p-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition"
-                            >
-                              {playingRecordingId === call.id ? (
-                                <Pause size={20} />
-                              ) : (
-                                <Play size={20} />
-                              )}
-                            </button>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Headphones size={16} className="text-indigo-600" />
-                                <span className="text-sm font-medium text-indigo-900">تسجيل المكالمة</span>
-                              </div>
-                              <div className="w-full bg-indigo-200 rounded-full h-2">
-                                <div
-                                  className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full"
-                                  style={{ width: playingRecordingId === call.id ? '45%' : '0%' }}
-                                ></div>
-                              </div>
-                            </div>
-                            <a
-                              href={call.recordingUrl}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition"
-                              title="تحميل التسجيل"
-                            >
-                              <Download size={20} />
-                            </a>
+                        <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Headphones size={18} className="text-indigo-600" />
+                            <span className="text-sm font-semibold text-indigo-900">🎧 استماع للمكالمة</span>
                           </div>
+                          
+                          {/* HTML5 Audio Player */}
+                          <audio
+                            controls
+                            className="w-full mb-3 rounded-lg"
+                            style={{ height: '40px' }}
+                            preload="metadata"
+                          >
+                            <source src={call.recordingUrl} type="audio/mpeg" />
+                            <source src={call.recordingUrl} type="audio/wav" />
+                            متصفحك لا يدعم تشغيل الصوت
+                          </audio>
+                          
+                          {/* Download Button */}
+                          <a
+                            href={call.recordingUrl}
+                            download={`call-recording-${call.id}.mp3`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md hover:shadow-lg w-full justify-center"
+                            title="تحميل التسجيل"
+                          >
+                            <Download size={18} />
+                            <span className="text-sm font-medium">تحميل التسجيل</span>
+                          </a>
                         </div>
                       )}
                     </div>
