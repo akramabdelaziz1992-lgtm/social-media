@@ -557,13 +557,34 @@ export default function InboxPage() {
           setLoading(false);
         }
       } else {
-        // Connect with phone number
+        // Connect with phone number - BUT WhatsApp requires QR Code
         if (!phoneNumber.trim()) {
           alert('الرجاء إدخال رقم الهاتف');
           setConnectionStatus('disconnected');
+          setLoading(false);
           return;
         }
 
+        // Initialize WebSocket FIRST
+        initializeWebSocket();
+        
+        // Wait for WebSocket to connect
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Show alert that QR is required
+        alert(`سيتم ربط WhatsApp للرقم: ${phoneNumber}\n\nملاحظة: WhatsApp Web يتطلب مسح QR Code من التطبيق`);
+        
+        // Set timeout for QR
+        const qrTimeout = setTimeout(() => {
+          if (connectionStatus === 'connecting') {
+            console.warn('⏱️ QR Code timeout');
+            setConnectionStatus('disconnected');
+            setLoading(false);
+            alert('انتهت المهلة. حاول مرة أخرى.');
+          }
+        }, 15000);
+        
+        // Initialize WhatsApp to generate QR
         const response = await fetch(`${apiUrl}/api/whatsapp/connect-phone`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -572,15 +593,13 @@ export default function InboxPage() {
 
         const result = await response.json();
 
-        if (result.success) {
-          setConnectionStatus('connected');
-          setIsWhatsAppConnected(true);
-          localStorage.setItem('whatsapp_connected', 'true');
-          loadData();
-        } else {
-          alert('فشل الربط برقم الهاتف. حاول مرة أخرى.');
+        if (!result.success) {
+          clearTimeout(qrTimeout);
+          alert('فشل بدء الاتصال. حاول مرة أخرى.');
           setConnectionStatus('disconnected');
+          setLoading(false);
         }
+        // If success, wait for QR code from WebSocket
       }
     } catch (error) {
       console.error('Connection error:', error);
@@ -975,36 +994,88 @@ export default function InboxPage() {
                   ) : (
                     // Phone Number Method
                     <div className="w-full max-w-sm">
-                      <div className="mb-6">
-                        <label className="block text-white font-medium mb-2">رقم الهاتف</label>
-                        <input
-                          type="tel"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          placeholder="+966 5xx xxx xxx"
-                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-emerald-300/50"
-                          dir="ltr"
-                        />
-                        <p className="text-emerald-200/60 text-xs mt-2">أدخل رقمك مع رمز الدولة (مثال: +966)</p>
-                      </div>
+                      {connectionStatus === 'disconnected' && (
+                        <>
+                          <div className="mb-6">
+                            <label className="block text-white font-medium mb-2">رقم الهاتف</label>
+                            <input
+                              type="tel"
+                              value={phoneNumber}
+                              onChange={(e) => setPhoneNumber(e.target.value)}
+                              placeholder="+966 5xx xxx xxx"
+                              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-emerald-300/50"
+                              dir="ltr"
+                            />
+                            <p className="text-emerald-200/60 text-xs mt-2">أدخل رقمك مع رمز الدولة (مثال: +966)</p>
+                          </div>
 
-                      <button
-                        onClick={handleConnectWhatsApp}
-                        disabled={loading || !phoneNumber.trim()}
-                        className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:cursor-not-allowed"
-                      >
-                        {loading ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span>جاري الربط...</span>
-                          </>
-                        ) : (
-                          <>
-                            <MessageSquare className="w-5 h-5" />
-                            <span>ربط WhatsApp</span>
-                          </>
-                        )}
-                      </button>
+                          <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
+                            <p className="text-yellow-200 text-xs text-center">
+                              ⚠️ WhatsApp Web يتطلب مسح QR Code بعد إدخال الرقم
+                            </p>
+                          </div>
+
+                          <button
+                            onClick={handleConnectWhatsApp}
+                            disabled={loading || !phoneNumber.trim()}
+                            className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+                          >
+                            {loading ? (
+                              <>
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                <span>جاري الربط...</span>
+                              </>
+                            ) : (
+                              <>
+                                <MessageSquare className="w-5 h-5" />
+                                <span>ربط WhatsApp</span>
+                              </>
+                            )}
+                          </button>
+                        </>
+                      )}
+
+                      {connectionStatus === 'connecting' && (
+                        <div className="text-center">
+                          <div className="w-64 h-64 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/20">
+                            <div className="text-center px-4">
+                              <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                              <p className="text-white font-medium mb-2">جاري توليد QR Code...</p>
+                              <p className="text-emerald-200/70 text-sm">الرقم: {phoneNumber}</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setConnectionStatus('disconnected');
+                              setLoading(false);
+                            }}
+                            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-all"
+                          >
+                            إلغاء
+                          </button>
+                        </div>
+                      )}
+
+                      {connectionStatus === 'qr' && qrCode && (
+                        <div className="text-center">
+                          <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-400/30 rounded-xl">
+                            <p className="text-emerald-200 text-sm">
+                              📱 الرقم: <span className="font-bold" dir="ltr">{phoneNumber}</span>
+                            </p>
+                          </div>
+                          <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl mx-auto">
+                            <img 
+                              src={qrCode} 
+                              alt="QR Code" 
+                              className="w-full h-full"
+                            />
+                          </div>
+                          <div className="flex items-center justify-center gap-2 text-emerald-200 mb-4 animate-pulse">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                            <span className="text-sm font-medium">امسح QR Code من هاتفك...</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
