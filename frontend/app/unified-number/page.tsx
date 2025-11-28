@@ -775,11 +775,18 @@ export default function CallCenterPage() {
             </div>
 
             {/* Call Records List */}
-            {[...realCallRecords, ...callHistory, ...callRecords].map((call) => (
-              <div
-                key={call.id}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-100 hover:scale-[1.01] transition"
-              >
+            {realCallRecords.length === 0 ? (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-gray-100 text-center">
+                <Phone size={64} className="mx-auto text-gray-300 mb-4" />
+                <h3 className="text-xl font-bold text-gray-400 mb-2">لا توجد مكالمات</h3>
+                <p className="text-gray-500">ابدأ مكالمتك الأولى الآن!</p>
+              </div>
+            ) : (
+              realCallRecords.map((call) => (
+                <div
+                  key={call.id}
+                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-100 hover:scale-[1.01] transition"
+                >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 flex-1">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
@@ -881,7 +888,8 @@ export default function CallCenterPage() {
                   </div>
                 )}
               </div>
-            ))}
+              ))
+            )}
           </div>
         )}
 
