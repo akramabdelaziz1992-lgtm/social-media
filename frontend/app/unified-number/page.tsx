@@ -818,41 +818,68 @@ export default function CallCenterPage() {
                           <span>{call.timestamp}</span>
                         </div>
                       </div>
+                    </div>
+                  </div>
 
-                      {/* Recording Player */}
-                      {call.recordingUrl && (
-                        <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Headphones size={18} className="text-indigo-600" />
-                            <span className="text-sm font-semibold text-indigo-900">🎧 استماع للمكالمة</span>
-                          </div>
-                          
-                          {/* HTML5 Audio Player */}
-                          <audio
-                            controls
-                            className="w-full mb-3 rounded-lg"
-                            style={{ height: '40px' }}
-                            preload="metadata"
-                          >
-                            <source src={call.recordingUrl} type="audio/mpeg" />
-                            <source src={call.recordingUrl} type="audio/wav" />
-                            متصفحك لا يدعم تشغيل الصوت
-                          </audio>
-                          
-                          {/* Download Button */}
-                          <a
-                            href={call.recordingUrl}
-                            download={`call-recording-${call.id}.mp3`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md hover:shadow-lg w-full justify-center"
-                            title="تحميل التسجيل"
-                          >
-                            <Download size={18} />
-                            <span className="text-sm font-medium">تحميل التسجيل</span>
-                          </a>
-                        </div>
-                      )}
+                  {/* Action Buttons - Always Visible */}
+                  <div className="flex flex-col gap-2 mr-4">
+                    {call.recordingUrl ? (
+                      <>
+                        {/* Listen Button */}
+                        <button
+                          onClick={() => {
+                            const audio = new Audio(call.recordingUrl);
+                            audio.play();
+                          }}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:shadow-lg transition font-medium"
+                          title="استماع للمكالمة"
+                        >
+                          <Headphones size={20} />
+                          <span>استماع</span>
+                        </button>
+                        
+                        {/* Download Button */}
+                        <a
+                          href={call.recordingUrl}
+                          download={`call-recording-${call.id}.mp3`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:shadow-lg transition font-medium text-center"
+                          title="تحميل التسجيل"
+                        >
+                          <Download size={20} />
+                          <span>تحميل</span>
+                        </a>
+                      </>
+                    ) : (
+                      <div className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm text-center">
+                        لا يوجد تسجيل
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Expandable Audio Player */}
+                {call.recordingUrl && (
+                  <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Headphones size={18} className="text-indigo-600" />
+                      <span className="text-sm font-semibold text-indigo-900">🎧 مشغل الصوت</span>
+                    </div>
+                    
+                    {/* HTML5 Audio Player */}
+                    <audio
+                      controls
+                      className="w-full rounded-lg"
+                      style={{ height: '40px' }}
+                      preload="metadata"
+                    >
+                      <source src={call.recordingUrl} type="audio/mpeg" />
+                      <source src={call.recordingUrl} type="audio/wav" />
+                      متصفحك لا يدعم تشغيل الصوت
+                    </audio>
+                  </div>
+                )}
                     </div>
                   </div>
                 </div>
