@@ -18,10 +18,24 @@ import {
   Activity,
 } from 'lucide-react';
 
+interface SettingsItem {
+  name: string;
+  href: string;
+  icon: string;
+  description: string;
+  badge?: string;
+}
+
 export default function SettingsPage() {
   const pathname = usePathname();
 
-  const settingsSections = [
+  const settingsSections: {
+    id: string;
+    title: string;
+    icon: any;
+    color: string;
+    items: SettingsItem[];
+  }[] = [
     {
       id: 'general',
       title: 'الإعدادات العامة',
