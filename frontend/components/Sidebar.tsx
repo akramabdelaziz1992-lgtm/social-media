@@ -15,8 +15,6 @@ import {
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [expandedChannels, setExpandedChannels] = React.useState<string[]>(['whatsapp', 'facebook', 'instagram', 'telegram']);
-  const [settingsExpanded, setSettingsExpanded] = React.useState<boolean>(false);
 
   const channels = [
     { 
@@ -85,11 +83,7 @@ export default function Sidebar() {
     },
   ];
 
-  const toggleChannel = (channelId: string) => {
-    setExpandedChannels((prev) =>
-      prev.includes(channelId) ? prev.filter((id) => id !== channelId) : [...prev, channelId]
-    );
-  };
+
 
   return (
     <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
@@ -270,112 +264,29 @@ export default function Sidebar() {
 
       </nav>
 
-      {/* Bottom Menu - Settings with Social Channels */}
+      {/* Bottom Menu - Settings as Direct Link */}
       <div className="p-4 border-t border-cyan-500/20 bg-gradient-to-b from-transparent to-black/20">
-        <button
-          onClick={() => setSettingsExpanded(!settingsExpanded)}
-          className={`group w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 ${
-            settingsExpanded
+        <Link
+          href="/settings"
+          className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+            pathname === '/settings'
               ? 'bg-gradient-to-r from-slate-600/30 to-slate-500/30 backdrop-blur-sm border border-slate-400/30 shadow-lg' 
               : 'text-slate-300 hover:bg-white/5 hover:border-slate-400/20 border border-transparent'
           }`}
         >
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              settingsExpanded
-                ? 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-lg' 
-                : 'bg-white/10 group-hover:bg-white/15'
-            }`}>
-              <Settings size={18} className={settingsExpanded ? 'text-white' : 'text-slate-300'} />
-            </div>
-            <span className={`font-semibold ${settingsExpanded ? 'text-white' : 'text-slate-300'}`}>
-              الإعدادات
-            </span>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+            pathname === '/settings'
+              ? 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-lg' 
+              : 'bg-white/10 group-hover:bg-white/15'
+          }`}>
+            <Settings size={18} className={pathname === '/settings' ? 'text-white' : 'text-slate-300'} />
           </div>
-          {settingsExpanded ? (
-            <ChevronDown size={16} className="text-cyan-300" />
-          ) : (
-            <ChevronRight size={16} className="text-slate-400" />
-          )}
-        </button>
-
-        {/* Settings Submenu with Social Channels */}
-        {settingsExpanded && (
-          <div className="mt-3 space-y-2 animate-fadeInUp">
-            {/* General Settings */}
-            <Link
-              href="/settings"
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                pathname === '/settings'
-                  ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-white font-medium'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="text-base">⚙️</span>
-              <span className="text-sm">الإعدادات العامة</span>
-            </Link>
-
-            {/* Divider */}
-            <div className="px-4 py-2">
-              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">منصات التواصل</span>
-            </div>
-
-            {/* Social Channels */}
-            {channels.map((channel) => (
-              <div key={channel.id}>
-                <button
-                  onClick={() => toggleChannel(channel.id)}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-300 ${
-                    expandedChannels.includes(channel.id) 
-                      ? 'bg-white/10 text-white font-semibold' 
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{channel.icon}</span>
-                    <span className="text-sm font-semibold">{channel.name}</span>
-                  </div>
-                  {channel.submenus.length > 0 && (
-                    expandedChannels.includes(channel.id) ? (
-                      <ChevronDown size={14} className="text-cyan-300" />
-                    ) : (
-                      <ChevronRight size={14} className="text-slate-400" />
-                    )
-                  )}
-                </button>
-
-                {/* Channel Submenu */}
-                {expandedChannels.includes(channel.id) && channel.submenus.length > 0 && (
-                  <div className="ml-3 mt-1 space-y-1 border-l-2 border-cyan-500/30 pl-3">
-                    {channel.submenus.map((submenu) => (
-                      <Link
-                        key={submenu.href}
-                        href={submenu.href}
-                        className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 ${
-                          pathname === submenu.href
-                            ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-white font-medium shadow-sm'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{submenu.icon}</span>
-                          <span className="text-xs">{submenu.name}</span>
-                        </div>
-                        {submenu.badge && (
-                          <span className="px-1.5 py-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[9px] rounded-full font-bold shadow-md animate-pulse">
-                            {submenu.badge}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+          <span className={`font-semibold ${pathname === '/settings' ? 'text-white' : 'text-slate-300'}`}>
+            الإعدادات
+          </span>
+        </Link>
       </div>
     </div>
   );
 }
- 
+
