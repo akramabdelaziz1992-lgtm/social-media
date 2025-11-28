@@ -27,7 +27,7 @@ export class CallsService {
    */
   async updateCallStatus(
     twilioCallSid: string,
-    status: CallStatus,
+    status: CallStatus | null,
     additionalData?: Partial<Call>,
   ): Promise<Call> {
     const call = await this.callsRepository.findOne({
@@ -38,10 +38,16 @@ export class CallsService {
       throw new NotFoundException(`Call with SID ${twilioCallSid} not found`);
     }
 
-    Object.assign(call, { status, ...additionalData });
-
-    if (status === CallStatus.COMPLETED) {
-      call.endedAt = new Date();
+    // لو status موجود، نحدّثه
+    if (status) {
+      Object.assign(call, { status, ...additionalData });
+      
+      if (status === CallStatus.COMPLETED) {
+        call.endedAt = new Date();
+      }
+    } else {
+      // لو status = null، نحدّث additionalData بس (زي Recording URL)
+      Object.assign(call, additionalData);
     }
 
     return await this.callsRepository.save(call);

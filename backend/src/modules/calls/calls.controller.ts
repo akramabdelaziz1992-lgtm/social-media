@@ -270,6 +270,38 @@ export class CallsController {
   }
 
   /**
+   * Webhook لتحديث Recording URL
+   */
+  @Post('webhook/recording')
+  async handleRecordingCallback(@Body() twilioData: any) {
+    try {
+      this.logger.log(
+        `🎙️ Recording callback: ${twilioData.CallSid}`,
+      );
+      this.logger.log(`   Recording URL: ${twilioData.RecordingUrl}`);
+      this.logger.log(`   Recording SID: ${twilioData.RecordingSid}`);
+      this.logger.log(`   Duration: ${twilioData.RecordingDuration}s`);
+
+      // تحديث المكالمة بـ Recording URL
+      await this.callsService.updateCallStatus(
+        twilioData.CallSid,
+        null, // مش هنغير الحالة
+        {
+          recordingUrl: twilioData.RecordingUrl,
+          recordingSid: twilioData.RecordingSid,
+          recordingDuration: parseInt(twilioData.RecordingDuration || '0', 10),
+        },
+      );
+
+      this.logger.log(`✅ Recording URL saved for call: ${twilioData.CallSid}`);
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`❌ Error updating recording: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * TwiML للمكالمات الصادرة من المتصفح (WebRTC) - اتصال مباشر WebRTC
    */
   @Post('twiml/outbound')
@@ -307,11 +339,13 @@ export class CallsController {
       const twiml = new (require('twilio').twiml.VoiceResponse)();
       
       // الاتصال مباشرة بالرقم من المتصفح (WebRTC to PSTN)
+      const backendUrl = process.env.BACKEND_URL || 'https://almasar-backend2025.onrender.com';
+      
       const dial = twiml.dial({
         callerId: process.env.TWILIO_PHONE_NUMBER || '+18154860356',
         timeout: 60, // وقت أطول للانتظار
         record: 'record-from-answer-dual', // تسجيل الصوت من الجهتين
-        recordingStatusCallback: `${process.env.BACKEND_URL || 'https://unacetic-nearly-tawanna.ngrok-free.dev'}/api/calls/webhook/recording`,
+        recordingStatusCallback: `${backendUrl}/api/calls/webhook/recording`,
         recordingStatusCallbackEvent: ['completed'],
         trim: 'trim-silence',
       });
@@ -319,7 +353,7 @@ export class CallsController {
       // الاتصال مباشرة بالرقم
       dial.number({
         statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
-        statusCallback: `${process.env.BACKEND_URL || 'https://unacetic-nearly-tawanna.ngrok-free.dev'}/api/calls/webhook/status`,
+        statusCallback: `${backendUrl}/api/calls/webhook/status`,
       }, toNumber);
       
       // لا نضيف أي رسالة بعد المكالمة - فقط نغلق

@@ -54,6 +54,12 @@ export class Call {
   @Column({ name: 'recording_url', nullable: true })
   recordingUrl: string;
 
+  @Column({ name: 'recording_sid', nullable: true })
+  recordingSid: string;
+
+  @Column({ name: 'recording_duration', nullable: true, default: 0 })
+  recordingDuration: number;
+
   @Column({ name: 'agent_id', nullable: true })
   agentId: string;
 
