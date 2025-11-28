@@ -60,13 +60,13 @@ export default function CallCenterLogin() {
       <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 w-full max-w-md p-8">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl mb-4">
-            <Phone size={32} className="text-white" />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src="/logo.png" alt="المسار الساخن" className="w-24 h-24 object-contain" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent mb-2">
             مركز الاتصالات
           </h1>
-          <p className="text-slate-400">تسجيل دخول الموظفين</p>
+          <p className="text-slate-400">المسار الساخن للسفر والسياحة</p>
         </div>
 
         {/* Error Message */}

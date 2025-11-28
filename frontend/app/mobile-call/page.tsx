@@ -290,8 +290,11 @@ export default function MobileCallPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 shadow-2xl">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center">📞 موبايل كول</h1>
-          <p className="text-sm sm:text-base text-blue-100 text-center mt-1 sm:mt-2">نظام المكالمات الصوتية - المسار الساخن</p>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <img src="/logo.png" alt="المسار الساخن" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">📞 موبايل كول</h1>
+          </div>
+          <p className="text-sm sm:text-base text-blue-100 text-center">المسار الساخن للسفر والسياحة</p>
         </div>
 
         <div className="bg-white rounded-b-xl sm:rounded-b-2xl shadow-2xl overflow-hidden">

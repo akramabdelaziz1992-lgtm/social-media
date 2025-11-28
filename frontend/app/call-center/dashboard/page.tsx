@@ -147,13 +147,16 @@ export default function CallCenterDashboard() {
       <div className="relative bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-cyan-600/20 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
-                لوحة التحكم - مركز الاتصالات
-              </h1>
-              <p className="text-slate-400 text-sm mt-1">
-                مرحباً {user?.name || user?.username} 👋
-              </p>
+            <div className="flex items-center gap-4">
+              <img src="/logo.png" alt="المسار الساخن" className="w-12 h-12 object-contain" />
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+                  لوحة التحكم - المسار الساخن
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">
+                  مرحباً {user?.name || user?.username} 👋
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <button
