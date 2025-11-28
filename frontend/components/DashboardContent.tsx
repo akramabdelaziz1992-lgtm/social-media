@@ -1,9 +1,40 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
 import StatCard from './StatCard';
 import { TrendingUp, MessageSquare, Users, Bot } from 'lucide-react';
+
+// Dynamic import for charts to avoid SSR issues
+const LineChartComponent = dynamic(
+  () => import('./DashboardCharts').then(mod => mod.LineChartComponent),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 h-[400px] flex items-center justify-center">
+        <div className="text-cyan-300 flex items-center gap-2">
+          <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          جاري تحميل الرسم البياني...
+        </div>
+      </div>
+    )
+  }
+);
+
+const PieChartComponent = dynamic(
+  () => import('./DashboardCharts').then(mod => mod.PieChartComponent),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 h-[400px] flex items-center justify-center">
+        <div className="text-cyan-300 flex items-center gap-2">
+          <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          جاري تحميل الرسم البياني...
+        </div>
+      </div>
+    )
+  }
+);
 
 const channelStats = [
   { name: 'Facebook', label: 'فيسبوك', data: { messages: 1175, widgets: 0, sequences: 0, flows: 0 }, color: 'from-blue-500 to-blue-600', icon: '📘' },
@@ -11,35 +42,11 @@ const channelStats = [
   { name: 'Telegram', label: 'تيليجرام', data: { messages: 0, widgets: 0, sequences: 0, flows: 0 }, color: 'from-cyan-500 to-blue-500', icon: '✈️' },
 ];
 
-const subscriberGrowthData = [
-  { day: 'الاثنين', growth: 4 },
-  { day: 'الثلاثاء', growth: 3 },
-  { day: 'الأربعاء', growth: 2 },
-  { day: 'الخميس', growth: 2.7 },
-  { day: 'الجمعة', growth: 2 },
-  { day: 'السبت', growth: 2.8 },
-  { day: 'الأحد', growth: 3 },
-];
-
-const pieData = [
-  { name: 'Telegram', value: 8 },
-  { name: 'WhatsApp', value: 7 },
-  { name: 'Meta', value: 4 },
-];
-
-const COLORS = ['#06B6D4', '#10B981', '#8B5CF6'];
-
 export default function DashboardContent() {
   const [mounted, setMounted] = useState(false);
-  const [chartsReady, setChartsReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Delay charts rendering to ensure proper hydration
-    const timer = setTimeout(() => {
-      setChartsReady(true);
-    }, 100);
-    return () => clearTimeout(timer);
   }, []);
 
   if (!mounted) {
@@ -163,110 +170,8 @@ export default function DashboardContent() {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Subscriber Growth Chart */}
-          <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-300">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white">نمو المشتركين (آخر 30 يومًا)</h3>
-            </div>
-            {chartsReady ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={subscriberGrowthData}>
-                  <defs>
-                    <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.1}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="day" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-                  <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      borderRadius: '12px',
-                      backdropFilter: 'blur(10px)'
-                    }}
-                    labelStyle={{ color: '#FFF', fontWeight: 'bold' }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="growth" 
-                    stroke="#06B6D4" 
-                    strokeWidth={3} 
-                    dot={{ fill: '#06B6D4', r: 5 }}
-                    activeDot={{ r: 8, fill: '#22D3EE' }}
-                    fill="url(#colorGrowth)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[300px] flex items-center justify-center">
-                <div className="text-cyan-300">جاري تحميل الرسم البياني...</div>
-              </div>
-            )}
-          </div>
-
-          {/* Subscriber Distribution */}
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-400">
-            <h3 className="text-xl font-bold text-white mb-6">مقارنة المشتركين</h3>
-            <div className="flex flex-col items-center">
-              {chartsReady ? (
-                <>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={3}
-                        dataKey="value"
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={COLORS[index]} 
-                            className="hover:opacity-80 transition-opacity cursor-pointer"
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          borderRadius: '12px'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="text-center mt-6">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">3</div>
-                    <div className="text-sm text-cyan-200 mt-1">المشتركين هذا الأسبوع</div>
-                  </div>
-                  <div className="mt-4 space-y-2 w-full">
-                    {pieData.map((entry, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
-                          <span className="text-white">{entry.name}</span>
-                        </div>
-                        <span className="text-cyan-200 font-semibold">{entry.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="h-[200px] flex items-center justify-center">
-                  <div className="text-cyan-300">جاري تحميل الرسم البياني...</div>
-                </div>
-              )}
-            </div>
-          </div>
+          <LineChartComponent />
+          <PieChartComponent />
         </div>
 
         {/* Broadcast Summary */}
