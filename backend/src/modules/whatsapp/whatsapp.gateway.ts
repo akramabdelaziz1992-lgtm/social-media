@@ -29,7 +29,9 @@ export class WhatsAppGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   sendQRCode(qr: string) {
     this.logger.log('📱 Broadcasting QR Code to clients...');
-    this.server.emit('qr', { qr });
+    this.logger.log(`QR Code length: ${qr?.length || 0} characters`);
+    // إرسال QR Code مباشرة بدون object wrapper
+    this.server.emit('qr', qr);
   }
 
   sendConnectionStatus(status: 'connected' | 'disconnected' | 'failed') {

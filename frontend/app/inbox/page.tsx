@@ -125,10 +125,12 @@ export default function InboxPage() {
       });
 
       socketRef.current.on('qr', (data: any) => {
-        console.log('📱 QR Code جاهز:', data);
-        const qrCode = typeof data === 'string' ? data : data.qr;
+        console.log('📱 QR Code جاهز! Type:', typeof data);
+        const qrCode = typeof data === 'string' ? data : (data?.qr || data);
+        console.log('QR Code received, length:', qrCode?.length);
         setQrCode(qrCode);
         setConnectionStatus('qr');
+        setLoading(false);
       });
 
       socketRef.current.on('ready', () => {
@@ -530,6 +532,16 @@ export default function InboxPage() {
         // Wait a bit for WebSocket to connect
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        // Set timeout to reset if QR doesn't arrive
+        const qrTimeout = setTimeout(() => {
+          if (connectionStatus === 'connecting') {
+            console.warn('⏱️ QR Code timeout - resetting connection');
+            setConnectionStatus('disconnected');
+            setLoading(false);
+            alert('انتهت المهلة. حاول مرة أخرى.');
+          }
+        }, 15000); // 15 seconds timeout
+        
         // Then initialize WhatsApp to generate QR Code
         const response = await fetch(`${apiUrl}/api/whatsapp/initialize`, {
           method: 'POST',
@@ -539,8 +551,10 @@ export default function InboxPage() {
         const result = await response.json();
         
         if (!result.success) {
+          clearTimeout(qrTimeout);
           alert('فشل بدء الاتصال. حاول مرة أخرى.');
           setConnectionStatus('disconnected');
+          setLoading(false);
         }
       } else {
         // Connect with phone number
@@ -929,6 +943,15 @@ export default function InboxPage() {
                               <p className="text-emerald-200/70 text-sm">انتظر قليلاً لتوليد QR Code</p>
                             </div>
                           </div>
+                          <button
+                            onClick={() => {
+                              setConnectionStatus('disconnected');
+                              setLoading(false);
+                            }}
+                            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-all"
+                          >
+                            إلغاء
+                          </button>
                         </div>
                       )}
 
