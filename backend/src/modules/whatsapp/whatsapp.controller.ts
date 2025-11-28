@@ -28,6 +28,37 @@ export class WhatsAppController {
   }
 
   /**
+   * بدء عملية الاتصال بـ WhatsApp (alias لـ connect)
+   */
+  @Post('initialize')
+  async initialize() {
+    return this.connect();
+  }
+
+  /**
+   * ربط WhatsApp برقم الهاتف
+   */
+  @Post('connect-phone')
+  async connectPhone(@Body() body: { phone: string }) {
+    try {
+      // في الحقيقة WhatsApp Web يستخدم QR Code فقط
+      // لكن يمكننا إرجاع success وبدء الاتصال العادي
+      await this.whatsappService.initialize();
+      return {
+        success: true,
+        message: 'جاري الاتصال... يرجى مسح QR Code من هاتفك',
+        note: 'WhatsApp Web يتطلب مسح QR Code من التطبيق',
+      };
+    } catch (error) {
+      this.logger.error('Error connecting with phone:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
    * الحصول على حالة الاتصال
    */
   @Get('status')
