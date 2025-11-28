@@ -279,16 +279,18 @@ export default function InboxPage() {
       
       console.log('WhatsApp Status:', statusData);
       
-      // إذا WhatsApp غير متصل، اعرض رسالة
+      // إذا WhatsApp غير متصل على Backend، أعد المستخدم لشاشة الربط
       if (!statusData.isReady) {
-        console.warn('⚠️ WhatsApp is not connected on backend');
+        console.warn('⚠️ WhatsApp is not connected on backend - redirecting to connection page');
+        // إزالة حالة الاتصال المحلية
+        localStorage.removeItem('whatsapp_connected');
+        setIsWhatsAppConnected(false);
+        setConnectionStatus('disconnected');
         setConversations([]);
         setChannels([
           { id: '1', name: 'واتساب', status: 'disconnected', type: 'whatsapp' },
         ]);
         setLoading(false);
-        // يمكننا إعادة محاولة الاتصال
-        await handleConnectWhatsApp();
         return;
       }
       
