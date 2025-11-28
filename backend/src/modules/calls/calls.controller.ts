@@ -48,8 +48,16 @@ export class CallsController {
    * الحصول على إحصائيات المكالمات
    */
   @Get('stats')
-  async getCallStats() {
-    return await this.callsService.getCallStats();
+  async getCallStats(@Query('period') period?: 'today' | 'week' | 'month' | 'all') {
+    return await this.callsService.getDetailedStats(period);
+  }
+
+  /**
+   * الحصول على آخر المكالمات
+   */
+  @Get('recent')
+  async getRecentCalls(@Query('limit') limit: string = '10') {
+    return await this.callsService.getRecentCalls(parseInt(limit, 10));
   }
 
   /**

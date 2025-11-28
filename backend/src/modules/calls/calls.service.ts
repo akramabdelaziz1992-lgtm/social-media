@@ -184,4 +184,72 @@ export class CallsService {
       activeCalls,
     };
   }
+
+  /**
+   * الحصول على إحصائيات مفصلة للمكالمات
+   */
+  async getDetailedStats(period: 'today' | 'week' | 'month' | 'all' = 'today') {
+    const now = new Date();
+    let startDate: Date;
+
+    switch (period) {
+      case 'today':
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case 'week':
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - 7);
+        startDate = weekStart;
+        break;
+      case 'month':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      default:
+        startDate = new Date(0); // Beginning of time
+    }
+
+    const query = this.callsRepository.createQueryBuilder('call')
+      .where('call.createdAt >= :startDate', { startDate });
+
+    const calls = await query.getMany();
+
+    const inbound = calls.filter(c => c.direction === CallDirection.INBOUND);
+    const outbound = calls.filter(c => c.direction === CallDirection.OUTBOUND);
+    const completed = calls.filter(c => c.status === CallStatus.COMPLETED);
+    const missed = calls.filter(c => c.status === CallStatus.NO_ANSWER || c.status === CallStatus.FAILED);
+
+    const totalDuration = completed.reduce((sum, call) => sum + (call.durationSeconds || 0), 0);
+    const avgDuration = completed.length > 0 ? Math.round(totalDuration / completed.length) : 0;
+
+    // Get today, week, month counts
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - 7);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const today = calls.filter(c => new Date(c.createdAt) >= todayStart).length;
+    const thisWeek = calls.filter(c => new Date(c.createdAt) >= weekStart).length;
+    const thisMonth = calls.filter(c => new Date(c.createdAt) >= monthStart).length;
+
+    return {
+      total: calls.length,
+      inbound: inbound.length,
+      outbound: outbound.length,
+      missed: missed.length,
+      avgDuration,
+      today,
+      thisWeek,
+      thisMonth,
+    };
+  }
+
+  /**
+   * الحصول على آخر المكالمات
+   */
+  async getRecentCalls(limit: number = 10): Promise<Call[]> {
+    return await this.callsRepository.find({
+      order: { createdAt: 'DESC' },
+      take: limit,
+    });
+  }
 }
