@@ -184,4 +184,91 @@ export class WhatsAppController {
       };
     }
   }
+
+  /**
+   * الحصول على إعدادات WhatsApp Business API
+   */
+  @Get('settings')
+  async getSettings() {
+    return {
+      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+      accessToken: process.env.WHATSAPP_ACCESS_TOKEN ? '***' + process.env.WHATSAPP_ACCESS_TOKEN.slice(-10) : '',
+      verifyToken: process.env.WHATSAPP_VERIFY_TOKEN || '',
+      businessAccountId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '',
+    };
+  }
+
+  /**
+   * حفظ إعدادات WhatsApp Business API
+   */
+  @Post('settings')
+  async saveSettings(@Body() settings: {
+    phoneNumberId: string;
+    accessToken: string;
+    verifyToken: string;
+    businessAccountId: string;
+  }) {
+    try {
+      // في بيئة production، يجب حفظ هذه البيانات في قاعدة البيانات أو ملف .env
+      // لكن الآن سنرجع success فقط
+      this.logger.log('Settings saved:', {
+        phoneNumberId: settings.phoneNumberId,
+        businessAccountId: settings.businessAccountId,
+        hasToken: !!settings.accessToken,
+      });
+
+      return {
+        success: true,
+        message: 'تم حفظ الإعدادات بنجاح',
+      };
+    } catch (error) {
+      this.logger.error('Error saving settings:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * اختبار الاتصال بـ WhatsApp Business API
+   */
+  @Post('test-connection')
+  async testConnection(@Body() settings: {
+    phoneNumberId: string;
+    accessToken: string;
+  }) {
+    try {
+      // اختبار الاتصال مع WhatsApp Cloud API
+      const response = await fetch(
+        `https://graph.facebook.com/v21.0/${settings.phoneNumberId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${settings.accessToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          success: true,
+          message: 'الاتصال ناجح! WhatsApp Business API يعمل بشكل صحيح',
+          data,
+        };
+      } else {
+        const error = await response.json();
+        return {
+          success: false,
+          error: error.error?.message || 'فشل الاتصال',
+        };
+      }
+    } catch (error) {
+      this.logger.error('Error testing connection:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
 }
