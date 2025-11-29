@@ -181,9 +181,9 @@ export default function DashboardContent() {
           </div>
           <div className="grid grid-cols-3 gap-4">
             {[
-              { icon: '💬', label: 'زيادة', value: '2', color: 'from-green-500 to-emerald-500' },
-              { icon: '📉', label: 'انخفاض', value: '0', color: 'from-red-500 to-pink-500' },
-              { icon: '📊', label: 'المجموع', value: '2', color: 'from-blue-500 to-cyan-500' },
+              { icon: '💬', label: 'زيادة', value: '2', color: 'from-emerald-500 to-green-500' },
+              { icon: '📉', label: 'انخفاض', value: '0', color: 'from-cyan-500 to-teal-500' },
+              { icon: '📊', label: 'المجموع', value: '2', color: 'from-teal-600 to-emerald-600' },
             ].map((item, idx) => (
               <div 
                 key={idx} 
