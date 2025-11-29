@@ -152,15 +152,15 @@ export default function Sidebar() {
         <div className="flex items-center gap-3">
           <img 
             src="/logo.png" 
-            alt="المسار الساخن" 
+            alt="لينك كول" 
             className="w-10 h-10 lg:w-12 lg:h-12 object-contain"
           />
           {!isCollapsed && (
             <div>
               <div className="text-base lg:text-lg font-bold text-white">
-                المسار الساخن
+                لينك كول
               </div>
-              <div className="text-xs text-white/80">للسفر والسياحة</div>
+              <div className="text-xs text-white/80">LinkCall</div>
             </div>
           )}
         </div>

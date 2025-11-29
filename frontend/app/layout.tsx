@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "المسار الساخن - مركز المحادثات الموحد",
+  title: "لينك كول - LinkCall",
   description: "منصة ويب احترافية لإدارة محادثات الأقسام عبر صندوق وارد موحد",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
