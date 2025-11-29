@@ -88,19 +88,26 @@ export default function MobileCallPage() {
   const loadCallHistory = async () => {
     try {
       const response = await fetch(`${serverUrl}/api/calls`);
-      const calls = await response.json();
+      if (!response.ok) {
+        console.log('Call history endpoint not available yet');
+        return;
+      }
+      const data = await response.json();
+      const calls = Array.isArray(data) ? data : [];
       
       const formattedHistory: CallRecord[] = calls.slice(0, 10).map((call: any) => ({
         id: call.id,
-        phone: call.toNumber || call.fromNumber,
-        duration: formatDuration(call.durationSeconds || 0),
-        time: new Date(call.createdAt).toLocaleString('ar-EG'),
-        type: call.direction === 'outbound' ? 'outgoing' : 'incoming',
+        phone: call.to || call.from || 'Unknown',
+        duration: formatDuration(call.duration || 0),
+        time: new Date(call.createdAt || Date.now()).toLocaleString('ar-EG'),
+        type: call.status === 'completed' ? 'outgoing' : 'incoming',
+        employeeName: call.employeeName || currentUser?.name || undefined,
       }));
       
       setCallHistory(formattedHistory);
     } catch (error) {
       console.error('Failed to load call history:', error);
+      setCallHistory([]);
     }
   };
 
