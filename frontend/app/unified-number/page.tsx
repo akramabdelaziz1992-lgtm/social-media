@@ -93,6 +93,17 @@ export default function CallCenterPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const syncRecordings = async () => {
+    try {
+      await fetch(`${apiUrl}/api/calls/sync-recordings`, { method: 'POST' });
+      console.log('✅ Recordings synced');
+      // إعادة تحميل المكالمات بعد المزامنة
+      setTimeout(loadCallRecords, 2000);
+    } catch (error) {
+      console.error('خطأ في مزامنة التسجيلات:', error);
+    }
+  };
+
   const loadCallRecords = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/calls`);
@@ -390,6 +401,14 @@ export default function CallCenterPage() {
               >
                 <Activity size={20} />
                 <span>تحديث</span>
+              </button>
+              <button 
+                onClick={syncRecordings}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
+                title="مزامنة التسجيلات مع Twilio"
+              >
+                <Download size={20} />
+                <span>مزامنة التسجيلات</span>
               </button>
             </div>
           </div>

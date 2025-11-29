@@ -258,4 +258,55 @@ export class CallsService {
       take: limit,
     });
   }
+
+  /**
+   * جلب التسجيلات من Twilio وربطها بالمكالمات
+   */
+  async syncRecordingsWithCalls(): Promise<void> {
+    try {
+      // جلب جميع التسجيلات من Twilio
+      const recordings = await this.twilioService.getAllRecordings(100);
+      
+      this.logger.log(`🎙️ Syncing ${recordings.length} recordings with calls`);
+      
+      // ربط كل تسجيل بمكالمته
+      for (const recording of recordings) {
+        const call = await this.callsRepository.findOne({
+          where: { twilioCallSid: recording.callSid },
+        });
+        
+        if (call && !call.recordingUrl) {
+          // حفظ رابط التسجيل
+          call.recordingUrl = recording.url;
+          await this.callsRepository.save(call);
+          this.logger.log(`✅ Recording linked to call ${call.id}`);
+        }
+      }
+    } catch (error) {
+      this.logger.error(`❌ Failed to sync recordings: ${error.message}`);
+    }
+  }
+
+  /**
+   * جلب تسجيل مكالمة محددة
+   */
+  async getCallRecording(callId: string): Promise<string | null> {
+    const call = await this.getCallById(callId);
+    
+    if (call.recordingUrl) {
+      return call.recordingUrl;
+    }
+    
+    // محاولة جلب التسجيل من Twilio
+    if (call.twilioCallSid) {
+      const recordings = await this.twilioService.getRecordings(call.twilioCallSid);
+      if (recordings.length > 0) {
+        call.recordingUrl = recordings[0].url;
+        await this.callsRepository.save(call);
+        return call.recordingUrl;
+      }
+    }
+    
+    return null;
+  }
 }

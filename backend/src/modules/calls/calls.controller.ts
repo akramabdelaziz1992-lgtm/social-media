@@ -84,6 +84,21 @@ export class CallsController {
   }
 
   /**
+   * مزامنة التسجيلات مع المكالمات
+   */
+  @Post('sync-recordings')
+  async syncRecordings() {
+    try {
+      await this.callsService.syncRecordingsWithCalls();
+      this.logger.log('✅ Recordings synced with calls');
+      return { message: 'Recordings synced successfully' };
+    } catch (error) {
+      this.logger.error(`❌ Error syncing recordings: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * الحصول على جميع تسجيلات المكالمات
    */
   @Get('recordings')
