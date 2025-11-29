@@ -173,6 +173,26 @@ export default function LoginPage() {
               </span>
             ) : 'تسجيل الدخول'}
           </button>
+
+          {/* Quick Access Button */}
+          <button
+            type="button"
+            onClick={() => {
+              // Store fake token and user data
+              localStorage.setItem('accessToken', 'demo-token-' + Date.now());
+              localStorage.setItem('user', JSON.stringify({
+                id: '1',
+                email: 'akram@local.com',
+                name: 'Akram',
+                role: 'admin'
+              }));
+              // Redirect to dashboard
+              router.push('/dashboard');
+            }}
+            className="w-full mt-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-700 hover:to-teal-700 transform hover:scale-[1.02] transition-all duration-200 shadow-xl hover:shadow-2xl"
+          >
+            🚀 دخول سريع (بدون كلمة مرور)
+          </button>
         </form>
 
         <div className={`mt-6 p-5 bg-gradient-to-br from-slate-50 to-teal-50 rounded-2xl border-2 border-teal-100 shadow-inner transition-all duration-700 delay-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
