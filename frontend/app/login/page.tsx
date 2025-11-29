@@ -30,7 +30,7 @@ export default function LoginPage() {
 
       const data = await response.json();
       
-      authStorage.setTokens(data.access_token, data.refresh_token || '');
+      authStorage.setTokens(data.accessToken, data.refreshToken || '');
       authStorage.setUser(data.user);
 
       router.push('/dashboard');
@@ -68,7 +68,8 @@ export default function LoginPage() {
                 alt="المسار الساخن" 
                 width={100} 
                 height={100}
-                className="object-contain relative z-10 drop-shadow-2xl"
+                className="relative z-10 drop-shadow-2xl"
+                style={{ width: 'auto', height: 'auto' }}
                 priority
               />
             </div>
