@@ -13,11 +13,13 @@ export class TwilioService {
   constructor(private configService: ConfigService) {
     this.accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
     this.authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
-    this.phoneNumber = this.configService.get<string>('TWILIO_PHONE_NUMBER');
+    // استخدام الرقم السعودي كـ Caller ID الافتراضي
+    this.phoneNumber = this.configService.get<string>('TWILIO_SAUDI_CALLER_ID') || this.configService.get<string>('TWILIO_PHONE_NUMBER');
 
     if (this.accountSid && this.authToken) {
       this.twilioClient = twilio(this.accountSid, this.authToken);
       this.logger.log('✅ Twilio client initialized successfully');
+      this.logger.log(`📱 Default Caller ID: ${this.phoneNumber}`);
     } else {
       this.logger.warn('⚠️ Twilio credentials not configured');
     }

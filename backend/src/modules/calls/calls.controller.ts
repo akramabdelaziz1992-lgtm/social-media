@@ -392,7 +392,7 @@ export class CallsController {
       const backendUrl = process.env.BACKEND_URL || 'https://almasar-backend2025.onrender.com';
       
       const dial = twiml.dial({
-        callerId: process.env.TWILIO_PHONE_NUMBER || '+18154860356',
+        callerId: process.env.TWILIO_SAUDI_CALLER_ID || process.env.TWILIO_PHONE_NUMBER || '+18154860356',
         timeout: 60, // وقت أطول للانتظار
         record: 'record-from-answer-dual', // تسجيل الصوت من الجهتين
         recordingStatusCallback: `${backendUrl}/api/calls/webhook/recording`,
