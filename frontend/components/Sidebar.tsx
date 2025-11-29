@@ -86,9 +86,9 @@ export default function Sidebar() {
 
 
   return (
-    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
+    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-teal-500/20 sidebar-scroll">
       {/* Logo */}
-      <div className="p-6 border-b border-cyan-500/20">
+      <div className="p-6 border-b border-teal-500/20">
         <div className="flex items-center gap-3">
           <img 
             src="/logo.png" 
@@ -96,10 +96,10 @@ export default function Sidebar() {
             className="w-12 h-12 object-contain"
           />
           <div>
-            <div className="text-lg font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
+            <div className="text-lg font-bold bg-gradient-to-r from-teal-300 to-emerald-300 bg-clip-text text-transparent">
               المسار الساخن
             </div>
-            <div className="text-xs text-cyan-400">للسفر والسياحة</div>
+            <div className="text-xs text-teal-400">للسفر والسياحة</div>
           </div>
         </div>
       </div>
@@ -111,16 +111,16 @@ export default function Sidebar() {
           href="/dashboard"
           className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
             pathname === '/dashboard' 
-              ? 'bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-sm border border-cyan-400/30 shadow-lg shadow-cyan-500/20' 
-              : 'text-slate-300 hover:bg-white/5 hover:border-cyan-400/20 border border-transparent'
+              ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' 
+              : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'
           }`}
         >
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
             pathname === '/dashboard' 
-              ? 'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg' 
+              ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' 
               : 'bg-white/10 group-hover:bg-white/15'
           }`}>
-            <BarChart3 size={18} className={pathname === '/dashboard' ? 'text-white' : 'text-cyan-300'} />
+            <BarChart3 size={18} className={pathname === '/dashboard' ? 'text-white' : 'text-orange-300'} />
           </div>
           <span className={`font-semibold ${pathname === '/dashboard' ? 'text-white' : 'text-slate-300'}`}>
             لوحة التحكم

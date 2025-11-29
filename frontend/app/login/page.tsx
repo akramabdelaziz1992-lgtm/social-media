@@ -42,8 +42,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 via-cyan-50 to-blue-50">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-cyan-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-orange-100">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -56,7 +56,7 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-600 bg-clip-text text-transparent mb-2">
             المسار الساخن
           </h1>
           <p className="text-gray-600 font-medium">للسفر والسياحة</p>
@@ -78,7 +78,7 @@ export default function LoginPage() {
               type="email"
               value={credentials.email}
               onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
               placeholder="admin@elmasarelsa5en.com"
               required
               disabled={loading}
@@ -93,7 +93,7 @@ export default function LoginPage() {
               type="password"
               value={credentials.password}
               onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
               placeholder="••••••"
               required
               disabled={loading}
@@ -103,25 +103,25 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-3 rounded-lg font-medium hover:from-cyan-700 hover:to-blue-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-teal-700 to-emerald-700 text-white py-3 rounded-lg font-medium hover:from-teal-800 hover:to-emerald-800 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '⏳ جاري تسجيل الدخول...' : '🔓 تسجيل الدخول'}
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border border-cyan-200">
+        <div className="mt-6 p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-lg border border-teal-200">
           <p className="text-center text-sm font-medium text-gray-700 mb-3">الحسابات المتاحة:</p>
           <div className="space-y-2 text-xs text-gray-600">
-            <div className="bg-white p-2 rounded border border-cyan-100">
-              <p className="font-medium text-cyan-700">👨‍💼 الإدارة</p>
+            <div className="bg-white p-2 rounded border border-teal-100">
+              <p className="font-medium text-teal-700">👨‍💼 الإدارة</p>
               <p>admin@elmasarelsa5en.com / Admin@123</p>
             </div>
-            <div className="bg-white p-2 rounded border border-cyan-100">
-              <p className="font-medium text-cyan-700">💰 المبيعات</p>
+            <div className="bg-white p-2 rounded border border-teal-100">
+              <p className="font-medium text-teal-700">💰 المبيعات</p>
               <p>sales@elmasarelsa5en.com / Sales@123</p>
             </div>
-            <div className="bg-white p-2 rounded border border-cyan-100">
-              <p className="font-medium text-cyan-700">📊 المحاسبة</p>
+            <div className="bg-white p-2 rounded border border-teal-100">
+              <p className="font-medium text-teal-700">📊 المحاسبة</p>
               <p>accounting@elmasarelsa5en.com / Accounting@123</p>
             </div>
           </div>
