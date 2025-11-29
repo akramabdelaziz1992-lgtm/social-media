@@ -86,9 +86,23 @@ export default function Sidebar() {
 
 
   return (
-    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-teal-500/20 sidebar-scroll">
+    <div className="w-64 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 flex flex-col overflow-y-auto shadow-2xl border-r border-teal-500/20 sidebar-scroll relative">
+      {/* Animated Background Shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Circles */}
+        <div className="absolute top-20 left-5 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl animate-blob"></div>
+        <div className="absolute top-60 right-5 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-40 left-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+        
+        {/* Animated Lines Pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gMTAwIDAgTCAwIDAgMCAxMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBkOTQ4OCIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"></div>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-slate-900/50"></div>
+      </div>
+
       {/* Logo */}
-      <div className="p-6 border-b border-teal-500/20">
+      <div className="p-6 border-b border-teal-500/20 relative z-10">
         <div className="flex items-center gap-3">
           <img 
             src="/logo.png" 
@@ -105,7 +119,7 @@ export default function Sidebar() {
       </div>
 
       {/* Main Menu */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 relative z-10">
         {/* Dashboard */}
         <Link
           href="/dashboard"
@@ -267,7 +281,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Menu - Settings as Direct Link */}
-      <div className="p-4 border-t border-cyan-500/20 bg-gradient-to-b from-transparent to-black/20">
+      <div className="p-4 border-t border-cyan-500/20 bg-gradient-to-b from-transparent to-black/20 relative z-10">
         <Link
           href="/settings"
           className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
