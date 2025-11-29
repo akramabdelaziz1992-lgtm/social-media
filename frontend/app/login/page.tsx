@@ -137,18 +137,19 @@ export default function LoginPage() {
         <div className="mt-6 p-5 bg-gradient-to-br from-slate-50 to-teal-50 rounded-2xl border-2 border-teal-100 shadow-inner">
           <p className="text-center text-sm font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
             <span className="text-teal-600">🔑</span>
-            الحسابات المتاحة
+            الحساب المتاح
           </p>
-          <div className="space-y-3">
-            <div className="bg-white p-3 rounded-xl border-l-4 border-teal-600 shadow-sm hover:shadow-md transition-shadow">
-              <p className="font-bold text-teal-700 mb-1">👨‍💼 الإدارة</p>
-              <p className="text-xs text-slate-600 font-mono">admin@elmasarelsa5en.com</p>
-              <p className="text-xs text-slate-500 font-mono">كلمة المرور: Admin@123</p>
-            </div>
-            <div className="bg-white p-3 rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition-shadow">
-              <p className="font-bold text-emerald-700 mb-1">💰 المبيعات</p>
-              <p className="text-xs text-slate-600 font-mono">sales@elmasarelsa5en.com</p>
-              <p className="text-xs text-slate-500 font-mono">كلمة المرور: Sales@123</p>
+          <div className="bg-white p-4 rounded-xl border-2 border-teal-600 shadow-lg">
+            <p className="font-bold text-teal-700 mb-2 text-lg">👨‍💻 Akram</p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">📧</span>
+                <p className="text-sm text-slate-700 font-mono font-bold">akram@local.com</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">🔐</span>
+                <p className="text-sm text-slate-700 font-mono font-bold">Aazxc123</p>
+              </div>
             </div>
           </div>
         </div>
