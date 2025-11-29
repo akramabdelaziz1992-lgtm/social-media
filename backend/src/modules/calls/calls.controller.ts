@@ -99,6 +99,56 @@ export class CallsController {
   }
 
   /**
+   * جلب التسجيلات للمكالمات الأخيرة (آخر 48 ساعة)
+   * يستخدم لجلب التسجيلات الجديدة التي لم تُحمّل بعد
+   */
+  @Post('fetch-recent-recordings')
+  async fetchRecentRecordings() {
+    try {
+      this.logger.log('🔄 Fetching recent call recordings...');
+      
+      // جلب المكالمات بدون تسجيلات من آخر 48 ساعة
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      
+      const callsWithoutRecordings = await this.callsService.getCallsWithoutRecordings(twoDaysAgo);
+      this.logger.log(`📊 Found ${callsWithoutRecordings.length} calls without recordings`);
+      
+      let synced = 0;
+      for (const call of callsWithoutRecordings) {
+        if (call.twilioCallSid) {
+          try {
+            const recordings = await this.twilioService.getRecordings(call.twilioCallSid);
+            if (recordings.length > 0) {
+              await this.callsService.updateCallStatus(call.twilioCallSid, null, {
+                recordingUrl: recordings[0].url,
+                recordingSid: recordings[0].sid,
+              });
+              synced++;
+              this.logger.log(`✅ Recording found for call ${call.twilioCallSid}`);
+            } else {
+              this.logger.log(`⏳ Recording not ready yet for call ${call.twilioCallSid}`);
+            }
+          } catch (error) {
+            this.logger.warn(`⚠️ Could not fetch recording for call ${call.twilioCallSid}: ${error.message}`);
+          }
+        }
+      }
+      
+      this.logger.log(`✅ Fetched recordings: ${synced}/${callsWithoutRecordings.length} calls updated`);
+      return { 
+        success: true, 
+        synced,
+        total: callsWithoutRecordings.length,
+        message: `${synced} recordings found and synced`
+      };
+    } catch (error) {
+      this.logger.error(`❌ Error fetching recordings: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * الحصول على جميع تسجيلات المكالمات
    */
   @Get('recordings')

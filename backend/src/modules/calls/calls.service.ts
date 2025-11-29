@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThan } from 'typeorm';
 import { Call, CallStatus, CallDirection } from './entities/call.entity';
 import { TwilioService } from './twilio.service';
 
@@ -284,6 +284,27 @@ export class CallsService {
       }
     } catch (error) {
       this.logger.error(`❌ Failed to sync recordings: ${error.message}`);
+    }
+  }
+
+  /**
+   * جلب المكالمات بدون تسجيلات (لمحاولة جلب التسجيلات الجديدة)
+   */
+  async getCallsWithoutRecordings(fromDate: Date): Promise<Call[]> {
+    try {
+      const calls = await this.callsRepository.find({
+        where: [
+          { 
+            recordingUrl: null,
+            status: CallStatus.COMPLETED,
+            createdAt: MoreThan(fromDate)
+          }
+        ]
+      });
+      return calls;
+    } catch (error) {
+      this.logger.error(`❌ Error getting calls without recordings: ${error.message}`);
+      throw error;
     }
   }
 

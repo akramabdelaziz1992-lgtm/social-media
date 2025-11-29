@@ -95,12 +95,26 @@ export default function CallCenterPage() {
 
   const syncRecordings = async () => {
     try {
-      await fetch(`${apiUrl}/api/calls/sync-recordings`, { method: 'POST' });
-      console.log('✅ Recordings synced');
-      // إعادة تحميل المكالمات بعد المزامنة
-      setTimeout(loadCallRecords, 2000);
+      const response = await fetch(`${apiUrl}/api/calls/fetch-recent-recordings`, { method: 'POST' });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log(`✅ Recordings synced: ${result.synced}/${result.total} calls updated`);
+        
+        if (result.synced > 0) {
+          alert(`✅ تم العثور على ${result.synced} تسجيل جديد!`);
+        } else if (result.total > 0) {
+          alert(`⏳ لا توجد تسجيلات جاهزة بعد.\n\nيرجى الانتظار 30-60 ثانية بعد انتهاء المكالمة ثم المحاولة مرة أخرى.`);
+        } else {
+          alert('✅ جميع المكالمات لديها تسجيلات بالفعل');
+        }
+        
+        // إعادة تحميل المكالمات
+        setTimeout(loadCallRecords, 1000);
+      }
     } catch (error) {
       console.error('خطأ في مزامنة التسجيلات:', error);
+      alert('❌ حدث خطأ أثناء جلب التسجيلات');
     }
   };
 
@@ -404,11 +418,14 @@ export default function CallCenterPage() {
               </button>
               <button 
                 onClick={syncRecordings}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
-                title="مزامنة التسجيلات مع Twilio"
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2 group"
+                title="جلب تسجيلات المكالمات من Twilio (للمكالمات الجديدة)"
               >
-                <Download size={20} />
-                <span>مزامنة التسجيلات</span>
+                <Download size={20} className="group-hover:animate-bounce" />
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-semibold">🎙️ جلب التسجيلات</span>
+                  <span className="text-xs opacity-80">(بعد 30-60 ثانية من المكالمة)</span>
+                </div>
               </button>
             </div>
           </div>
@@ -878,8 +895,11 @@ export default function CallCenterPage() {
                         </a>
                       </>
                     ) : (
-                      <div className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm text-center">
-                        لا يوجد تسجيل
+                      <div className="px-4 py-2.5 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-xl text-sm text-center flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>⏳ التسجيل قيد المعالجة (انتظر 30-60 ثانية)</span>
                       </div>
                     )}
                   </div>

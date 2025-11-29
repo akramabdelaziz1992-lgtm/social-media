@@ -237,8 +237,22 @@ export default function MobileCallPage() {
         (window as any).activeDevice = null;
         (window as any).activeCall = null;
         
-        // تحديث السجل
+        // تحديث السجل وجلب التسجيلات بعد 60 ثانية
         loadCallHistory();
+        
+        // محاولة جلب التسجيل بعد دقيقة
+        setTimeout(async () => {
+          console.log('⏰ Attempting to fetch recording after 60 seconds...');
+          try {
+            const serverUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+            const baseUrl = serverUrl.replace(/\/api$/, '');
+            await fetch(`${baseUrl}/api/calls/fetch-recent-recordings`, { method: 'POST' });
+            console.log('✅ Recording fetch triggered');
+            loadCallHistory();
+          } catch (error) {
+            console.error('❌ Error fetching recording:', error);
+          }
+        }, 60000); // 60 ثانية
       });
       
       // حفظ الـ device لاستخدامه في End Call
@@ -320,6 +334,20 @@ export default function MobileCallPage() {
     
     // تحديث السجل
     setTimeout(() => loadCallHistory(), 1000);
+    
+    // محاولة جلب التسجيل بعد دقيقة
+    setTimeout(async () => {
+      console.log('⏰ Attempting to fetch recording after 60 seconds...');
+      try {
+        const serverUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+        const baseUrl = serverUrl.replace(/\/api$/, '');
+        await fetch(`${baseUrl}/api/calls/fetch-recent-recordings`, { method: 'POST' });
+        console.log('✅ Recording fetch triggered');
+        loadCallHistory();
+      } catch (error) {
+        console.error('❌ Error fetching recording:', error);
+      }
+    }, 60000); // 60 ثانية
   };
 
   const dialpadButtons = [
