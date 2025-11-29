@@ -87,7 +87,8 @@ export default function MobileCallPage() {
 
   const loadCallHistory = async () => {
     try {
-      const response = await fetch(`${serverUrl}/api/calls`);
+      const baseUrl = serverUrl.replace(/\/api$/, '');
+      const response = await fetch(`${baseUrl}/api/calls`);
       if (!response.ok) {
         console.log('Call history endpoint not available yet');
         return;
@@ -189,7 +190,14 @@ export default function MobileCallPage() {
       
       // الحصول على Token من Backend مع معلومات الموظف
       const identity = `${currentUser.name}-${Date.now()}`;
-      const tokenResponse = await fetch(`${serverUrl}/api/calls/token?identity=${encodeURIComponent(identity)}&employeeName=${encodeURIComponent(currentUser.name)}&employeeEmail=${encodeURIComponent(currentUser.email)}&department=${encodeURIComponent(currentUser.department || 'N/A')}`);
+      // تنظيف URL - إزالة /api المكررة
+      const baseUrl = serverUrl.replace(/\/api$/, '');
+      const tokenResponse = await fetch(`${baseUrl}/api/calls/token?identity=${encodeURIComponent(identity)}&employeeName=${encodeURIComponent(currentUser.name)}&employeeEmail=${encodeURIComponent(currentUser.email)}&department=${encodeURIComponent(currentUser.department || 'N/A')}`);
+      
+      if (!tokenResponse.ok) {
+        throw new Error('Failed to get Twilio token');
+      }
+      
       const { token } = await tokenResponse.json();
       
       // إنشاء Twilio Device
