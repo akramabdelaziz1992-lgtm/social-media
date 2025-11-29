@@ -315,10 +315,10 @@ export default function MobileCallPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 flex flex-col">
-      <div className="max-w-4xl mx-auto w-full flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4">
+      <div className="max-w-4xl mx-auto w-full">
         {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-3 sm:p-4 shadow-2xl flex-shrink-0">
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-3 sm:p-4 shadow-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <img src="/logo.png" alt="المسار الساخن" className="w-10 h-10 object-contain" />
@@ -336,8 +336,8 @@ export default function MobileCallPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-b-xl shadow-2xl flex-1 flex flex-col mb-4">
-          <div className="flex flex-col md:flex-row flex-1">
+        <div className="bg-white rounded-b-xl shadow-2xl mb-4">
+          <div className="flex flex-col md:flex-row min-h-[600px]">
             {/* Sidebar */}
             <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-teal-600 to-emerald-700 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
               <button
