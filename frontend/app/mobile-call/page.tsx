@@ -315,16 +315,16 @@ export default function MobileCallPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 md:p-6 overflow-y-auto">
-      <div className="max-w-7xl mx-auto">
+    <div className="h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 overflow-hidden flex flex-col">
+      <div className="max-w-4xl mx-auto w-full flex flex-col h-full">
         {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 shadow-2xl">
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-3 sm:p-4 shadow-2xl flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="المسار الساخن" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="المسار الساخن" className="w-10 h-10 object-contain" />
               <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">📞 موبايل كول</h1>
-                <p className="text-sm sm:text-base text-teal-100">المسار الساخن للسفر والسياحة</p>
+                <h1 className="text-lg sm:text-xl font-bold text-white">📞 موبايل كول</h1>
+                <p className="text-xs text-teal-100">المسار الساخن للسفر والسياحة</p>
               </div>
             </div>
             {currentUser && (
@@ -336,8 +336,8 @@ export default function MobileCallPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-b-xl sm:rounded-b-2xl shadow-2xl overflow-hidden">
-          <div className="flex flex-col md:flex-row">
+        <div className="bg-white rounded-b-xl shadow-2xl overflow-hidden flex-1 flex flex-col">
+          <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
             {/* Sidebar */}
             <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-teal-600 to-emerald-700 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
               <button
@@ -438,7 +438,7 @@ export default function MobileCallPage() {
 
                   {/* Add Contact Form */}
                   {showAddContactForm && (
-                    <div className="mt-4 sm:mt-6 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6">
+                    <div className="mt-4 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 max-h-[300px] overflow-y-auto">
                       <h3 className="font-bold text-gray-800 mb-3 sm:mb-4 text-sm sm:text-base">إضافة جهة اتصال جديدة</h3>
                       <div className="space-y-3">
                         <div>
@@ -522,96 +522,104 @@ export default function MobileCallPage() {
 
               {/* Contacts View */}
               {currentView === 'contacts' && (
-                <div>
-                  <div className="flex items-center justify-between mb-4 sm:mb-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">جهات الاتصال</h2>
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">جهات الاتصال ({contacts.length})</h2>
                     <button
                       onClick={() => {
                         setCurrentView('dialpad');
                         setShowAddContactForm(true);
                       }}
-                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs sm:text-sm font-bold"
+                      className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-sm font-bold"
                     >
                       👤+ جديد
                     </button>
                   </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    {contacts.map((contact) => (
-                      <div
-                        key={contact.id}
-                        className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 sm:p-4 rounded-xl transition cursor-pointer active:scale-98"
-                        onClick={() => {
-                          setPhoneNumber(contact.phone);
-                          setCurrentView('dialpad');
-                        }}
-                      >
-                        <div className="flex items-center gap-3 sm:gap-4">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg sm:text-xl">
-                            👤
-                          </div>
-                          <div>
-                            <div className="font-bold text-gray-800 text-sm sm:text-base">{contact.name}</div>
-                            <div className="text-gray-600 text-xs sm:text-sm" dir="ltr">{contact.phone}</div>
-                          </div>
-                        </div>
-                        <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs sm:text-sm">
-                          📞 اتصال
-                        </button>
+                  <div className="space-y-2 overflow-y-auto flex-1">
+                    {contacts.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="text-4xl mb-2">📇</div>
+                        <p>لا توجد جهات اتصال</p>
                       </div>
-                    ))}
+                    ) : (
+                      contacts.map((contact) => (
+                        <div
+                          key={contact.id}
+                          className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 rounded-xl transition"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg flex-shrink-0">
+                              👤
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-bold text-gray-800 text-sm truncate">{contact.name}</div>
+                              <div className="text-gray-600 text-xs" dir="ltr">{contact.phone}</div>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              setPhoneNumber(contact.phone);
+                              setCurrentView('dialpad');
+                            }}
+                            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs flex-shrink-0"
+                          >
+                            📞 اتصال
+                          </button>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               )}
 
               {/* History View */}
               {currentView === 'history' && (
-                <div>
-                  <div className="flex items-center justify-between mb-4 sm:mb-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">سجل المكالمات</h2>
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">سجل المكالمات ({callHistory.length})</h2>
                     <button
                       onClick={loadCallHistory}
-                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs sm:text-sm"
+                      className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-sm"
                     >
                       🔄 تحديث
                     </button>
                   </div>
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-2 overflow-y-auto flex-1">
                     {callHistory.length === 0 ? (
-                      <div className="text-center text-gray-500 py-8 sm:py-12">
-                        <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">📭</div>
-                        <p className="text-sm sm:text-base">لا توجد مكالمات بعد</p>
+                      <div className="text-center text-gray-500 py-8">
+                        <div className="text-4xl mb-3">📭</div>
+                        <p className="text-sm">لا توجد مكالمات بعد</p>
                       </div>
                     ) : (
                       callHistory.map((call) => (
                         <div
                           key={call.id}
-                          className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 sm:p-4 rounded-xl transition"
+                          className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 rounded-xl transition"
                         >
-                          <div className="flex items-center gap-3 sm:gap-4 flex-1">
-                            <div className={`text-xl sm:text-2xl ${
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className={`text-xl flex-shrink-0 ${
                               call.type === 'outgoing' ? 'text-green-500' : 
                               call.type === 'incoming' ? 'text-blue-500' : 'text-red-500'
                             }`}>
                               {call.type === 'outgoing' ? '📞' : call.type === 'incoming' ? '📲' : '📵'}
                             </div>
-                            <div className="flex-1">
-                              <div className="font-bold text-gray-800 text-sm sm:text-base" dir="ltr">{call.phone}</div>
-                              <div className="text-gray-600 text-xs sm:text-sm">{call.time}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-bold text-gray-800 text-sm truncate" dir="ltr">{call.phone}</div>
+                              <div className="text-gray-600 text-xs">{call.time}</div>
                               {call.employeeName && (
-                                <div className="text-blue-600 text-xs mt-1">
+                                <div className="text-blue-600 text-xs mt-1 truncate">
                                   👤 {call.employeeName}
                                 </div>
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div className="text-gray-600 text-xs sm:text-sm">{call.duration}</div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="text-gray-600 text-xs">{call.duration}</div>
                             <button
                               onClick={() => handleCallFromHistory(call.phone)}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs sm:text-sm flex items-center gap-1"
+                              className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs flex items-center gap-1"
                             >
                               <span>📞</span>
-                              <span className="hidden sm:inline">اتصال</span>
                             </button>
                           </div>
                         </div>
