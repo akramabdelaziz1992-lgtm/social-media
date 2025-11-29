@@ -86,20 +86,20 @@ export default function Sidebar() {
 
 
   return (
-    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-orange-500/20 sidebar-scroll">
+    <div className="w-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col overflow-y-auto shadow-2xl border-r border-cyan-500/20 sidebar-scroll">
       {/* Logo */}
-      <div className="p-6 border-b border-orange-500/20">
+      <div className="p-6 border-b border-cyan-500/20">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="المسار الساخن" 
+            className="w-12 h-12 object-contain"
+          />
           <div>
-            <div className="text-lg font-bold bg-gradient-to-r from-orange-300 to-red-300 bg-clip-text text-transparent">
+            <div className="text-lg font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
               المسار الساخن
             </div>
-            <div className="text-xs text-orange-400">للسفر والسياحة</div>
+            <div className="text-xs text-cyan-400">للسفر والسياحة</div>
           </div>
         </div>
       </div>
@@ -111,16 +111,16 @@ export default function Sidebar() {
           href="/dashboard"
           className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
             pathname === '/dashboard' 
-              ? 'bg-gradient-to-r from-orange-500/30 to-red-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' 
-              : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'
+              ? 'bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-sm border border-cyan-400/30 shadow-lg shadow-cyan-500/20' 
+              : 'text-slate-300 hover:bg-white/5 hover:border-cyan-400/20 border border-transparent'
           }`}
         >
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
             pathname === '/dashboard' 
-              ? 'bg-gradient-to-br from-orange-500 to-red-600 shadow-lg' 
+              ? 'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg' 
               : 'bg-white/10 group-hover:bg-white/15'
           }`}>
-            <BarChart3 size={18} className={pathname === '/dashboard' ? 'text-white' : 'text-orange-300'} />
+            <BarChart3 size={18} className={pathname === '/dashboard' ? 'text-white' : 'text-cyan-300'} />
           </div>
           <span className={`font-semibold ${pathname === '/dashboard' ? 'text-white' : 'text-slate-300'}`}>
             لوحة التحكم
