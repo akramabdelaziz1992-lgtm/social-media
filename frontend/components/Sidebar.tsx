@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3,
   MessageSquare,
@@ -176,98 +177,122 @@ export default function Sidebar() {
       {/* Main Menu */}
       <nav className="flex-1 p-3 lg:p-4 space-y-1.5 lg:space-y-2 relative z-10 pb-20 lg:pb-4">
         {/* Dashboard */}
-        <Link
-          href="/dashboard"
-          onClick={() => setIsOpen(false)}
-          className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${
-            pathname === '/dashboard' 
-              ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' 
-              : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'
-          }`}
-          title={isCollapsed ? 'لوحة التحكم' : ''}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${
-            pathname === '/dashboard' 
-              ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' 
-              : 'bg-white/10 group-hover:bg-white/15'
-          }`}>
-            <BarChart3 size={16} className={pathname === '/dashboard' ? 'text-white' : 'text-orange-300'} />
-          </div>
-          {!isCollapsed && (
-            <span className={`font-medium text-sm lg:text-base ${pathname === '/dashboard' ? 'text-white' : 'text-slate-300'}`}>
-              لوحة التحكم
-            </span>
-          )}
-        </Link>
+          <Link
+            href="/dashboard"
+            onClick={() => setIsOpen(false)}
+            className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${
+              pathname === '/dashboard' 
+                ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' 
+                : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'
+            }`}
+            title={isCollapsed ? 'لوحة التحكم' : ''}
+          >
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${
+                pathname === '/dashboard' 
+                  ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' 
+                  : 'bg-white/10 group-hover:bg-white/15'
+              }`}
+            >
+              <BarChart3 size={16} className={pathname === '/dashboard' ? 'text-white' : 'text-orange-300'} />
+            </motion.div>
+            {!isCollapsed && (
+              <span className={`font-medium text-sm lg:text-base ${pathname === '/dashboard' ? 'text-white' : 'text-slate-300'}`}>
+                لوحة التحكم
+              </span>
+            )}
+          </Link>
+        </motion.div>
 
         {/* WhatsApp Business */}
-        <Link href="/inbox" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'واتساب بيزنس' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <MessageSquare size={16} className={pathname === '/inbox' ? 'text-white' : 'text-green-300'} />
-          </div>
-          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/inbox' ? 'text-white' : 'text-slate-300'}`}>واتساب بيزنس</span>}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+          <Link href="/inbox" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'واتساب بيزنس' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <MessageSquare size={16} className={pathname === '/inbox' ? 'text-white' : 'text-green-300'} />
+            </motion.div>
+            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/inbox' ? 'text-white' : 'text-slate-300'}`}>واتساب بيزنس</span>}
+          </Link>
+        </motion.div>
 
         {/* Social Posting */}
-        <Link href="/social-media" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 backdrop-blur-sm border border-violet-400/30 shadow-lg shadow-violet-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-violet-400/20 border border-transparent'}`} title={isCollapsed ? 'النشر الاجتماعي' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <span className="text-lg">📱</span>
-          </div>
-          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/social-media' ? 'text-white' : 'text-slate-300'}`}>النشر الاجتماعي</span>}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.3 }}>
+          <Link href="/social-media" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 backdrop-blur-sm border border-violet-400/30 shadow-lg shadow-violet-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-violet-400/20 border border-transparent'}`} title={isCollapsed ? 'النشر الاجتماعي' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <span className="text-lg">📱</span>
+            </motion.div>
+            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/social-media' ? 'text-white' : 'text-slate-300'}`}>النشر الاجتماعي</span>}
+          </Link>
+        </motion.div>
 
         {/* Call Center */}
-        <Link href="/call-center" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'مركز الاتصالات' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <span className="text-lg">☎️</span>
-          </div>
-          {!isCollapsed && (
-            <div className="flex-1 flex items-center justify-between">
-              <span className={`font-medium text-sm lg:text-base ${pathname === '/call-center' || pathname === '/unified-number' ? 'text-white' : 'text-slate-300'}`}>مركز الاتصالات</span>
-              <span className="px-1.5 py-0.5 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[9px] rounded-full font-bold shadow-md animate-pulse">🇸🇦</span>
-            </div>
-          )}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.4 }}>
+          <Link href="/call-center" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'مركز الاتصالات' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <span className="text-lg">☎️</span>
+            </motion.div>
+            {!isCollapsed && (
+              <div className="flex-1 flex items-center justify-between">
+                <span className={`font-medium text-sm lg:text-base ${pathname === '/call-center' || pathname === '/unified-number' ? 'text-white' : 'text-slate-300'}`}>مركز الاتصالات</span>
+                <span className="px-1.5 py-0.5 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[9px] rounded-full font-bold shadow-md animate-pulse">🇸🇦</span>
+              </div>
+            )}
+          </Link>
+        </motion.div>
 
         {/* Mobile Call */}
-        <Link href="/mobile-call" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-sm border border-blue-400/30 shadow-lg shadow-blue-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-blue-400/20 border border-transparent'}`} title={isCollapsed ? 'موبايل كول' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <span className="text-lg">📱</span>
-          </div>
-          {!isCollapsed && (
-            <div className="flex-1 flex items-center justify-between">
-              <span className={`font-medium text-sm lg:text-base ${pathname === '/mobile-call' ? 'text-white' : 'text-slate-300'}`}>موبايل كول</span>
-              <span className="px-1.5 py-0.5 bg-gradient-to-r from-blue-400 to-cyan-500 text-white text-[9px] rounded-full font-bold shadow-md">🇪🇬→🇸🇦</span>
-            </div>
-          )}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.5 }}>
+          <Link href="/mobile-call" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-sm border border-blue-400/30 shadow-lg shadow-blue-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-blue-400/20 border border-transparent'}`} title={isCollapsed ? 'موبايل كول' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <span className="text-lg">📱</span>
+            </motion.div>
+            {!isCollapsed && (
+              <div className="flex-1 flex items-center justify-between">
+                <span className={`font-medium text-sm lg:text-base ${pathname === '/mobile-call' ? 'text-white' : 'text-slate-300'}`}>موبايل كول</span>
+                <span className="px-1.5 py-0.5 bg-gradient-to-r from-blue-400 to-cyan-500 text-white text-[9px] rounded-full font-bold shadow-md">🇪🇬→🇸🇦</span>
+              </div>
+            )}
+          </Link>
+        </motion.div>
 
         {/* Customers */}
-        <Link href="/customers" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 backdrop-blur-sm border border-purple-400/30 shadow-lg shadow-purple-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-purple-400/20 border border-transparent'}`} title={isCollapsed ? 'العملاء' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <span className="text-lg">👥</span>
-          </div>
-          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/customers' ? 'text-white' : 'text-slate-300'}`}>العملاء</span>}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.6 }}>
+          <Link href="/customers" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 backdrop-blur-sm border border-purple-400/30 shadow-lg shadow-purple-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-purple-400/20 border border-transparent'}`} title={isCollapsed ? 'العملاء' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <span className="text-lg">👥</span>
+            </motion.div>
+            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/customers' ? 'text-white' : 'text-slate-300'}`}>العملاء</span>}
+          </Link>
+        </motion.div>
 
         {/* Employees */}
-        <Link href="/employees" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'}`} title={isCollapsed ? 'الموظفين' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <span className="text-lg">👨‍💼</span>
-          </div>
-          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/employees' ? 'text-white' : 'text-slate-300'}`}>الموظفين</span>}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.7 }}>
+          <Link href="/employees" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'}`} title={isCollapsed ? 'الموظفين' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <span className="text-lg">👨‍💼</span>
+            </motion.div>
+            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/employees' ? 'text-white' : 'text-slate-300'}`}>الموظفين</span>}
+          </Link>
+        </motion.div>
 
       </nav>
 
       {/* Bottom Menu - Settings */}
       <div className="p-3 lg:p-4 border-t border-cyan-500/20 bg-gradient-to-b from-transparent to-black/20 relative z-10">
-        <Link href="/settings" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-r from-slate-600/30 to-slate-500/30 backdrop-blur-sm border border-slate-400/30 shadow-lg' : 'text-slate-300 hover:bg-white/5 hover:border-slate-400/20 border border-transparent'}`} title={isCollapsed ? 'الإعدادات' : ''}>
-          <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-            <Settings size={16} className={pathname === '/settings' ? 'text-white' : 'text-slate-300'} />
-          </div>
-          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/settings' ? 'text-white' : 'text-slate-300'}`}>الإعدادات</span>}
-        </Link>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.8 }}>
+          <Link href="/settings" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-r from-slate-600/30 to-slate-500/30 backdrop-blur-sm border border-slate-400/30 shadow-lg' : 'text-slate-300 hover:bg-white/5 hover:border-slate-400/20 border border-transparent'}`} title={isCollapsed ? 'الإعدادات' : ''}>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
+              <Settings size={16} className={pathname === '/settings' ? 'text-white' : 'text-slate-300'} />
+            </motion.div>
+            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/settings' ? 'text-white' : 'text-slate-300'}`}>الإعدادات</span>}
+          </Link>
+        </motion.div>
       </div>
     </div>
     </>
