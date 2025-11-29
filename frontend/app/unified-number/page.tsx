@@ -369,7 +369,7 @@ export default function CallCenterPage() {
                 <Phone className="text-white" size={24} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-200 to-emerald-200 bg-clip-text text-transparent">
                   ☎️ مركز الاتصالات - Call Center
                 </h1>
                 <p className="text-gray-600">نظام متكامل لإدارة مركز الاتصالات والعملاء | المملكة العربية السعودية 🇸🇦</p>
@@ -385,7 +385,7 @@ export default function CallCenterPage() {
                   loadCallRecords();
                   checkSoftphoneStatus();
                 }}
-                className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
+                className="px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
                 title="تحديث سجل المكالمات"
               >
                 <Activity size={20} />

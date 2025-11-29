@@ -413,7 +413,7 @@ export default function EmployeesPage() {
       emerald: 'from-emerald-500 to-green-600',
       blue: 'from-blue-500 to-cyan-600',
       purple: 'from-purple-500 to-pink-600',
-      orange: 'from-orange-500 to-amber-600',
+      orange: 'from-teal-600 to-emerald-600',
       red: 'from-red-500 to-rose-600',
       indigo: 'from-indigo-500 to-violet-600'
     };
@@ -439,7 +439,7 @@ export default function EmployeesPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-y-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-200 via-emerald-200 to-cyan-200 bg-clip-text text-transparent mb-2">
           إدارة الموظفين والأقسام
         </h1>
         <p className="text-slate-400">إدارة فريق العمل والأقسام والصلاحيات</p>
@@ -451,7 +451,7 @@ export default function EmployeesPage() {
           onClick={() => setActiveTab('employees')}
           className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
             activeTab === 'employees'
-              ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30'
+              ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/30'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -462,7 +462,7 @@ export default function EmployeesPage() {
           onClick={() => setActiveTab('departments')}
           className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
             activeTab === 'departments'
-              ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30'
+              ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/30'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -485,7 +485,7 @@ export default function EmployeesPage() {
                   placeholder="بحث بالاسم، البريد، أو الهاتف..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pr-10 pl-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 transition-colors"
+                  className="w-full pr-10 pl-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-teal-500 transition-colors"
                 />
               </div>
 
@@ -493,7 +493,7 @@ export default function EmployeesPage() {
               <select
                 value={filterDepartment}
                 onChange={(e) => setFilterDepartment(e.target.value)}
-                className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
               >
                 <option value="all">كل الأقسام</option>
                 {departments.map(dept => (
@@ -505,7 +505,7 @@ export default function EmployeesPage() {
               <select
                 value={filterRole}
                 onChange={(e) => setFilterRole(e.target.value)}
-                className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
               >
                 <option value="all">كل الأدوار</option>
                 <option value="مدير">مدير</option>
@@ -517,7 +517,7 @@ export default function EmployeesPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
               >
                 <option value="all">كل الحالات</option>
                 <option value="نشط">نشط</option>
@@ -529,7 +529,7 @@ export default function EmployeesPage() {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300"
               >
                 <Plus className="w-4 h-4" />
                 <span>إضافة موظف</span>
@@ -623,7 +623,7 @@ export default function EmployeesPage() {
           <div className="mb-6 flex justify-between items-center">
             <button
               onClick={() => setShowDepartmentModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300"
             >
               <Plus className="w-4 h-4" />
               <span>إضافة قسم</span>
@@ -634,7 +634,7 @@ export default function EmployeesPage() {
             {departments.map((dept) => (
               <div
                 key={dept.id}
-                className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-xl p-6 hover:border-orange-500/30 transition-all duration-300"
+                className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-xl p-6 hover:border-teal-500/30 transition-all duration-300"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getDepartmentColorClass(dept.color)} flex items-center justify-center`}>
@@ -698,7 +698,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                     placeholder="أدخل اسم الموظف"
                   />
                 </div>
@@ -709,7 +709,7 @@ export default function EmployeesPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                     placeholder="example@almasar.com"
                   />
                 </div>
@@ -720,7 +720,7 @@ export default function EmployeesPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                     placeholder="+966XXXXXXXXX"
                   />
                 </div>
@@ -730,7 +730,7 @@ export default function EmployeesPage() {
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   >
                     <option value="">اختر القسم</option>
                     {departments.map(dept => (
@@ -744,7 +744,7 @@ export default function EmployeesPage() {
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   >
                     <option value="موظف">موظف</option>
                     <option value="مشرف">مشرف</option>
@@ -757,7 +757,7 @@ export default function EmployeesPage() {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   >
                     <option value="نشط">نشط</option>
                     <option value="غير نشط">غير نشط</option>
@@ -771,7 +771,7 @@ export default function EmployeesPage() {
                     type="date"
                     value={formData.hireDate}
                     onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   />
                 </div>
 
@@ -782,7 +782,7 @@ export default function EmployeesPage() {
                       type="password"
                       value={formData.password || ''}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                       placeholder="كلمة المرور"
                     />
                   </div>
@@ -806,7 +806,7 @@ export default function EmployeesPage() {
                         type="checkbox"
                         checked={formData.permissions?.includes(perm.id) || false}
                         onChange={() => togglePermission(perm.id)}
-                        className="w-4 h-4 rounded border-slate-600 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900"
+                        className="w-4 h-4 rounded border-slate-600 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-900"
                       />
                       <span className="text-sm text-slate-300">{perm.label}</span>
                     </label>
@@ -817,7 +817,7 @@ export default function EmployeesPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={showAddModal ? handleAddEmployee : handleUpdateEmployee}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 font-semibold"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 font-semibold"
                 >
                   {showAddModal ? 'إضافة' : 'حفظ التغييرات'}
                 </button>
@@ -860,7 +860,7 @@ export default function EmployeesPage() {
                   type="text"
                   value={deptFormData.name}
                   onChange={(e) => setDeptFormData({ ...deptFormData, name: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   placeholder="مثال: المبيعات"
                 />
               </div>
@@ -870,7 +870,7 @@ export default function EmployeesPage() {
                 <textarea
                   value={deptFormData.description}
                   onChange={(e) => setDeptFormData({ ...deptFormData, description: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   placeholder="وصف مختصر للقسم"
                   rows={3}
                 />
@@ -882,7 +882,7 @@ export default function EmployeesPage() {
                   type="text"
                   value={deptFormData.manager}
                   onChange={(e) => setDeptFormData({ ...deptFormData, manager: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                   placeholder="اسم مدير القسم"
                 />
               </div>
@@ -892,7 +892,7 @@ export default function EmployeesPage() {
                 <select
                   value={deptFormData.color}
                   onChange={(e) => setDeptFormData({ ...deptFormData, color: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-orange-500 transition-colors"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                 >
                   <option value="blue">أزرق</option>
                   <option value="emerald">أخضر</option>
@@ -906,7 +906,7 @@ export default function EmployeesPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleAddDepartment}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 font-semibold"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 font-semibold"
                 >
                   إضافة القسم
                 </button>

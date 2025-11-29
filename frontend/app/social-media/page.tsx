@@ -31,8 +31,8 @@ export default function SocialMediaPage() {
   ];
 
   const stats = [
-    { label: 'إجمالي المنشورات', value: '245', change: '+12%', icon: Share2, color: 'from-cyan-500 to-blue-500' },
-    { label: 'المتابعون', value: '12.5K', change: '+8%', icon: Users, color: 'from-blue-500 to-cyan-500' },
+    { label: 'إجمالي المنشورات', value: '245', change: '+12%', icon: Share2, color: 'from-teal-500 to-emerald-500' },
+    { label: 'المتابعون', value: '12.5K', change: '+8%', icon: Users, color: 'from-emerald-500 to-teal-500' },
     { label: 'التفاعلات', value: '45.2K', change: '+23%', icon: Heart, color: 'from-red-500 to-pink-500' },
     { label: 'معدل التفاعل', value: '8.7%', change: '+3%', icon: TrendingUp, color: 'from-emerald-500 to-teal-500' },
   ];
@@ -65,34 +65,34 @@ export default function SocialMediaPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-y-auto">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
       {/* Header */}
-      <header className="relative bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-cyan-600/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl sticky top-0 z-50">
+      <header className="relative bg-gradient-to-r from-teal-600/20 via-emerald-600/20 to-teal-600/20 backdrop-blur-sm border-b border-white/10 px-6 py-4 shadow-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
+            <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
               <Share2 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-200 to-emerald-200 bg-clip-text text-transparent">
                 📱 النشر الاجتماعي
               </h1>
-              <p className="text-sm text-cyan-200">إدارة ونشر المحتوى على جميع المنصات</p>
+              <p className="text-sm text-teal-200">إدارة ونشر المحتوى على جميع المنصات</p>
             </div>
           </div>
           <div className="flex gap-3">
             <button 
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg text-sm font-medium transition-all shadow-lg text-white"
+              className="px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 rounded-lg text-sm font-medium transition-all shadow-lg text-white"
             >
               لوحة التحكم
             </button>
             <button 
               onClick={() => router.push('/inbox')}
-              className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-sm font-medium transition-all shadow-md hover:shadow-lg"
             >
               صندوق الوارد
             </button>

@@ -315,22 +315,22 @@ export default function MobileCallPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-2 sm:p-4 md:p-6 overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 md:p-6 overflow-y-auto">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 shadow-2xl">
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 shadow-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="المسار الساخن" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
               <div>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">📞 موبايل كول</h1>
-                <p className="text-sm sm:text-base text-blue-100">المسار الساخن للسفر والسياحة</p>
+                <p className="text-sm sm:text-base text-teal-100">المسار الساخن للسفر والسياحة</p>
               </div>
             </div>
             {currentUser && (
               <div className="hidden sm:block text-right">
                 <div className="text-white font-bold">{currentUser.name}</div>
-                <div className="text-blue-200 text-sm">{currentUser.department || currentUser.role}</div>
+                <div className="text-teal-200 text-sm">{currentUser.department || currentUser.role}</div>
               </div>
             )}
           </div>
@@ -339,7 +339,7 @@ export default function MobileCallPage() {
         <div className="bg-white rounded-b-xl sm:rounded-b-2xl shadow-2xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Sidebar */}
-            <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-blue-600 to-blue-800 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
+            <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-teal-600 to-emerald-700 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
               <button
                 onClick={() => setCurrentView('dialpad')}
                 className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${

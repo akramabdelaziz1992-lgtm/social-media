@@ -204,14 +204,14 @@ export default function CustomersPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
               <Users className="text-white" size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-200 to-emerald-200 bg-clip-text text-transparent">
                 إدارة العملاء
               </h1>
-              <p className="text-cyan-300/70">إجمالي العملاء: {customers.length}</p>
+              <p className="text-teal-300/70">إجمالي العملاء: {customers.length}</p>
             </div>
           </div>
           
@@ -221,7 +221,7 @@ export default function CustomersPage() {
               setSelectedCustomer(null);
               setShowAddModal(true);
             }}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition-all"
           >
             <Plus size={20} />
             <span>إضافة عميل جديد</span>
@@ -237,14 +237,14 @@ export default function CustomersPage() {
               placeholder="بحث بالاسم، الهاتف، أو البريد..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pr-12 pl-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pr-12 pl-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-teal-300/50 focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
           
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
-            className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option value="all">كل المصادر</option>
             <option value="واتساب">واتساب</option>
@@ -256,7 +256,7 @@ export default function CustomersPage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option value="all">كل الحالات</option>
             <option value="عميل">عميل</option>
@@ -385,7 +385,7 @@ export default function CustomersPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                       required
                     />
                   </div>
@@ -396,7 +396,7 @@ export default function CustomersPage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                       required
                     />
                   </div>
@@ -409,7 +409,7 @@ export default function CustomersPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
                   
@@ -419,7 +419,7 @@ export default function CustomersPage() {
                       type="text"
                       value={formData.company}
                       onChange={(e) => setFormData({...formData, company: e.target.value})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
                 </div>
@@ -430,7 +430,7 @@ export default function CustomersPage() {
                     <select
                       value={formData.source}
                       onChange={(e) => setFormData({...formData, source: e.target.value})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="واتساب">واتساب</option>
                       <option value="فيسبوك">فيسبوك</option>
@@ -446,7 +446,7 @@ export default function CustomersPage() {
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({...formData, status: e.target.value as any})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="محتمل">محتمل</option>
                       <option value="نشط">نشط</option>
@@ -462,7 +462,7 @@ export default function CustomersPage() {
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({...formData, priority: e.target.value as any})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="عادية">عادية</option>
                       <option value="متوسطة">متوسطة</option>
@@ -475,7 +475,7 @@ export default function CustomersPage() {
                     <select
                       value={formData.department}
                       onChange={(e) => setFormData({...formData, department: e.target.value})}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="">اختر القسم</option>
                       <option value="المبيعات">المبيعات</option>
@@ -491,7 +491,7 @@ export default function CustomersPage() {
                   <select
                     value={formData.assignedAgent}
                     onChange={(e) => setFormData({...formData, assignedAgent: e.target.value})}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   >
                     <option value="">غير مسند</option>
                     <option value="أحمد محمد">أحمد محمد - مبيعات</option>
@@ -507,7 +507,7 @@ export default function CustomersPage() {
                     value={formData.notes}
                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     rows={3}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                   />
                 </div>
               </div>
@@ -526,7 +526,7 @@ export default function CustomersPage() {
                 <button
                   onClick={selectedCustomer ? handleUpdateCustomer : handleAddCustomer}
                   disabled={!formData.name || !formData.phone}
-                  className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="px-6 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   {selectedCustomer ? 'حفظ التعديلات' : 'إضافة العميل'}
                 </button>
