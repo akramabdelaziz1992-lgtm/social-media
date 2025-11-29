@@ -77,8 +77,8 @@ export default function DashboardContent() {
               <TrendingUp className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-teal-200 to-emerald-200 bg-clip-text text-transparent">لوحة المعلومات</h1>
-              <p className="text-teal-200 mt-1">مرحباً بك في نظام إدارة المحادثات</p>
+              <h1 className="text-4xl font-bold text-white">لوحة المعلومات</h1>
+              <p className="text-white/90 mt-1">مرحباً بك في نظام إدارة المحادثات</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ export default function DashboardContent() {
                 localStorage.clear();
                 window.location.href = '/login';
               }}
-              className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2"
+              className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2 text-white"
             >
               🚪 تسجيل الخروج
             </button>
@@ -96,19 +96,19 @@ export default function DashboardContent() {
         
         <div className="flex items-center gap-4 mt-4">
           <div className="group px-6 py-3 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-white">
               <Users className="w-4 h-4" />
               <span>المشتركون: <strong>9</strong>/500K</span>
             </div>
           </div>
           <div className="group px-6 py-3 bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-white">
               <MessageSquare className="w-4 h-4" />
               <span>الرسائل: <strong>1317</strong>/5M</span>
             </div>
           </div>
           <div className="group px-6 py-3 bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-white">
               <Bot className="w-4 h-4" />
               <span>رصيد AI: <strong>66.5K</strong>/100M</span>
             </div>

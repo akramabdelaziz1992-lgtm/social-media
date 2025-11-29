@@ -110,10 +110,10 @@ export default function Sidebar() {
             className="w-12 h-12 object-contain"
           />
           <div>
-            <div className="text-lg font-bold bg-gradient-to-r from-teal-300 to-emerald-300 bg-clip-text text-transparent">
+            <div className="text-lg font-bold text-white">
               المسار الساخن
             </div>
-            <div className="text-xs text-teal-400">للسفر والسياحة</div>
+            <div className="text-xs text-white/80">للسفر والسياحة</div>
           </div>
         </div>
       </div>
