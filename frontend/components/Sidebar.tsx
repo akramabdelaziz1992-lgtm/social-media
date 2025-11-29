@@ -17,7 +17,8 @@ import {
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // For mobile
+  const [isCollapsed, setIsCollapsed] = useState(false); // For desktop
 
   const channels = [
     { 
@@ -90,15 +91,25 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Hamburger Button - Fixed at top */}
+      {/* Mobile Hamburger Button - Fixed at top RIGHT for RTL */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-[60] w-11 h-11 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex flex-col items-center justify-center shadow-2xl hover:shadow-xl transition-all duration-300 active:scale-95 group"
+        className="lg:hidden fixed top-4 right-4 z-[60] w-11 h-11 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex flex-col items-center justify-center shadow-2xl hover:shadow-xl transition-all duration-300 active:scale-95 group"
         aria-label="Toggle Menu"
       >
         <div className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-1.5' : 'mb-1'}`}></div>
         <div className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? 'opacity-0' : 'mb-1'}`}></div>
         <div className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+      </button>
+
+      {/* Desktop Toggle Button - Inside Sidebar */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="hidden lg:block fixed top-4 z-[60] w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 active:scale-95"
+        style={{ right: isCollapsed ? '4px' : '260px' }}
+        aria-label="Toggle Sidebar"
+      >
+        <ChevronRight className={`text-white transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} size={20} />
       </button>
 
       {/* Overlay for mobile */}
@@ -112,14 +123,15 @@ export default function Sidebar() {
       {/* Sidebar */}
       <div className={`
         fixed lg:relative
-        w-[280px] lg:w-64 h-screen
+        h-screen
         bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 
         flex flex-col overflow-y-auto 
-        shadow-2xl lg:shadow-none border-r border-teal-500/20 
+        shadow-2xl lg:shadow-none border-l border-teal-500/20 
         sidebar-scroll
         transition-all duration-300 ease-in-out
         z-50
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${isOpen ? 'right-0 w-[280px]' : '-right-full w-[280px]'} lg:right-0
+        ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
       `}>
       {/* Animated Background Shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -143,12 +155,14 @@ export default function Sidebar() {
             alt="المسار الساخن" 
             className="w-10 h-10 lg:w-12 lg:h-12 object-contain"
           />
-          <div>
-            <div className="text-base lg:text-lg font-bold text-white">
-              المسار الساخن
+          {!isCollapsed && (
+            <div>
+              <div className="text-base lg:text-lg font-bold text-white">
+                المسار الساخن
+              </div>
+              <div className="text-xs text-white/80">للسفر والسياحة</div>
             </div>
-            <div className="text-xs text-white/80">للسفر والسياحة</div>
-          </div>
+          )}
         </div>
         {/* Close button for mobile */}
         <button
@@ -165,11 +179,12 @@ export default function Sidebar() {
         <Link
           href="/dashboard"
           onClick={() => setIsOpen(false)}
-          className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${
+          className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${
             pathname === '/dashboard' 
               ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' 
               : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'
           }`}
+          title={isCollapsed ? 'لوحة التحكم' : ''}
         >
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${
             pathname === '/dashboard' 
@@ -178,74 +193,80 @@ export default function Sidebar() {
           }`}>
             <BarChart3 size={16} className={pathname === '/dashboard' ? 'text-white' : 'text-orange-300'} />
           </div>
-          <span className={`font-medium text-sm lg:text-base ${pathname === '/dashboard' ? 'text-white' : 'text-slate-300'}`}>
-            لوحة التحكم
-          </span>
+          {!isCollapsed && (
+            <span className={`font-medium text-sm lg:text-base ${pathname === '/dashboard' ? 'text-white' : 'text-slate-300'}`}>
+              لوحة التحكم
+            </span>
+          )}
         </Link>
 
         {/* WhatsApp Business */}
-        <Link href="/inbox" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`}>
+        <Link href="/inbox" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'واتساب بيزنس' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/inbox' ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <MessageSquare size={16} className={pathname === '/inbox' ? 'text-white' : 'text-green-300'} />
           </div>
-          <span className={`font-medium text-sm lg:text-base ${pathname === '/inbox' ? 'text-white' : 'text-slate-300'}`}>واتساب بيزنس</span>
+          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/inbox' ? 'text-white' : 'text-slate-300'}`}>واتساب بيزنس</span>}
         </Link>
 
         {/* Social Posting */}
-        <Link href="/social-media" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 backdrop-blur-sm border border-violet-400/30 shadow-lg shadow-violet-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-violet-400/20 border border-transparent'}`}>
+        <Link href="/social-media" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 backdrop-blur-sm border border-violet-400/30 shadow-lg shadow-violet-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-violet-400/20 border border-transparent'}`} title={isCollapsed ? 'النشر الاجتماعي' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <span className="text-lg">📱</span>
           </div>
-          <span className={`font-medium text-sm lg:text-base ${pathname === '/social-media' ? 'text-white' : 'text-slate-300'}`}>النشر الاجتماعي</span>
+          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/social-media' ? 'text-white' : 'text-slate-300'}`}>النشر الاجتماعي</span>}
         </Link>
 
         {/* Call Center */}
-        <Link href="/call-center" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`}>
+        <Link href="/call-center" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'مركز الاتصالات' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/call-center' || pathname === '/unified-number' ? 'bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <span className="text-lg">☎️</span>
           </div>
-          <div className="flex-1 flex items-center justify-between">
-            <span className={`font-medium text-sm lg:text-base ${pathname === '/call-center' || pathname === '/unified-number' ? 'text-white' : 'text-slate-300'}`}>مركز الاتصالات</span>
-            <span className="px-1.5 py-0.5 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[9px] rounded-full font-bold shadow-md animate-pulse">🇸🇦</span>
-          </div>
+          {!isCollapsed && (
+            <div className="flex-1 flex items-center justify-between">
+              <span className={`font-medium text-sm lg:text-base ${pathname === '/call-center' || pathname === '/unified-number' ? 'text-white' : 'text-slate-300'}`}>مركز الاتصالات</span>
+              <span className="px-1.5 py-0.5 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[9px] rounded-full font-bold shadow-md animate-pulse">🇸🇦</span>
+            </div>
+          )}
         </Link>
 
         {/* Mobile Call */}
-        <Link href="/mobile-call" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-sm border border-blue-400/30 shadow-lg shadow-blue-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-blue-400/20 border border-transparent'}`}>
+        <Link href="/mobile-call" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-sm border border-blue-400/30 shadow-lg shadow-blue-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-blue-400/20 border border-transparent'}`} title={isCollapsed ? 'موبايل كول' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/mobile-call' ? 'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <span className="text-lg">📱</span>
           </div>
-          <div className="flex-1 flex items-center justify-between">
-            <span className={`font-medium text-sm lg:text-base ${pathname === '/mobile-call' ? 'text-white' : 'text-slate-300'}`}>موبايل كول</span>
-            <span className="px-1.5 py-0.5 bg-gradient-to-r from-blue-400 to-cyan-500 text-white text-[9px] rounded-full font-bold shadow-md">🇪🇬→🇸🇦</span>
-          </div>
+          {!isCollapsed && (
+            <div className="flex-1 flex items-center justify-between">
+              <span className={`font-medium text-sm lg:text-base ${pathname === '/mobile-call' ? 'text-white' : 'text-slate-300'}`}>موبايل كول</span>
+              <span className="px-1.5 py-0.5 bg-gradient-to-r from-blue-400 to-cyan-500 text-white text-[9px] rounded-full font-bold shadow-md">🇪🇬→🇸🇦</span>
+            </div>
+          )}
         </Link>
 
         {/* Customers */}
-        <Link href="/customers" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 backdrop-blur-sm border border-purple-400/30 shadow-lg shadow-purple-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-purple-400/20 border border-transparent'}`}>
+        <Link href="/customers" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 backdrop-blur-sm border border-purple-400/30 shadow-lg shadow-purple-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-purple-400/20 border border-transparent'}`} title={isCollapsed ? 'العملاء' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/customers' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <span className="text-lg">👥</span>
           </div>
-          <span className={`font-medium text-sm lg:text-base ${pathname === '/customers' ? 'text-white' : 'text-slate-300'}`}>العملاء</span>
+          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/customers' ? 'text-white' : 'text-slate-300'}`}>العملاء</span>}
         </Link>
 
         {/* Employees */}
-        <Link href="/employees" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'}`}>
+        <Link href="/employees" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/30 backdrop-blur-sm border border-orange-400/30 shadow-lg shadow-orange-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-orange-400/20 border border-transparent'}`} title={isCollapsed ? 'الموظفين' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/employees' ? 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <span className="text-lg">👨‍💼</span>
           </div>
-          <span className={`font-medium text-sm lg:text-base ${pathname === '/employees' ? 'text-white' : 'text-slate-300'}`}>الموظفين</span>
+          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/employees' ? 'text-white' : 'text-slate-300'}`}>الموظفين</span>}
         </Link>
 
       </nav>
 
       {/* Bottom Menu - Settings */}
       <div className="p-3 lg:p-4 border-t border-cyan-500/20 bg-gradient-to-b from-transparent to-black/20 relative z-10">
-        <Link href="/settings" onClick={() => setIsOpen(false)} className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-r from-slate-600/30 to-slate-500/30 backdrop-blur-sm border border-slate-400/30 shadow-lg' : 'text-slate-300 hover:bg-white/5 hover:border-slate-400/20 border border-transparent'}`}>
+        <Link href="/settings" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-r from-slate-600/30 to-slate-500/30 backdrop-blur-sm border border-slate-400/30 shadow-lg' : 'text-slate-300 hover:bg-white/5 hover:border-slate-400/20 border border-transparent'}`} title={isCollapsed ? 'الإعدادات' : ''}>
           <div className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/settings' ? 'bg-gradient-to-br from-slate-600 to-slate-700 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
             <Settings size={16} className={pathname === '/settings' ? 'text-white' : 'text-slate-300'} />
           </div>
-          <span className={`font-medium text-sm lg:text-base ${pathname === '/settings' ? 'text-white' : 'text-slate-300'}`}>الإعدادات</span>
+          {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/settings' ? 'text-white' : 'text-slate-300'}`}>الإعدادات</span>}
         </Link>
       </div>
     </div>
