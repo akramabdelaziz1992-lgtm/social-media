@@ -12,8 +12,8 @@ const LineChartComponent = dynamic(
     ssr: false,
     loading: () => (
       <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 h-[400px] flex items-center justify-center">
-        <div className="text-cyan-300 flex items-center gap-2">
-          <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-teal-300 flex items-center gap-2">
+          <div className="w-5 h-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
           جاري تحميل الرسم البياني...
         </div>
       </div>
@@ -39,7 +39,7 @@ const PieChartComponent = dynamic(
 const channelStats = [
   { name: 'Facebook', label: 'فيسبوك', data: { messages: 1175, widgets: 0, sequences: 0, flows: 0 }, color: 'from-blue-500 to-blue-600', icon: '📘' },
   { name: 'WhatsApp', label: 'واتس آب', data: { messages: 1, widgets: 0, sequences: 0, flows: 0 }, color: 'from-green-500 to-emerald-600', icon: '💬' },
-  { name: 'Telegram', label: 'تيليجرام', data: { messages: 0, widgets: 0, sequences: 0, flows: 0 }, color: 'from-cyan-500 to-blue-500', icon: '✈️' },
+  { name: 'Telegram', label: 'تيليجرام', data: { messages: 0, widgets: 0, sequences: 0, flows: 0 }, color: 'from-teal-500 to-emerald-500', icon: '✈️' },
 ];
 
 export default function DashboardContent() {
@@ -64,27 +64,27 @@ export default function DashboardContent() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-cyan-600/20 backdrop-blur-sm p-6 border-b border-white/10 shadow-2xl">
+      <div className="relative bg-gradient-to-r from-teal-600/20 via-emerald-600/20 to-teal-600/20 backdrop-blur-sm p-6 border-b border-white/10 shadow-2xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
+            <div className="w-14 h-14 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
               <TrendingUp className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">لوحة المعلومات</h1>
-              <p className="text-cyan-200 mt-1">مرحباً بك في نظام إدارة المحادثات</p>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-teal-200 to-emerald-200 bg-clip-text text-transparent">لوحة المعلومات</h1>
+              <p className="text-teal-200 mt-1">مرحباً بك في نظام إدارة المحادثات</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => window.location.href = '/inbox'}
-              className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               📥 صندوق الوارد
             </button>
