@@ -13,6 +13,7 @@ import {
   UserCircle, ChevronDown, X, Plus, History, Image, FileText,
   Menu, ChevronLeft, ChevronRight, LogOut
 } from 'lucide-react';
+import QRCode from 'qrcode';
 
 export default function InboxPage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function InboxPage() {
   // WhatsApp Connection States
   const [isWhatsAppConnected, setIsWhatsAppConnected] = useState(false);
   const [qrCode, setQrCode] = useState('');
+  const [qrCodeImage, setQrCodeImage] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'qr' | 'connecting' | 'connected'>('disconnected');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [connectionMethod, setConnectionMethod] = useState<'qr' | 'phone'>('qr');
@@ -142,11 +144,28 @@ export default function InboxPage() {
         console.log('✅ WebSocket متصل - جاهز لاستقبال الرسائل');
       });
 
-      socketRef.current.on('qr', (data: any) => {
+      socketRef.current.on('qr', async (data: any) => {
         console.log('📱 QR Code جاهز! Type:', typeof data);
         const qrCode = typeof data === 'string' ? data : (data?.qr || data);
         console.log('QR Code received, length:', qrCode?.length);
         setQrCode(qrCode);
+        
+        // تحويل QR string لصورة
+        try {
+          const qrImageUrl = await QRCode.toDataURL(qrCode, {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            }
+          });
+          setQrCodeImage(qrImageUrl);
+          console.log('✅ QR Code تم تحويله لصورة');
+        } catch (error) {
+          console.error('❌ خطأ في تحويل QR Code:', error);
+        }
+        
         setConnectionStatus('qr');
         setLoading(false);
       });
@@ -636,6 +655,23 @@ export default function InboxPage() {
               console.log('✅ QR Code received from polling!');
               clearInterval(pollQR);
               setQrCode(qrData.qr);
+              
+              // تحويل QR string لصورة
+              try {
+                const qrImageUrl = await QRCode.toDataURL(qrData.qr, {
+                  width: 300,
+                  margin: 2,
+                  color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                  }
+                });
+                setQrCodeImage(qrImageUrl);
+                console.log('✅ QR Code تم تحويله لصورة');
+              } catch (error) {
+                console.error('❌ خطأ في تحويل QR Code:', error);
+              }
+              
               setConnectionStatus('qr');
               setLoading(false);
             } else if (attempts >= maxAttempts) {
@@ -707,6 +743,23 @@ export default function InboxPage() {
               console.log('✅ QR Code received!');
               clearInterval(pollQR);
               setQrCode(qrData.qr);
+              
+              // تحويل QR string لصورة
+              try {
+                const qrImageUrl = await QRCode.toDataURL(qrData.qr, {
+                  width: 300,
+                  margin: 2,
+                  color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                  }
+                });
+                setQrCodeImage(qrImageUrl);
+                console.log('✅ QR Code تم تحويله لصورة');
+              } catch (error) {
+                console.error('❌ خطأ في تحويل QR Code:', error);
+              }
+              
               setConnectionStatus('qr');
               setLoading(false);
             } else if (attempts >= maxAttempts) {
@@ -1098,46 +1151,23 @@ export default function InboxPage() {
                         </div>
                       )}
 
-                      {connectionStatus === 'qr' && qrCode && (
+                      {connectionStatus === 'qr' && qrCodeImage && (
                         <div className="text-center">
                           <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl mx-auto flex items-center justify-center">
-                            {qrCode.startsWith('data:image') || qrCode.startsWith('http') ? (
-                              <img 
-                                src={qrCode} 
-                                alt="QR Code" 
-                                className="w-full h-full object-contain"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-center p-4">
-                                <div>
-                                  <div className="text-4xl mb-3">📱</div>
-                                  <p className="text-slate-800 font-bold mb-2">QR Code جاهز!</p>
-                                  <p className="text-slate-600 text-xs break-all font-mono">
-                                    {qrCode.substring(0, 50)}...
-                                  </p>
-                                  <p className="text-slate-500 text-xs mt-2">
-                                    افتح WhatsApp → الإعدادات → الأجهزة المرتبطة → ربط جهاز
-                                  </p>
-                                </div>
-                              </div>
-                            )}
+                            <img 
+                              src={qrCodeImage} 
+                              alt="QR Code" 
+                              className="w-full h-full object-contain"
+                            />
                           </div>
                           <div className="flex items-center justify-center gap-2 text-emerald-200 mb-4 animate-pulse">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
                             <span className="text-sm font-medium">في انتظار المسح...</span>
                           </div>
-                          <p className="text-white/70 text-sm">امسح الرمز من تطبيق WhatsApp على هاتفك</p>
-                          <button
-                            onClick={() => {
-                              console.log('QR Code Value:', qrCode);
-                              console.log('QR Code Type:', typeof qrCode);
-                              console.log('QR Code Length:', qrCode?.length);
-                              alert('تحقق من Console للمزيد من التفاصيل');
-                            }}
-                            className="mt-4 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-lg text-xs transition-all"
-                          >
-                            🔍 Debug QR Code
-                          </button>
+                          <p className="text-white/70 text-sm mb-2">امسح الرمز من تطبيق WhatsApp على هاتفك</p>
+                          <p className="text-white/50 text-xs">
+                            WhatsApp → الإعدادات → الأجهزة المرتبطة → ربط جهاز
+                          </p>
                         </div>
                       )}
                     </div>
@@ -1206,7 +1236,7 @@ export default function InboxPage() {
                         </div>
                       )}
 
-                      {connectionStatus === 'qr' && qrCode && (
+                      {connectionStatus === 'qr' && qrCodeImage && (
                         <div className="text-center">
                           <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-400/30 rounded-xl">
                             <p className="text-emerald-200 text-sm">
@@ -1214,31 +1244,19 @@ export default function InboxPage() {
                             </p>
                           </div>
                           <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl mx-auto flex items-center justify-center">
-                            {qrCode.startsWith('data:image') || qrCode.startsWith('http') ? (
-                              <img 
-                                src={qrCode} 
-                                alt="QR Code" 
-                                className="w-full h-full object-contain"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-center p-4">
-                                <div>
-                                  <div className="text-4xl mb-3">📱</div>
-                                  <p className="text-slate-800 font-bold mb-2">QR Code جاهز!</p>
-                                  <p className="text-slate-600 text-xs break-all font-mono">
-                                    {qrCode.substring(0, 50)}...
-                                  </p>
-                                  <p className="text-slate-500 text-xs mt-2">
-                                    افتح WhatsApp → الإعدادات → الأجهزة المرتبطة → ربط جهاز
-                                  </p>
-                                </div>
-                              </div>
-                            )}
+                            <img 
+                              src={qrCodeImage} 
+                              alt="QR Code" 
+                              className="w-full h-full object-contain"
+                            />
                           </div>
                           <div className="flex items-center justify-center gap-2 text-emerald-200 mb-4 animate-pulse">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
                             <span className="text-sm font-medium">امسح QR Code من هاتفك...</span>
                           </div>
+                          <p className="text-white/50 text-xs">
+                            WhatsApp → الإعدادات → الأجهزة المرتبطة → ربط جهاز
+                          </p>
                         </div>
                       )}
                     </div>
