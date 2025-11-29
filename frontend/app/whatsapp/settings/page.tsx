@@ -149,7 +149,7 @@ export default function WhatsAppSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 text-white p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 text-white p-4 md:p-8 overflow-y-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
