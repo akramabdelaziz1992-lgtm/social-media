@@ -315,8 +315,8 @@ export default function MobileCallPage() {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 overflow-hidden flex flex-col">
-      <div className="max-w-4xl mx-auto w-full flex flex-col h-full">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 flex flex-col">
+      <div className="max-w-4xl mx-auto w-full flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-3 sm:p-4 shadow-2xl flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -336,8 +336,8 @@ export default function MobileCallPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-b-xl shadow-2xl overflow-hidden flex-1 flex flex-col">
-          <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+        <div className="bg-white rounded-b-xl shadow-2xl flex-1 flex flex-col mb-4">
+          <div className="flex flex-col md:flex-row flex-1">
             {/* Sidebar */}
             <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-teal-600 to-emerald-700 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
               <button
@@ -375,10 +375,10 @@ export default function MobileCallPage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 p-4 sm:p-6 md:p-8">
+            <div className="flex-1 p-4 sm:p-6 md:p-8 pb-20">
               {/* Dialpad View */}
               {currentView === 'dialpad' && !isInCall && (
-                <div className="max-w-md mx-auto">
+                <div className="max-w-md mx-auto pb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">لوحة الاتصال</h2>
                   
                   {/* Phone number display */}
