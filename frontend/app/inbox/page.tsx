@@ -1100,18 +1100,44 @@ export default function InboxPage() {
 
                       {connectionStatus === 'qr' && qrCode && (
                         <div className="text-center">
-                          <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl">
-                            <img 
-                              src={qrCode} 
-                              alt="QR Code" 
-                              className="w-full h-full"
-                            />
+                          <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl mx-auto flex items-center justify-center">
+                            {qrCode.startsWith('data:image') || qrCode.startsWith('http') ? (
+                              <img 
+                                src={qrCode} 
+                                alt="QR Code" 
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-center p-4">
+                                <div>
+                                  <div className="text-4xl mb-3">📱</div>
+                                  <p className="text-slate-800 font-bold mb-2">QR Code جاهز!</p>
+                                  <p className="text-slate-600 text-xs break-all font-mono">
+                                    {qrCode.substring(0, 50)}...
+                                  </p>
+                                  <p className="text-slate-500 text-xs mt-2">
+                                    افتح WhatsApp → الإعدادات → الأجهزة المرتبطة → ربط جهاز
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center justify-center gap-2 text-emerald-200 mb-4 animate-pulse">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
                             <span className="text-sm font-medium">في انتظار المسح...</span>
                           </div>
                           <p className="text-white/70 text-sm">امسح الرمز من تطبيق WhatsApp على هاتفك</p>
+                          <button
+                            onClick={() => {
+                              console.log('QR Code Value:', qrCode);
+                              console.log('QR Code Type:', typeof qrCode);
+                              console.log('QR Code Length:', qrCode?.length);
+                              alert('تحقق من Console للمزيد من التفاصيل');
+                            }}
+                            className="mt-4 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-lg text-xs transition-all"
+                          >
+                            🔍 Debug QR Code
+                          </button>
                         </div>
                       )}
                     </div>
@@ -1187,12 +1213,27 @@ export default function InboxPage() {
                               📱 الرقم: <span className="font-bold" dir="ltr">{phoneNumber}</span>
                             </p>
                           </div>
-                          <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl mx-auto">
-                            <img 
-                              src={qrCode} 
-                              alt="QR Code" 
-                              className="w-full h-full"
-                            />
+                          <div className="w-64 h-64 bg-white rounded-2xl p-3 mb-6 shadow-2xl mx-auto flex items-center justify-center">
+                            {qrCode.startsWith('data:image') || qrCode.startsWith('http') ? (
+                              <img 
+                                src={qrCode} 
+                                alt="QR Code" 
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-center p-4">
+                                <div>
+                                  <div className="text-4xl mb-3">📱</div>
+                                  <p className="text-slate-800 font-bold mb-2">QR Code جاهز!</p>
+                                  <p className="text-slate-600 text-xs break-all font-mono">
+                                    {qrCode.substring(0, 50)}...
+                                  </p>
+                                  <p className="text-slate-500 text-xs mt-2">
+                                    افتح WhatsApp → الإعدادات → الأجهزة المرتبطة → ربط جهاز
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center justify-center gap-2 text-emerald-200 mb-4 animate-pulse">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>

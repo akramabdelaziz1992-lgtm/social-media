@@ -83,16 +83,13 @@ export default function DashboardContent() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => window.location.href = '/inbox'}
-              className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = '/login';
+              }}
+              className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2"
             >
-              📥 صندوق الوارد
-            </button>
-            <button
-              onClick={() => window.location.href = '/social-media'}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 rounded-xl text-sm font-medium transition-all shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              📱 النشر الاجتماعي
+              🚪 تسجيل الخروج
             </button>
           </div>
         </div>
