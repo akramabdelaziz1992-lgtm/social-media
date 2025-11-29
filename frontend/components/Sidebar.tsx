@@ -141,24 +141,24 @@ export default function Sidebar() {
           </span>
         </Link>
 
-        {/* Shared Inbox */}
+        {/* WhatsApp Business */}
         <Link
           href="/inbox"
           className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
             pathname === '/inbox' 
-              ? 'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 backdrop-blur-sm border border-blue-400/30 shadow-lg shadow-blue-500/20' 
-              : 'text-slate-300 hover:bg-white/5 hover:border-blue-400/20 border border-transparent'
+              ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' 
+              : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'
           }`}
         >
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
             pathname === '/inbox' 
-              ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg' 
+              ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg' 
               : 'bg-white/10 group-hover:bg-white/15'
           }`}>
-            <MessageSquare size={18} className={pathname === '/inbox' ? 'text-white' : 'text-blue-300'} />
+            <MessageSquare size={18} className={pathname === '/inbox' ? 'text-white' : 'text-green-300'} />
           </div>
           <span className={`font-semibold ${pathname === '/inbox' ? 'text-white' : 'text-slate-300'}`}>
-            صندوق الوارد المشترك
+            واتساب بيزنس
           </span>
         </Link>
 
