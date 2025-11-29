@@ -70,14 +70,14 @@ export default function DashboardContent() {
       </div>
 
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-teal-600/20 via-emerald-600/20 to-teal-600/20 backdrop-blur-sm p-6 border-b border-white/10 shadow-2xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
-              <TrendingUp className="w-7 h-7 text-white" />
+      <div className="relative bg-gradient-to-r from-teal-600/20 via-emerald-600/20 to-teal-600/20 backdrop-blur-sm p-4 md:p-6 border-b border-white/10 shadow-2xl">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
+              <TrendingUp className="w-5 h-5 md:w-7 md:h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-white">لوحة المعلومات</h1>
+              <h1 className="text-2xl md:text-4xl font-bold text-white">لوحة المعلومات</h1>
               <p className="text-white/90 mt-1">مرحباً بك في نظام إدارة المحادثات</p>
             </div>
           </div>
@@ -94,28 +94,28 @@ export default function DashboardContent() {
           </div>
         </div>
         
-        <div className="flex items-center gap-4 mt-4">
-          <div className="group px-6 py-3 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-4">
+          <div className="group px-3 md:px-6 py-2 md:py-3 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md rounded-xl text-xs md:text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
             <div className="flex items-center gap-2 text-white">
-              <Users className="w-4 h-4" />
-              <span>المشتركون: <strong>9</strong>/500K</span>
+              <Users className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="whitespace-nowrap">المشتركون: <strong>9</strong>/500K</span>
             </div>
           </div>
-          <div className="group px-6 py-3 bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
+          <div className="group px-3 md:px-6 py-2 md:py-3 bg-gradient-to-r from-blue-500/30 to-cyan-500/30 backdrop-blur-md rounded-xl text-xs md:text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
             <div className="flex items-center gap-2 text-white">
-              <MessageSquare className="w-4 h-4" />
-              <span>الرسائل: <strong>1317</strong>/5M</span>
+              <MessageSquare className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="whitespace-nowrap">الرسائل: <strong>1317</strong>/5M</span>
             </div>
           </div>
-          <div className="group px-6 py-3 bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
+          <div className="group px-3 md:px-6 py-2 md:py-3 bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-md rounded-xl text-xs md:text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg">
             <div className="flex items-center gap-2 text-white">
-              <Bot className="w-4 h-4" />
-              <span>رصيد AI: <strong>66.5K</strong>/100M</span>
+              <Bot className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="whitespace-nowrap">رصيد AI: <strong>66.5K</strong>/100M</span>
             </div>
           </div>
           <div 
             onClick={() => window.location.href = '/unified-number'}
-            className="group px-6 py-3 bg-gradient-to-r from-emerald-500/30 to-green-500/30 backdrop-blur-md rounded-xl text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg"
+            className="group px-3 md:px-6 py-2 md:py-3 bg-gradient-to-r from-emerald-500/30 to-green-500/30 backdrop-blur-md rounded-xl text-xs md:text-sm border border-white/20 hover:scale-105 transition-transform cursor-pointer shadow-lg"
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">☎️</span>
@@ -127,9 +127,9 @@ export default function DashboardContent() {
       </div>
 
       {/* Main Content */}
-      <div className="relative p-6 space-y-6">
+      <div className="relative p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Channel Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {channelStats.map((channel, idx) => (
             <div 
               key={channel.name} 
@@ -143,21 +143,21 @@ export default function DashboardContent() {
                 </div>
               </div>
               <p className="text-cyan-200 text-sm mb-4">كل الأوقات</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur rounded-xl p-4 border border-white/10 hover:scale-105 transition-transform">
-                  <div className="text-3xl font-bold text-white">{channel.data.messages}</div>
-                  <div className="text-sm text-cyan-200 mt-1">الرسائل</div>
+              <div className="grid grid-cols-2 gap-2 md:gap-3">
+                <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur rounded-xl p-3 md:p-4 border border-white/10 hover:scale-105 transition-transform">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{channel.data.messages}</div>
+                  <div className="text-xs md:text-sm text-cyan-200 mt-1">الرسائل</div>
                 </div>
-                <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur rounded-xl p-4 border border-white/10 hover:scale-105 transition-transform">
-                  <div className="text-3xl font-bold text-white">{channel.data.widgets}</div>
-                  <div className="text-sm text-blue-200 mt-1">ويدجت</div>
+                <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur rounded-xl p-3 md:p-4 border border-white/10 hover:scale-105 transition-transform">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{channel.data.widgets}</div>
+                  <div className="text-xs md:text-sm text-blue-200 mt-1">ويدجت</div>
                 </div>
-                <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur rounded-xl p-4 border border-white/10 hover:scale-105 transition-transform">
-                  <div className="text-3xl font-bold text-white">{channel.data.sequences}</div>
-                  <div className="text-sm text-green-200 mt-1">تسلسل</div>
+                <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur rounded-xl p-3 md:p-4 border border-white/10 hover:scale-105 transition-transform">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{channel.data.sequences}</div>
+                  <div className="text-xs md:text-sm text-green-200 mt-1">تسلسل</div>
                 </div>
-                <div className="bg-gradient-to-br from-orange-500/20 to-yellow-500/20 backdrop-blur rounded-xl p-4 border border-white/10 hover:scale-105 transition-transform">
-                  <div className="text-3xl font-bold text-white">{channel.data.flows}</div>
+                <div className="bg-gradient-to-br from-orange-500/20 to-yellow-500/20 backdrop-blur rounded-xl p-3 md:p-4 border border-white/10 hover:scale-105 transition-transform">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{channel.data.flows}</div>
                   <div className="text-sm text-orange-200 mt-1">سير الإدخال</div>
                 </div>
               </div>
@@ -172,14 +172,14 @@ export default function DashboardContent() {
         </div>
 
         {/* Broadcast Summary */}
-        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-500">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-white" />
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/10 hover:border-white/30 transition-all duration-300 animate-fadeInUp animation-delay-500">
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white">ملخص البث (آخر 7 أيام)</h3>
+            <h3 className="text-lg md:text-xl font-bold text-white">ملخص البث (آخر 7 أيام)</h3>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2 md:gap-4">
             {[
               { icon: '💬', label: 'زيادة', value: '2', color: 'from-emerald-500 to-green-500' },
               { icon: '📉', label: 'انخفاض', value: '0', color: 'from-cyan-500 to-teal-500' },
@@ -187,11 +187,11 @@ export default function DashboardContent() {
             ].map((item, idx) => (
               <div 
                 key={idx} 
-                className={`group bg-gradient-to-br ${item.color} bg-opacity-20 backdrop-blur rounded-xl p-5 text-center border border-white/20 hover:scale-110 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
+                className={`group bg-gradient-to-br ${item.color} bg-opacity-20 backdrop-blur rounded-xl p-3 md:p-5 text-center border border-white/20 hover:scale-110 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
               >
-                <div className="text-4xl mb-3 group-hover:scale-125 transition-transform">{item.icon}</div>
-                <div className="text-3xl font-bold text-white mb-1">{item.value}</div>
-                <div className="text-sm text-white/80">{item.label}</div>
+                <div className="text-2xl md:text-4xl mb-2 md:mb-3 group-hover:scale-125 transition-transform">{item.icon}</div>
+                <div className="text-xl md:text-3xl font-bold text-white mb-1">{item.value}</div>
+                <div className="text-xs md:text-sm text-white/80">{item.label}</div>
               </div>
             ))}
           </div>

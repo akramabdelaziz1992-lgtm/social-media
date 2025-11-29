@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -10,11 +10,14 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
+  Menu,
+  X,
 } from 'lucide-react';
 
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const channels = [
     { 
@@ -86,7 +89,39 @@ export default function Sidebar() {
 
 
   return (
-    <div className="w-64 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 flex flex-col overflow-y-auto shadow-2xl border-r border-teal-500/20 sidebar-scroll relative">
+    <>
+      {/* Mobile Hamburger Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="lg:hidden fixed top-4 right-4 z-50 w-12 h-12 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+      >
+        {isOpen ? (
+          <X size={24} className="text-white" />
+        ) : (
+          <Menu size={24} className="text-white" />
+        )}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed lg:relative
+        w-64 h-screen
+        bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 
+        flex flex-col overflow-y-auto 
+        shadow-2xl border-r border-teal-500/20 
+        sidebar-scroll
+        transition-transform duration-300 ease-in-out
+        z-40
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
       {/* Animated Background Shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Circles */}
@@ -303,6 +338,7 @@ export default function Sidebar() {
         </Link>
       </div>
     </div>
+    </>
   );
 }
 
