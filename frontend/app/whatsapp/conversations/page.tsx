@@ -160,157 +160,178 @@ export default function WhatsAppConversationsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0b1426]" dir="rtl">
-      {/* Conversations List */}
-      <div className="w-96 bg-[#151f36] border-l border-gray-700 flex flex-col">
+    <div className="h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-slate-50 p-6 overflow-hidden" dir="rtl">
+      <div className="max-w-7xl mx-auto h-full flex flex-col">
         {/* Header */}
-        <div className="p-4 bg-[#1a2744] border-b border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <MessageSquare className="w-6 h-6 text-green-500" />
-              واتساب
-            </h1>
-          </div>
-          <div className="relative">
-            <Search className="absolute right-3 top-3 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="بحث..."
-              className="w-full bg-[#0b1426] text-white px-10 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-            />
+        <div className="mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+              <MessageSquare className="text-white" size={24} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                محادثات واتساب
+              </h1>
+              <p className="text-gray-600">محادثات العملاء المباشرة</p>
+            </div>
           </div>
         </div>
 
-        {/* Conversations */}
-        <div className="flex-1 overflow-y-auto">
-          {loading && (
-            <div className="p-8 text-center text-gray-400">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
-              <p className="mt-4">جاري التحميل...</p>
+        {/* Chat Container */}
+        <div className="flex-1 grid grid-cols-12 gap-6 overflow-hidden">
+          {/* Conversations List */}
+          <div className="col-span-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 flex flex-col overflow-hidden">
+            {/* Search */}
+            <div className="p-4 border-b border-gray-200">
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="ابحث عن محادثة..."
+                  className="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
             </div>
-          )}
-          
-          {!loading && conversations.size === 0 && (
-            <div className="p-8 text-center text-gray-400">
-              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-              <p>لا توجد محادثات</p>
-              <p className="text-sm mt-2">ابعت رسالة على: 0555254915</p>
-            </div>
-          )}
 
-          {Array.from(conversations.values()).map((conv) => (
-            <div
-              key={conv.phoneNumber}
-              onClick={() => setSelectedPhone(conv.phoneNumber)}
-              className={`p-4 border-b border-gray-700 cursor-pointer hover:bg-[#1a2744] transition ${
-                selectedPhone === conv.phoneNumber ? 'bg-[#1a2744]' : ''
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                  {conv.contactName[0]}
+            {/* Conversations */}
+            <div className="flex-1 overflow-y-auto">
+              {loading && (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">جاري التحميل...</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-white font-semibold truncate">{conv.contactName}</h3>
-                    <span className="text-xs text-gray-400">{formatDate(conv.timestamp)}</span>
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <p className="text-sm text-gray-400 truncate">{conv.lastMessage}</p>
+              )}
+              
+              {!loading && conversations.size === 0 && (
+                <div className="p-8 text-center">
+                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-600">لا توجد محادثات</p>
+                  <p className="text-sm text-gray-500 mt-2">ابعت رسالة على: 0555254915</p>
+                </div>
+              )}
+
+              {Array.from(conversations.values()).map((conv) => (
+                <div
+                  key={conv.phoneNumber}
+                  onClick={() => setSelectedPhone(conv.phoneNumber)}
+                  className={`p-4 border-b border-gray-100 cursor-pointer transition ${
+                    selectedPhone === conv.phoneNumber
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50'
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                        {conv.contactName[0]}
+                      </div>
+                      <div className="absolute bottom-0 left-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-bold text-gray-900 truncate">{conv.contactName}</h3>
+                        <span className="text-xs text-gray-500">{formatDate(conv.timestamp)}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 truncate">{conv.lastMessage}</p>
+                    </div>
                     {conv.unread > 0 && (
-                      <span className="bg-green-500 text-white text-xs rounded-full px-2 py-1 min-w-[24px] text-center">
+                      <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
                         {conv.unread}
-                      </span>
+                      </div>
                     )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {selectedPhone ? (
-          <>
-            {/* Chat Header */}
-            <div className="bg-[#1a2744] border-b border-gray-700 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                    {conversations.get(selectedPhone)?.contactName[0]}
-                  </div>
-                  <div>
-                    <h2 className="text-white font-semibold">
-                      {conversations.get(selectedPhone)?.contactName}
-                    </h2>
-                    <p className="text-sm text-gray-400">{selectedPhone}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-[#0b1426]">
-                    <Phone className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-[#0b1426]">
-                    <Video className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#0b1426]">
-              {getMessagesForPhone(selectedPhone).reverse().map((msg) => (
-                <div key={msg.id} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-bold">
-                    {msg.contactName[0]}
-                  </div>
-                  <div className="flex-1">
-                    <div className="bg-[#1f2f4d] rounded-lg p-3 max-w-xl">
-                      <p className="text-white">{msg.body}</p>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500">{formatTime(msg.timestamp)}</span>
-                    </div>
                   </div>
                 </div>
               ))}
             </div>
-
-            {/* Message Input */}
-            <div className="bg-[#1a2744] border-t border-gray-700 p-4">
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  placeholder="اكتب رسالتك هنا..."
-                  className="flex-1 bg-[#0b1426] text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && messageInput.trim()) {
-                      sendMessage();
-                    }
-                  }}
-                />
-                <button
-                  onClick={sendMessage}
-                  className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition disabled:opacity-50"
-                  disabled={!messageInput.trim()}
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center bg-[#0b1426]">
-            <div className="text-center text-gray-400">
-              <MessageSquare className="w-24 h-24 mx-auto mb-4 text-gray-600" />
-              <p className="text-xl">اختر محادثة لبدء المراسلة</p>
-            </div>
           </div>
-        )}
+
+          {/* Chat Area */}
+          <div className="col-span-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 flex flex-col overflow-hidden">
+            {selectedPhone ? (
+              <>
+                {/* Chat Header */}
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                      {conversations.get(selectedPhone)?.contactName[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">
+                        {conversations.get(selectedPhone)?.contactName}
+                      </h3>
+                      <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                        متصل
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                      <Phone size={20} />
+                    </button>
+                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                      <Video size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  {getMessagesForPhone(selectedPhone).reverse().map((msg) => (
+                    <div key={msg.id} className="flex justify-start">
+                      <div className="flex items-end gap-2 max-w-[70%]">
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                          {msg.contactName[0]}
+                        </div>
+                        <div>
+                          <div className="px-4 py-3 bg-gray-100 text-gray-900 rounded-2xl rounded-br-none">
+                            <p className="text-sm">{msg.body}</p>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                            <Clock size={12} />
+                            <span>{formatTime(msg.timestamp)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Message Input */}
+                <div className="p-4 border-t border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      placeholder="اكتب رسالتك..."
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                    <button
+                      onClick={sendMessage}
+                      className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:shadow-lg transition flex items-center gap-2"
+                      disabled={!messageInput.trim()}
+                    >
+                      <Send size={20} />
+                      <span>إرسال</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="text-white" size={48} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">اختر محادثة</h3>
+                  <p className="text-gray-600">اختر محادثة من القائمة لبدء المراسلة</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
