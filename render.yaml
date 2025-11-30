@@ -1,23 +1,13 @@
 # AlMasar Backend Deployment Configuration
-# يمكن استخدام هذا الملف للنشر التلقائي على Render
-
-databases:
-  - name: almasar-database
-    databaseName: almasar_production
-    user: almasar_user
-    region: frankfurt
-    plan: free
-
 services:
   - type: web
     name: almasar-backend
     runtime: node
     region: frankfurt
     plan: free
-    rootDirectory: backend
+    rootDir: backend
     buildCommand: npm install && npm run build
     startCommand: npm run start:prod
-    healthCheckPath: /api/health
     envVars:
       # Application
       - key: NODE_ENV
@@ -53,20 +43,6 @@ services:
       - key: WHATSAPP_BUSINESS_ACCOUNT_ID
         value: 829226516635919
       
-      # Meta/Facebook (⚠️ أضفها يدوياً في Dashboard)
+      # Meta Page Access Token
       - key: META_PAGE_ACCESS_TOKEN
-        sync: false
-      - key: META_VERIFY_TOKEN
-        sync: false
-      - key: META_API_VERSION
-        sync: false
-      
-      # Twilio (اختياري)
-      - key: TWILIO_ACCOUNT_SID
-        sync: false
-      - key: TWILIO_API_KEY
-        sync: false
-      - key: TWILIO_API_SECRET
-        sync: false
-      - key: TWILIO_PHONE_NUMBER
-        sync: false
+        value: EAAMObRfDmLgBQDVpZBe8l61KFYzG2LH4t86KmZCI1bwCfjEHxcRuUeNhq7RwCfZCYVNO39mkGD8gA80Uw3fhyORRl3ZBDmd8IRdl2pWj2GpT71TZB46KUx894wp0ZCKQ6klST2HK9WJ82U62zAZC213nDujhtXOQtpLCFvpX4tkL48ZAZCflbdZC6kdF5v2BfeF0ZBQWyHSYOhRZA5tLvQlbNmXUXZCpyBn7iI25qrHFJTkGydHdBhsy03mPIp4ai3snjc74ODOGhC2vtLuBxP5EpP0EaEwKC
