@@ -2,7 +2,7 @@ import { Controller, Post, Get, Body, Param, Query, Req, Res, HttpCode, HttpStat
 import { Request, Response } from 'express';
 import { WhatsAppBusinessService } from './whatsapp-business.service';
 
-@Controller('whatsapp-business')
+@Controller('api/whatsapp-business')
 export class WhatsAppBusinessController {
   private readonly logger = new Logger(WhatsAppBusinessController.name);
 
