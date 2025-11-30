@@ -155,39 +155,69 @@ export default function InboxPage() {
       });
 
       // استقبال الرسائل الجديدة من WhatsApp Business API
-      socketRef.current.on('message', (data: any) => {
-        console.log('📨 رسالة جديدة من WhatsApp:', data);
-        // TODO: إضافة الرسالة للمحادثة
-        loadData(); // إعادة تحميل المحادثات
-      });
-
-      socketRef.current.on('ready', () => {
-        console.log('✅ WhatsApp متصل بنجاح');
-        setConnectionStatus('connected');
-        setIsWhatsAppConnected(true);
-        localStorage.setItem('whatsapp_connected', 'true');
-        loadData();
-      });
-
-      socketRef.current.on('disconnected', () => {
-        console.log('❌ WhatsApp منفصل');
-        setConnectionStatus('disconnected');
-        setIsWhatsAppConnected(false);
-        localStorage.removeItem('whatsapp_connected');
-      });
-
       socketRef.current.on('new-message', (data: any) => {
-        console.log('📩 رسالة جديدة من WhatsApp:', data);
-        loadData();
+        console.log('📨 رسالة جديدة من WhatsApp:', data);
         
+        const phoneNumber = data.from;
+        const contactName = data.profile?.name || phoneNumber;
+        
+        // إنشاء الرسالة الجديدة
         const newMessage = {
-          id: data.id,
-          text: data.body,
+          id: data.id || `msg-${Date.now()}`,
+          text: data.text || data.body,
           senderType: 'user',
-          createdAt: new Date(data.timestamp * 1000).toISOString(),
+          createdAt: data.timestamp || new Date().toISOString(),
+          status: 'delivered'
         };
         
-        setMessages(prev => [...prev, newMessage]);
+        // تحديث قائمة المحادثات
+        setConversations(prev => {
+          const existingConv = prev.find(c => c.id === phoneNumber);
+          
+          if (existingConv) {
+            // إضافة الرسالة للمحادثة الموجودة
+            return prev.map(c => {
+              if (c.id === phoneNumber) {
+                return {
+                  ...c,
+                  lastMessage: newMessage.text,
+                  lastMessageTime: newMessage.createdAt,
+                  messages: [...(c.messages || []), newMessage],
+                  unreadCount: (c.unreadCount || 0) + 1
+                };
+              }
+              return c;
+            }).sort((a, b) => {
+              const timeA = new Date(a.lastMessageTime).getTime();
+              const timeB = new Date(b.lastMessageTime).getTime();
+              return timeB - timeA; // الأحدث أولاً
+            });
+          } else {
+            // إنشاء محادثة جديدة
+            const newConv = {
+              id: phoneNumber,
+              contactName: contactName,
+              contactPhone: phoneNumber,
+              lastMessage: newMessage.text,
+              lastMessageTime: newMessage.createdAt,
+              unreadCount: 1,
+              status: 'active',
+              channel: {
+                id: '1',
+                name: 'واتساب',
+                type: 'whatsapp',
+                status: 'connected'
+              },
+              messages: [newMessage]
+            };
+            return [newConv, ...prev];
+          }
+        });
+        
+        // إذا كانت المحادثة مفتوحة، أضف الرسالة فوراً
+        if (selectedConversation && selectedConversation.id === phoneNumber) {
+          setMessages(prev => [...prev, newMessage]);
+        }
       });
     } catch (error) {
       console.error('WebSocket connection failed:', error);
@@ -301,95 +331,100 @@ export default function InboxPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // أولاً: فحص حالة الاتصال
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const statusResponse = await fetch(`${apiUrl}/api/whatsapp/status`, {
+      // جلب الرسائل الحقيقية من WhatsApp Business API
+      const messagesResponse = await fetch(`${apiUrl}/api/whatsapp-business/recent-messages`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
       });
       
-      clearTimeout(timeoutId);
-      
-      if (!statusResponse.ok) {
-        throw new Error(`Backend returned ${statusResponse.status}`);
-      }
-      
-      const statusData = await statusResponse.json();
-      
-      console.log('WhatsApp Status:', statusData);
-      
-      // ملاحظة: نحن نستخدم WhatsApp Business API وليس WhatsApp Web
-      // لذلك نتجاهل التحقق من isReady (خاص بـ WhatsApp Web)
-      // إذا وصلنا هنا معناه أن الإعدادات موجودة من checkWhatsAppStatus()
-      console.log('✅ Using WhatsApp Business API - loading conversations from database');
-      
-      // إذا كان statusData.isReady = false، هذا طبيعي لأننا نستخدم Business API
-      // نتابع تحميل البيانات من قاعدة البيانات
-      
-      // ثانياً: جلب محادثات من قاعدة البيانات (Conversations API)
-      // ملاحظة: نستخدم Conversations API بدلاً من WhatsApp Web API
-      try {
-        const conversationsResponse = await fetch(`${apiUrl}/api/conversations`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        
-        if (!conversationsResponse.ok) {
-          console.warn('Could not load conversations, starting with empty list');
-          setConversations([]);
-          setChannels([
-            { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
-          ]);
-          setLoading(false);
-          return;
-        }
-        
-        const conversationsData = await conversationsResponse.json();
-        console.log('Conversations from database:', conversationsData);
-        
-        if (conversationsData && Array.isArray(conversationsData) && conversationsData.length > 0) {
-          console.log('Loaded conversations from database:', conversationsData.length);
-          setConversations(conversationsData);
-        } else {
-          console.log('No conversations found in database - starting with empty list');
-          setConversations([]);
-        }
-        
-        setChannels([
-          { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
-          { id: '2', name: 'ماسنجر', status: 'disconnected', type: 'messenger' },
-          { id: '3', name: 'تيليجرام', status: 'disconnected', type: 'telegram' },
-        ]);
-        setLoading(false);
-      } catch (conversationsError) {
-        console.warn('Error loading conversations:', conversationsError);
-        setConversations([]);
-        setChannels([
-          { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
-        ]);
-        setLoading(false);
-      }
-    } catch (apiError: any) {
-      // Check if backend is down
-      if (apiError.name === 'AbortError' || apiError.message?.includes('Failed to fetch')) {
-        console.warn('⚠️ Backend غير متاح - تأكد من تشغيل Backend على المنفذ 4000');
+      if (!messagesResponse.ok) {
+        console.warn('⚠️ Backend غير متاح - تأكد من تشغيل Backend');
         setConnectionStatus('disconnected');
         setIsWhatsAppConnected(false);
-      } else {
-        console.error('Error loading WhatsApp data:', apiError.message || apiError);
+        setConversations([]);
+        setChannels([
+          { id: '1', name: 'واتساب', status: 'disconnected', type: 'whatsapp' },
+        ]);
+        setLoading(false);
+        return;
       }
       
-      // في حالة الخطأ، اعرض قائمة فارغة
+      const messagesData = await messagesResponse.json();
+      console.log('✅ WhatsApp messages received:', messagesData.length);
+      
+      // تحويل الرسائل إلى محادثات (group by phone number)
+      const conversationsMap = new Map();
+      
+      messagesData.forEach((msg: any) => {
+        const phoneNumber = msg.from;
+        const contactName = msg.profile?.name || phoneNumber;
+        
+        if (!conversationsMap.has(phoneNumber)) {
+          conversationsMap.set(phoneNumber, {
+            id: phoneNumber,
+            contactName: contactName,
+            contactPhone: phoneNumber,
+            lastMessage: msg.text,
+            lastMessageTime: msg.timestamp,
+            unreadCount: 0,
+            status: 'active',
+            channel: {
+              id: '1',
+              name: 'واتساب',
+              type: 'whatsapp',
+              status: 'connected'
+            },
+            messages: []
+          });
+        }
+        
+        // إضافة الرسالة للمحادثة
+        const conversation = conversationsMap.get(phoneNumber);
+        conversation.messages.push({
+          id: msg.id || `msg-${Date.now()}-${Math.random()}`,
+          text: msg.text,
+          senderType: msg.type === 'sent' ? 'agent' : 'user',
+          createdAt: msg.timestamp,
+          status: 'delivered'
+        });
+        
+        // تحديث آخر رسالة
+        const msgTime = new Date(msg.timestamp).getTime();
+        const lastTime = new Date(conversation.lastMessageTime).getTime();
+        if (msgTime > lastTime) {
+          conversation.lastMessage = msg.text;
+          conversation.lastMessageTime = msg.timestamp;
+        }
+      });
+      
+      // تحويل Map إلى Array وترتيب حسب آخر رسالة
+      const conversationsArray = Array.from(conversationsMap.values()).sort((a, b) => {
+        const timeA = new Date(a.lastMessageTime).getTime();
+        const timeB = new Date(b.lastMessageTime).getTime();
+        return timeB - timeA; // الأحدث أولاً
+      });
+      
+      console.log('📱 Conversations created:', conversationsArray.length);
+      setConversations(conversationsArray);
+      setConnectionStatus('connected');
+      setIsWhatsAppConnected(true);
+      
+      setChannels([
+        { id: '1', name: 'واتساب', status: 'connected', type: 'whatsapp' },
+        { id: '2', name: 'ماسنجر', status: 'disconnected', type: 'messenger' },
+        { id: '3', name: 'تيليجرام', status: 'disconnected', type: 'telegram' },
+      ]);
+      
+    } catch (error: any) {
+      console.error('❌ Error loading WhatsApp data:', error);
+      setConnectionStatus('disconnected');
+      setIsWhatsAppConnected(false);
       setConversations([]);
       setChannels([
         { id: '1', name: 'واتساب', status: 'disconnected', type: 'whatsapp' },
       ]);
     }
     
-    // ALWAYS set loading to false
     setLoading(false);
   };
 
@@ -459,48 +494,12 @@ export default function InboxPage() {
 
   const selectConversation = async (conv: any) => {
     setSelectedConversation(conv);
-    try {
-      // إذا كانت محادثة WhatsApp، جلب الرسائل من API الخاص بها
-      if (conv.channel?.type === 'whatsapp') {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
-        const response = await fetch(`${apiUrl}/api/whatsapp/messages/${conv.id}`, {
-          signal: controller.signal,
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          console.error('Failed to fetch messages:', response.status);
-          setMessages([]);
-          return;
-        }
-        
-        const data = await response.json();
-        
-        if (data.success && data.messages) {
-          const whatsappMessages = data.messages.map((msg: any) => ({
-            id: msg.id,
-            text: msg.body,
-            senderType: msg.fromMe ? 'agent' : 'user',
-            createdAt: new Date(msg.timestamp * 1000).toISOString(),
-          }));
-          // ابدأ بالرسائل من الـ API أولاً عند فتح المحادثة
-          setMessages(whatsappMessages);
-          return;
-        }
-      }
-      
-      // محاولة جلب الرسائل من الـ API العادي
-      const realMessages = await messagesApi.getAll(conv.id);
-      setMessages(realMessages);
-    } catch (error: any) {
-      // Silently handle - no need to spam console
-      if (error.name !== 'AbortError' && error.message !== 'Failed to fetch') {
-        console.debug('No messages available:', error.message || error);
-      }
-      // لا توجد رسائل - اعرض قائمة فارغة
+    
+    // عرض الرسائل اللي موجودة في المحادثة
+    if (conv.messages && conv.messages.length > 0) {
+      console.log('📩 Displaying messages for:', conv.contactName, '- Total:', conv.messages.length);
+      setMessages(conv.messages);
+    } else {
       setMessages([]);
     }
   };
@@ -508,60 +507,61 @@ export default function InboxPage() {
   const sendMessage = async () => {
     if (!messageText.trim() || !selectedConversation) return;
 
-    try {
-      // إذا كانت محادثة WhatsApp، إرسال عبر WhatsApp API
-      if (selectedConversation.channel?.type === 'whatsapp') {
-        const response = await fetch(`${apiUrl}/api/whatsapp/send`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: selectedConversation.id,
-            message: messageText,
-          }),
-        });
+    const messageToSend = messageText.trim();
+    const tempId = `msg-${Date.now()}`;
+    
+    // إضافة الرسالة فوراً (optimistic UI)
+    const newMessage = {
+      id: tempId,
+      text: messageToSend,
+      senderType: 'agent',
+      createdAt: new Date().toISOString(),
+      status: 'sending'
+    };
+    
+    setMessages([...messages, newMessage]);
+    setMessageText('');
 
-        const result = await response.json();
-        
-        if (result.success) {
-          // إضافة الرسالة محلياً
-          const newMessage = {
-            id: `msg-${Date.now()}`,
-            text: messageText,
-            senderType: 'agent',
-            createdAt: new Date().toISOString(),
-          };
-          setMessages([...messages, newMessage]);
-          setMessageText('');
-          return;
-        }
-      }
-      
-      // الطريقة القديمة
-      await messagesApi.send({
-        conversationId: selectedConversation.id,
-        text: messageText,
-        channel: selectedConversation.channel.type,
+    try {
+      // إرسال عبر WhatsApp Business API
+      const response = await fetch(`${apiUrl}/api/whatsapp-business/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: selectedConversation.contactPhone || selectedConversation.id,
+          message: messageToSend,
+        }),
       });
-      setMessageText('');
-      const msgs = await messagesApi.getAll(selectedConversation.id);
-      setMessages(msgs);
-    } catch (error: any) {
-      // Fallback: add message locally
-      const newMessage = {
-        id: `msg-${Date.now()}`,
-        text: messageText,
-        senderType: 'agent',
-        createdAt: new Date().toISOString(),
-      };
-      setMessages([...messages, newMessage]);
-      setMessageText('');
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
       
-      // Show success message
-      setTimeout(() => {
-        alert('✓ تم إرسال الرسالة بنجاح!');
-      }, 100);
+      // تحديث حالة الرسالة إلى "sent"
+      setMessages(prev => prev.map(msg => 
+        msg.id === tempId 
+          ? { ...msg, id: result.messageId || tempId, status: 'sent' }
+          : msg
+      ));
+      
+      console.log('✅ Message sent successfully:', result);
+      
+    } catch (error: any) {
+      console.error('❌ Error sending message:', error);
+      
+      // تحديث حالة الرسالة إلى "failed" لكن نبقيها معروضة
+      setMessages(prev => prev.map(msg => 
+        msg.id === tempId 
+          ? { ...msg, status: 'failed' }
+          : msg
+      ));
+      
+      // عرض رسالة للمستخدم
+      alert('⚠️ حدث خطأ في الإرسال. تأكد من أن الباك إند يعمل.');
     }
   };
 
