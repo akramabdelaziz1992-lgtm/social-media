@@ -1,11 +1,7 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { WhatsAppGateway } from './whatsapp.gateway';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Message } from '../messages/entities/message.entity';
-import { Conversation } from '../conversations/entities/conversation.entity';
 
 @Injectable()
 export class WhatsAppBusinessService {
@@ -18,10 +14,6 @@ export class WhatsAppBusinessService {
   constructor(
     private readonly httpService: HttpService,
     private readonly whatsappGateway: WhatsAppGateway,
-    @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
-    @InjectRepository(Conversation)
-    private conversationRepository: Repository<Conversation>,
   ) {
     // التحقق من البيانات المطلوبة
     if (this.phoneNumberId && this.accessToken) {
@@ -172,50 +164,18 @@ export class WhatsAppBusinessService {
 
         this.logger.log(`📨 New message from ${contactName} (${from}): ${messageBody}`);
 
-        // حفظ الرسالة في Database
-        try {
-          // البحث عن المحادثة أو إنشاء واحدة جديدة
-          let conversation = await this.conversationRepository.findOne({
-            where: { phoneNumber: from },
-          });
+        // إرسال الرسالة للواجهة عبر WebSocket
+        this.whatsappGateway.sendMessage('new-message', {
+          id: messageId,
+          from: from,
+          body: messageBody,
+          timestamp: timestamp,
+          contactName: contactName,
+          type: messageType,
+        });
 
-          if (!conversation) {
-            conversation = this.conversationRepository.create({
-              phoneNumber: from,
-              customerName: contactName,
-              platform: 'whatsapp',
-              status: 'active',
-            });
-            await this.conversationRepository.save(conversation);
-            this.logger.log(`✅ Created new conversation for ${from}`);
-          }
-
-          // حفظ الرسالة
-          const newMessage = this.messageRepository.create({
-            conversation: conversation,
-            content: messageBody,
-            sender: 'customer',
-            messageType: messageType,
-            platform: 'whatsapp',
-            externalId: messageId,
-            timestamp: new Date(parseInt(timestamp) * 1000),
-          });
-          await this.messageRepository.save(newMessage);
-          this.logger.log(`✅ Message saved to database`);
-
-          // إرسال الرسالة للواجهة عبر WebSocket
-          this.whatsappGateway.sendMessage('new-message', {
-            id: messageId,
-            from: from,
-            body: messageBody,
-            timestamp: timestamp,
-            contactName: contactName,
-            type: messageType,
-            conversationId: conversation.id,
-          });
-        } catch (dbError) {
-          this.logger.error(`❌ Error saving message to database: ${dbError.message}`);
-        }
+        // TODO: حفظ الرسالة في Database
+        // يحتاج إلى channel و conversation setup صحيح
 
         return {
           success: true,
