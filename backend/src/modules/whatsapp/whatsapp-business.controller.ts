@@ -138,4 +138,15 @@ export class WhatsAppBusinessController {
       messages,
     };
   }
+
+  /**
+   * Get recent WhatsApp messages
+   */
+  @Get('recent-messages')
+  getRecentMessages() {
+    return {
+      success: true,
+      messages: this.whatsappBusinessService.getRecentMessages(),
+    };
+  }
 }

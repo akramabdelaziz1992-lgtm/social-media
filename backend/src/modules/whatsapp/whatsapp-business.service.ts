@@ -10,6 +10,7 @@ export class WhatsAppBusinessService {
   private readonly phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   private readonly accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
   private isReady = false;
+  private recentMessages: any[] = []; // Store recent messages in memory
 
   constructor(
     private readonly httpService: HttpService,
@@ -164,18 +165,25 @@ export class WhatsAppBusinessService {
 
         this.logger.log(`📨 New message from ${contactName} (${from}): ${messageBody}`);
 
-        // إرسال الرسالة للواجهة عبر WebSocket
-        this.whatsappGateway.sendMessage('new-message', {
+        // حفظ الرسالة في الذاكرة
+        const newMessage = {
           id: messageId,
           from: from,
           body: messageBody,
           timestamp: timestamp,
           contactName: contactName,
           type: messageType,
-        });
+          createdAt: new Date(),
+        };
+        
+        this.recentMessages.unshift(newMessage);
+        // Keep only last 100 messages
+        if (this.recentMessages.length > 100) {
+          this.recentMessages = this.recentMessages.slice(0, 100);
+        }
 
-        // TODO: حفظ الرسالة في Database
-        // يحتاج إلى channel و conversation setup صحيح
+        // إرسال الرسالة للواجهة عبر WebSocket
+        this.whatsappGateway.sendMessage('new-message', newMessage);
 
         return {
           success: true,
@@ -209,6 +217,13 @@ export class WhatsAppBusinessService {
       this.logger.warn('⚠️ Webhook verification failed');
       return null;
     }
+  }
+
+  /**
+   * Get recent messages
+   */
+  getRecentMessages() {
+    return this.recentMessages;
   }
 
   /**
