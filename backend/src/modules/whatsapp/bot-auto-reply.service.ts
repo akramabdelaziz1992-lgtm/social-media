@@ -127,25 +127,36 @@ export class BotAutoReplyService {
    */
   private saveUserInput(session: UserSession, questionId: string, input: string) {
     // حفظ البيانات بناءً على السؤال
-    if (questionId.includes('units_booking')) {
+    if (questionId === 'units_booking') {
       session.collectedData.notes = input;
       session.collectedData.service = 'حجز وحدات سكنية';
-    } else if (questionId.includes('car')) {
+    } else if (questionId === 'car_details') {
       session.collectedData.notes = input;
       session.collectedData.service = 'حجز سيارات';
-    } else if (questionId.includes('package')) {
+    } else if (questionId === 'package_details') {
       session.collectedData.notes = input;
       session.collectedData.service = 'باقة سياحية';
-    } else if (questionId.includes('event')) {
+    } else if (questionId === 'event_details') {
       session.collectedData.notes = input;
       session.collectedData.service = 'تنظيم حفلات';
-    } else if (questionId.includes('inquiry') || questionId.includes('complaint')) {
+    } else if (questionId.includes('inquiry')) {
       session.collectedData.notes = input;
+      session.collectedData.service = 'استفسار';
+    } else if (questionId.includes('complaint')) {
+      session.collectedData.notes = input;
+      session.collectedData.service = 'شكوى';
     } else if (questionId === 'get_contact_info') {
       // محاولة استخراج الاسم ورقم الهاتف
       const parts = input.split(/[،,]/);
       if (parts.length >= 1) session.collectedData.customerName = parts[0].trim();
       if (parts.length >= 2) session.collectedData.customerPhone = parts[1].trim();
+      
+      // Log collected data for staff notification
+      this.logger.log(`📋 طلب جديد من ${session.collectedData.customerName}:`);
+      this.logger.log(`📱 الهاتف: ${session.collectedData.customerPhone}`);
+      this.logger.log(`🔖 الخدمة: ${session.collectedData.service}`);
+      this.logger.log(`📝 التفاصيل: ${session.collectedData.notes}`);
+      this.logger.log(`👤 تحويل إلى موظف: تسنيم - قسم الحجوزات`);
     }
 
     this.logger.log(`💾 Saved data for ${session.phoneNumber}: ${questionId} = ${input}`);
