@@ -13,22 +13,17 @@ export class WhatsAppBusinessController {
    */
   @Post('send')
   async sendMessage(@Body() body: { to: string; message: string; type?: string; mediaUrl?: string }) {
-    try {
-      // إذا كانت رسالة نصية فقط
-      if (!body.type || body.type === 'text') {
-        return this.whatsappBusinessService.sendMessage(body.to, body.message);
-      }
-      
-      // إذا كانت صورة أو ملف
-      if (body.mediaUrl) {
-        return this.whatsappBusinessService.sendMedia(body.to, body.type, body.mediaUrl, body.message);
-      }
-      
-      return { success: false, error: 'Invalid message type or missing mediaUrl' };
-    } catch (error) {
-      this.logger.error(`Error in sendMessage: ${error.message}`);
-      return { success: false, error: error.message };
+    // إذا كانت رسالة نصية فقط
+    if (!body.type || body.type === 'text') {
+      return this.whatsappBusinessService.sendMessage(body.to, body.message);
     }
+    
+    // إذا كانت صورة أو ملف
+    if (body.mediaUrl) {
+      return this.whatsappBusinessService.sendMedia(body.to, body.type, body.mediaUrl, body.message);
+    }
+    
+    return { success: false, error: 'Invalid message type or missing mediaUrl' };
   }
 
   /**
@@ -36,27 +31,23 @@ export class WhatsAppBusinessController {
    */
   @Post('broadcast')
   async broadcastMessage(@Body() body: { recipients: string[]; message: string }) {
-    try {
-      const results = [];
-      for (const recipient of body.recipients) {
-        try {
-          const result = await this.whatsappBusinessService.sendMessage(recipient, body.message);
-          results.push({ recipient, success: true, result });
-        } catch (error) {
-          results.push({ recipient, success: false, error: error.message });
-        }
+    const results = [];
+    for (const recipient of body.recipients) {
+      try {
+        const result = await this.whatsappBusinessService.sendMessage(recipient, body.message);
+        results.push({ recipient, success: true, result });
+      } catch (error) {
+        this.logger.error(`Broadcast to ${recipient} failed: ${error.message}`);
+        results.push({ recipient, success: false, error: error.message });
       }
-      return {
-        success: true,
-        results,
-        total: body.recipients.length,
-        successful: results.filter(r => r.success).length,
-        failed: results.filter(r => !r.success).length,
-      };
-    } catch (error) {
-      this.logger.error(`Error in broadcast: ${error.message}`);
-      return { success: false, error: error.message };
     }
+    return {
+      success: true,
+      results,
+      total: body.recipients.length,
+      successful: results.filter(r => r.success).length,
+      failed: results.filter(r => !r.success).length,
+    };
   }
 
   /**
