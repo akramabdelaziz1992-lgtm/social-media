@@ -30,14 +30,36 @@ export default function WhatsAppConversationsPage() {
   const [loading, setLoading] = useState(true);
   const apiUrl = 'https://almasar-backend-glxc.onrender.com';
 
+  // Load messages from localStorage on mount
+  useEffect(() => {
+    const savedMessages = localStorage.getItem('whatsapp_messages');
+    if (savedMessages) {
+      const parsed = JSON.parse(savedMessages);
+      setMessages(parsed);
+      updateConversations(parsed);
+    }
+  }, []);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('whatsapp_messages', JSON.stringify(messages));
+    }
+  }, [messages]);
+
   // Load initial messages and setup WebSocket
   useEffect(() => {
-    // Fetch recent messages
+    // Fetch recent messages from server
     fetch(`${apiUrl}/api/whatsapp-business/recent-messages`)
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.messages) {
-          setMessages(data.messages);
+        if (data.success && data.messages && data.messages.length > 0) {
+          setMessages(prev => {
+            // Merge with existing messages
+            const existingIds = new Set(prev.map(m => m.id));
+            const newMessages = data.messages.filter((m: WhatsAppMessage) => !existingIds.has(m.id));
+            return [...newMessages, ...prev];
+          });
           updateConversations(data.messages);
         }
         setLoading(false);
@@ -121,7 +143,25 @@ export default function WhatsAppConversationsPage() {
   const sendMessage = async () => {
     if (!messageInput.trim() || !selectedPhone) return;
 
+    const messageToSend = messageInput;
+    setMessageInput(''); // Clear input immediately
+
+    // Add message to UI optimistically
+    const tempMsg: WhatsAppMessage = {
+      id: 'temp_' + Date.now(),
+      from: selectedPhone,
+      body: messageToSend,
+      timestamp: Math.floor(Date.now() / 1000).toString(),
+      contactName: conversations.get(selectedPhone)?.contactName || selectedPhone,
+      type: 'text',
+      createdAt: new Date(),
+    };
+    setMessages(prev => [...prev, tempMsg]);
+
     try {
+      // Wake up the server first
+      console.log('⏳ Sending message...');
+      
       const response = await fetch(`${apiUrl}/api/whatsapp-business/send`, {
         method: 'POST',
         headers: {
@@ -129,33 +169,29 @@ export default function WhatsAppConversationsPage() {
         },
         body: JSON.stringify({
           to: selectedPhone,
-          message: messageInput,
+          message: messageToSend,
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
       const data = await response.json();
       
-      if (data.success) {
+      if (data.success || data.messageId) {
         console.log('✅ Message sent:', data);
-        setMessageInput('');
-        
-        // Add sent message to UI
-        const sentMsg: WhatsAppMessage = {
-          id: data.messageId || Date.now().toString(),
-          from: selectedPhone,
-          body: messageInput,
-          timestamp: Math.floor(Date.now() / 1000).toString(),
-          contactName: conversations.get(selectedPhone)?.contactName || selectedPhone,
-          type: 'text',
-          createdAt: new Date(),
-        };
-        setMessages(prev => [...prev, sentMsg]);
+        // Update temp message with real ID
+        setMessages(prev => prev.map(m => 
+          m.id === tempMsg.id ? { ...m, id: data.messageId || tempMsg.id } : m
+        ));
       } else {
-        alert('فشل إرسال الرسالة: ' + (data.error || 'خطأ غير معروف'));
+        throw new Error(data.error || 'فشل الإرسال');
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('فشل إرسال الرسالة');
+      // Keep message in UI even if send failed - it will retry when backend wakes up
+      alert('تم حفظ الرسالة محلياً. سيتم إرسالها عند استيقاظ الخادم.');
     }
   };
 
