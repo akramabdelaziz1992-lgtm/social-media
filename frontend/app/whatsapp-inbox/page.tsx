@@ -79,7 +79,7 @@ export default function WhatsAppInboxPage() {
       messages.forEach((msg: any) => {
         const phoneNumber = msg.from;
         const contactName = msg.contactName || msg.profile?.name || phoneNumber;
-        const messageText = msg.body || msg.text || '';
+        const messageText = msg.body || msg.text?.body || msg.text || '';
         
         if (!conversationsMap.has(phoneNumber)) {
           conversationsMap.set(phoneNumber, {
