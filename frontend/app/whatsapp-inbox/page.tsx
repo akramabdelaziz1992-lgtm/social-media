@@ -28,7 +28,8 @@ interface Conversation {
 
 export default function WhatsAppInboxPage() {
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://almasar-backend-glxc.onrender.com';
+  // Always use Render backend where messages are stored
+  const apiUrl = 'https://almasar-backend-glxc.onrender.com';
   const socketRef = useRef<any>(null);
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
