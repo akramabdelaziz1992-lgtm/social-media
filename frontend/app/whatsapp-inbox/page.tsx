@@ -78,14 +78,15 @@ export default function WhatsAppInboxPage() {
       
       messages.forEach((msg: any) => {
         const phoneNumber = msg.from;
-        const contactName = msg.profile?.name || phoneNumber;
+        const contactName = msg.contactName || msg.profile?.name || phoneNumber;
+        const messageText = msg.body || msg.text || '';
         
         if (!conversationsMap.has(phoneNumber)) {
           conversationsMap.set(phoneNumber, {
             id: phoneNumber,
             contactName: contactName,
             contactPhone: phoneNumber,
-            lastMessage: msg.text,
+            lastMessage: messageText,
             lastMessageTime: msg.timestamp,
             unreadCount: 0,
             messages: []
@@ -95,7 +96,7 @@ export default function WhatsAppInboxPage() {
         const conversation = conversationsMap.get(phoneNumber)!;
         conversation.messages.push({
           id: msg.id || `msg-${Date.now()}-${Math.random()}`,
-          text: msg.text,
+          text: messageText,
           senderType: msg.type === 'sent' ? 'agent' : 'user',
           createdAt: msg.timestamp,
           status: 'delivered'
@@ -104,7 +105,7 @@ export default function WhatsAppInboxPage() {
         const msgTime = new Date(msg.timestamp).getTime();
         const lastTime = new Date(conversation.lastMessageTime).getTime();
         if (msgTime > lastTime) {
-          conversation.lastMessage = msg.text;
+          conversation.lastMessage = messageText;
           conversation.lastMessageTime = msg.timestamp;
         }
       });
