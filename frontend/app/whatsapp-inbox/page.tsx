@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Search, Phone, Video, MoreVertical, Send, Paperclip, 
@@ -41,6 +41,7 @@ export default function WhatsAppInboxPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'mine' | 'unassigned' | 'mentions'>('all');
+  const isInitialLoad = useRef(true);
 
   // Initialize notification sound
   useEffect(() => {
@@ -49,24 +50,10 @@ export default function WhatsAppInboxPage() {
     audioRef.current.volume = 0.7;
   }, []);
 
-  // Load conversations on mount
-  useEffect(() => {
-    loadConversations();
-    
-    // Refresh conversations every 5 seconds
-    const interval = setInterval(() => {
-      loadConversations();
-    }, 5000);
-    
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-
-
-  const loadConversations = async () => {
-    setLoading(true);
+  const loadConversations = useCallback(async (showLoading = false) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     try {
       console.log('🔄 جاري تحميل الرسائل من:', `${apiUrl}/api/whatsapp-business/recent-messages`);
       const response = await fetch(`${apiUrl}/api/whatsapp-business/recent-messages`);
@@ -135,13 +122,33 @@ export default function WhatsAppInboxPage() {
       }
       previousMessageCountRef.current = currentMessageCount;
       
-      setConversations(conversationsArray);
+      // Only update if conversations changed
+      setConversations(prev => {
+        const hasChanged = JSON.stringify(prev) !== JSON.stringify(conversationsArray);
+        return hasChanged ? conversationsArray : prev;
+      });
       
     } catch (error) {
       console.error('❌ خطأ في تحميل البيانات:', error);
     }
-    setLoading(false);
-  };
+    if (showLoading) {
+      setLoading(false);
+    }
+  }, [apiUrl]);
+
+  // Load conversations on mount
+  useEffect(() => {
+    loadConversations(true);
+    
+    // Refresh conversations every 5 seconds (without loading indicator)
+    const interval = setInterval(() => {
+      loadConversations(false);
+    }, 5000);
+    
+    return () => {
+      clearInterval(interval);
+    };
+  }, [loadConversations]);
 
   const playNotificationSound = () => {
     try {
