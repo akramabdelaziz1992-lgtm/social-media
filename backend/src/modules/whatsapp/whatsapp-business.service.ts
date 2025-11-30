@@ -125,6 +125,64 @@ export class WhatsAppBusinessService {
   }
 
   /**
+   * إرسال صورة أو ملف
+   */
+  async sendMedia(to: string, type: string, mediaUrl: string, caption?: string) {
+    if (!this.isReady) {
+      throw new Error('WhatsApp Business API not configured');
+    }
+
+    try {
+      const url = `${this.apiUrl}/${this.phoneNumberId}/messages`;
+      const cleanNumber = to.replace(/[^\d]/g, '');
+      
+      const payload: any = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: cleanNumber,
+        type: type, // image, document, video, audio
+      };
+
+      // إضافة الوسائط حسب النوع
+      payload[type] = {
+        link: mediaUrl,
+      };
+
+      if (caption && (type === 'image' || type === 'video' || type === 'document')) {
+        payload[type].caption = caption;
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, payload, {
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }),
+      );
+
+      this.logger.log(`✅ Media (${type}) sent successfully to ${cleanNumber}`);
+      const responseData: any = response.data;
+      const messageId = responseData.messages[0].id;
+
+      // حفظ في قاعدة البيانات
+      await this.saveSentMessage(cleanNumber, caption || `[${type}]`, messageId);
+
+      return {
+        success: true,
+        messageId: messageId,
+        data: responseData,
+      };
+    } catch (error) {
+      this.logger.error(`❌ Error sending media: ${error.message}`);
+      if (error.response) {
+        this.logger.error(`Response: ${JSON.stringify(error.response.data)}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * حفظ رسالة مُرسلة في قاعدة البيانات
    */
   private async saveSentMessage(

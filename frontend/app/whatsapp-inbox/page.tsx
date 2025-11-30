@@ -313,22 +313,29 @@ export default function WhatsAppInboxPage() {
     }
     
     try {
-      for (const contactId of selectedContacts) {
-        await fetch(`${apiUrl}/api/whatsapp-business/send`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: contactId,
-            message: broadcastMessage
-          }),
-        });
+      const response = await fetch(`${apiUrl}/api/whatsapp-business/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipients: selectedContacts,
+          message: broadcastMessage
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`تم إرسال ${result.successful} رسالة من أصل ${result.total}`);
+      } else {
+        alert('حدث خطأ في الإرسال الجماعي');
       }
       
-      alert(`تم إرسال الرسالة لـ ${selectedContacts.length} عميل!`);
       setShowBroadcast(false);
       setBroadcastMessage('');
       setSelectedContacts([]);
+      loadConversations();
     } catch (error) {
+      console.error('Broadcast error:', error);
       alert('حدث خطأ في الإرسال الجماعي');
     }
   };
@@ -359,7 +366,7 @@ export default function WhatsAppInboxPage() {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold flex items-center gap-2">
               <MessageSquare className="w-6 h-6" />
-              صندوق الوارد الموحد
+              واتساب
             </h1>
             <div className="flex items-center gap-2">
               <button 
@@ -635,31 +642,39 @@ export default function WhatsAppInboxPage() {
                   <Star className="w-5 h-5" />
                 </button>
                 
-                <button 
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="p-2.5 hover:bg-yellow-600/20 text-yellow-400 hover:text-yellow-300 rounded-xl transition-all hover:shadow-lg relative"
-                  title="إيموجي"
-                >
-                  <Smile className="w-5 h-5" />
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="p-2.5 hover:bg-yellow-600/20 text-yellow-400 hover:text-yellow-300 rounded-xl transition-all hover:shadow-lg"
+                    title="إيموجي"
+                  >
+                    <Smile className="w-5 h-5" />
+                  </button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-2 p-3 bg-slate-800 rounded-xl border border-slate-700 shadow-2xl z-50">
-                      <div className="grid grid-cols-5 gap-2 text-2xl">
-                        {['😊', '😂', '❤️', '👍', '🔥', '🎉', '✨', '🌟', '💪', '🙏', '👏', '✅', '❌', '⚠️', '📱'].map((emoji) => (
-                          <button
-                            key={emoji}
-                            onClick={() => {
-                              setMessageText(prev => prev + emoji);
-                              setShowEmojiPicker(false);
-                            }}
-                            className="hover:bg-slate-700 p-2 rounded-lg transition-all"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowEmojiPicker(false)}
+                      />
+                      <div className="absolute bottom-full left-0 mb-2 p-4 bg-slate-800 rounded-xl border border-slate-700 shadow-2xl z-50 w-64">
+                        <div className="grid grid-cols-6 gap-2 text-2xl">
+                          {['😊', '😂', '❤️', '👍', '🔥', '🎉', '✨', '🌟', '💪', '🙏', '👏', '✅', '❌', '⚠️', '📱', '🎈', '🌹', '💐', '🎁', '🏖️', '✈️', '🚗', '🏨', '🍽️'].map((emoji) => (
+                            <div
+                              key={emoji}
+                              onClick={() => {
+                                setMessageText(prev => prev + emoji);
+                                setShowEmojiPicker(false);
+                              }}
+                              className="hover:bg-slate-700 p-2 rounded-lg transition-all cursor-pointer text-center"
+                            >
+                              {emoji}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    </>
                   )}
-                </button>
+                </div>
                 
                 <input
                   type="text"
