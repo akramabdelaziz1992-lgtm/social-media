@@ -42,6 +42,20 @@ export default function WhatsAppInboxPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'mine' | 'unassigned' | 'mentions'>('all');
   const [showContactInfo, setShowContactInfo] = useState(false);
+  const [showAddContact, setShowAddContact] = useState(false);
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [newContact, setNewContact] = useState({ name: '', phone: '' });
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [quickReplies] = useState([
+    { id: '1', text: 'شكراً لتواصلك معنا! سنرد عليك قريباً' },
+    { id: '2', text: 'مرحباً بك في المسار الساخن للسفر والسياحة' },
+    { id: '3', text: 'نعتذر عن التأخير، سيتم الرد في أقرب وقت' },
+    { id: '4', text: 'تم استلام طلبك وسيتم المتابعة' },
+    { id: '5', text: 'لأي استفسار إضافي نحن في الخدمة' }
+  ]);
   const isInitialLoad = useRef(true);
 
   // Initialize notification sound
@@ -266,21 +280,6 @@ export default function WhatsAppInboxPage() {
       </div>
     );
   }
-
-  const [showAddContact, setShowAddContact] = useState(false);
-  const [showBroadcast, setShowBroadcast] = useState(false);
-  const [showQuickReplies, setShowQuickReplies] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [newContact, setNewContact] = useState({ name: '', phone: '' });
-  const [broadcastMessage, setBroadcastMessage] = useState('');
-  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
-  const [quickReplies] = useState([
-    { id: '1', text: 'شكراً لتواصلك معنا! سنرد عليك قريباً' },
-    { id: '2', text: 'مرحباً بك في المسار الساخن للسفر والسياحة' },
-    { id: '3', text: 'نعتذر عن التأخير، سيتم الرد في أقرب وقت' },
-    { id: '4', text: 'تم استلام طلبك وجاري المعالجة' },
-    { id: '5', text: 'شكراً لثقتك بنا 🌍✨' },
-  ]);
 
   const handleAddContact = async () => {
     if (!newContact.name || !newContact.phone) {
