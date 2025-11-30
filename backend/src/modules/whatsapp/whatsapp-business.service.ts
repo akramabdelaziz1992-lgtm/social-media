@@ -1,8 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { WhatsAppGateway } from './whatsapp.gateway';
 import { BotAutoReplyService } from './bot-auto-reply.service';
+import { Conversation } from '../conversations/entities/conversation.entity';
+import { Message, SenderType, MessageStatus } from '../messages/entities/message.entity';
+import { Channel } from '../channels/entities/channel.entity';
 
 @Injectable()
 export class WhatsAppBusinessService {
@@ -11,20 +16,56 @@ export class WhatsAppBusinessService {
   private readonly phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   private readonly accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
   private isReady = false;
-  private recentMessages: any[] = []; // Store recent messages in memory
   private autoReplyEnabled = true; // تفعيل الرد التلقائي
+  private whatsappChannelId: string | null = null;
 
   constructor(
     private readonly httpService: HttpService,
     private readonly whatsappGateway: WhatsAppGateway,
     private readonly botAutoReplyService: BotAutoReplyService,
+    @InjectRepository(Conversation)
+    private readonly conversationRepository: Repository<Conversation>,
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
+    @InjectRepository(Channel)
+    private readonly channelRepository: Repository<Channel>,
   ) {
     // التحقق من البيانات المطلوبة
     if (this.phoneNumberId && this.accessToken) {
       this.isReady = true;
       this.logger.log('✅ WhatsApp Business API configured and ready');
+      this.initializeWhatsAppChannel();
     } else {
       this.logger.warn('⚠️ WhatsApp Business API not configured. Set WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN');
+    }
+  }
+
+  /**
+   * تهيئة قناة الواتساب في قاعدة البيانات
+   */
+  private async initializeWhatsAppChannel() {
+    try {
+      let channel = await this.channelRepository.findOne({
+        where: { platform: 'whatsapp' },
+      });
+
+      if (!channel) {
+        channel = this.channelRepository.create({
+          name: 'WhatsApp Business',
+          platform: 'whatsapp',
+          isActive: true,
+          config: {
+            phoneNumberId: this.phoneNumberId,
+            phoneNumber: '0555254915',
+          },
+        });
+        await this.channelRepository.save(channel);
+        this.logger.log('✅ WhatsApp channel created in database');
+      }
+
+      this.whatsappChannelId = channel.id;
+    } catch (error) {
+      this.logger.error(`❌ Error initializing WhatsApp channel: ${error.message}`);
     }
   }
 
@@ -64,9 +105,14 @@ export class WhatsAppBusinessService {
 
       this.logger.log(`✅ Message sent successfully to ${cleanNumber}`);
       const responseData: any = response.data;
+      const messageId = responseData.messages[0].id;
+
+      // حفظ الرسالة المُرسلة في قاعدة البيانات
+      await this.saveSentMessage(cleanNumber, message, messageId);
+
       return {
         success: true,
-        messageId: responseData.messages[0].id,
+        messageId: messageId,
         data: responseData,
       };
     } catch (error) {
@@ -75,6 +121,62 @@ export class WhatsAppBusinessService {
         this.logger.error(`Response: ${JSON.stringify(error.response.data)}`);
       }
       throw error;
+    }
+  }
+
+  /**
+   * حفظ رسالة مُرسلة في قاعدة البيانات
+   */
+  private async saveSentMessage(
+    phoneNumber: string,
+    messageText: string,
+    externalMessageId: string,
+  ) {
+    try {
+      if (!this.whatsappChannelId) {
+        return;
+      }
+
+      // البحث عن المحادثة أو إنشاء واحدة جديدة
+      let conversation = await this.conversationRepository.findOne({
+        where: {
+          channelId: this.whatsappChannelId,
+          externalThreadId: phoneNumber,
+        },
+      });
+
+      if (!conversation) {
+        conversation = this.conversationRepository.create({
+          channelId: this.whatsappChannelId,
+          externalThreadId: phoneNumber,
+          customerProfile: {
+            phone: phoneNumber,
+            platform: 'whatsapp',
+            platformId: phoneNumber,
+          },
+          status: 'open',
+          lastMessageAt: new Date(),
+        });
+        await this.conversationRepository.save(conversation);
+      } else {
+        conversation.lastMessageAt = new Date();
+        await this.conversationRepository.save(conversation);
+      }
+
+      // حفظ الرسالة
+      const message = this.messageRepository.create({
+        conversationId: conversation.id,
+        senderType: SenderType.USER,
+        text: messageText,
+        status: MessageStatus.SENT,
+        externalMessageId: externalMessageId,
+        isAutoReply: this.autoReplyEnabled,
+      });
+      await this.messageRepository.save(message);
+
+      this.logger.log(`✅ Sent message saved to database`);
+    } catch (error) {
+      this.logger.error(`❌ Error saving sent message: ${error.message}`);
     }
   }
 
@@ -168,7 +270,10 @@ export class WhatsAppBusinessService {
 
         this.logger.log(`📨 New message from ${contactName} (${from}): ${messageBody}`);
 
-        // حفظ الرسالة في الذاكرة
+        // حفظ الرسالة في قاعدة البيانات
+        await this.saveIncomingMessage(from, contactName, messageBody, messageId, timestamp);
+
+        // إعداد الرسالة للإرسال عبر WebSocket
         const newMessage = {
           id: messageId,
           from: from,
@@ -178,12 +283,6 @@ export class WhatsAppBusinessService {
           type: messageType,
           createdAt: new Date(),
         };
-        
-        this.recentMessages.unshift(newMessage);
-        // Keep only last 100 messages
-        if (this.recentMessages.length > 100) {
-          this.recentMessages = this.recentMessages.slice(0, 100);
-        }
 
         // إرسال الرسالة للواجهة عبر WebSocket
         this.whatsappGateway.sendMessage('new-message', newMessage);
@@ -237,10 +336,114 @@ export class WhatsAppBusinessService {
   }
 
   /**
-   * Get recent messages
+   * حفظ رسالة واردة في قاعدة البيانات
    */
-  getRecentMessages() {
-    return this.recentMessages;
+  private async saveIncomingMessage(
+    phoneNumber: string,
+    contactName: string,
+    messageText: string,
+    externalMessageId: string,
+    timestamp: string,
+  ) {
+    try {
+      if (!this.whatsappChannelId) {
+        this.logger.warn('⚠️ WhatsApp channel not initialized, skipping save');
+        return;
+      }
+
+      // البحث عن المحادثة أو إنشاء واحدة جديدة
+      let conversation = await this.conversationRepository.findOne({
+        where: {
+          channelId: this.whatsappChannelId,
+          externalThreadId: phoneNumber,
+        },
+      });
+
+      if (!conversation) {
+        conversation = this.conversationRepository.create({
+          channelId: this.whatsappChannelId,
+          externalThreadId: phoneNumber,
+          customerProfile: {
+            name: contactName,
+            phone: phoneNumber,
+            platform: 'whatsapp',
+            platformId: phoneNumber,
+          },
+          status: 'open',
+          lastMessageAt: new Date(parseInt(timestamp) * 1000),
+          unreadCount: 1,
+        });
+        await this.conversationRepository.save(conversation);
+        this.logger.log(`✅ New conversation created for ${phoneNumber}`);
+      } else {
+        // تحديث المحادثة
+        conversation.lastMessageAt = new Date(parseInt(timestamp) * 1000);
+        conversation.unreadCount += 1;
+        await this.conversationRepository.save(conversation);
+      }
+
+      // حفظ الرسالة
+      const message = this.messageRepository.create({
+        conversationId: conversation.id,
+        senderType: SenderType.CUSTOMER,
+        text: messageText,
+        status: MessageStatus.DELIVERED,
+        externalMessageId: externalMessageId,
+        createdAt: new Date(parseInt(timestamp) * 1000),
+      });
+      await this.messageRepository.save(message);
+
+      this.logger.log(`✅ Message saved to database: ${messageText.substring(0, 50)}...`);
+    } catch (error) {
+      this.logger.error(`❌ Error saving message to database: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get recent messages from database
+   */
+  async getRecentMessages() {
+    try {
+      if (!this.whatsappChannelId) {
+        return [];
+      }
+
+      // جلب المحادثات الأخيرة
+      const conversations = await this.conversationRepository.find({
+        where: { channelId: this.whatsappChannelId },
+        order: { lastMessageAt: 'DESC' },
+        take: 50,
+      });
+
+      const messages = [];
+
+      for (const conv of conversations) {
+        const convMessages = await this.messageRepository.find({
+          where: { conversationId: conv.id },
+          order: { createdAt: 'DESC' },
+          take: 100,
+        });
+
+        for (const msg of convMessages) {
+          messages.push({
+            id: msg.externalMessageId || msg.id,
+            from: conv.externalThreadId,
+            body: msg.text,
+            timestamp: msg.createdAt.toISOString(),
+            contactName: conv.customerProfile?.name || conv.externalThreadId,
+            type: msg.senderType === SenderType.CUSTOMER ? 'received' : 'sent',
+            createdAt: msg.createdAt,
+          });
+        }
+      }
+
+      return messages.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } catch (error) {
+      this.logger.error(`❌ Error fetching messages from database: ${error.message}`);
+      return [];
+    }
   }
 
   /**
