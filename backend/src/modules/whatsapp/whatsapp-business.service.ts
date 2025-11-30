@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { WhatsAppGateway } from './whatsapp.gateway';
+import { BotAutoReplyService } from './bot-auto-reply.service';
 
 @Injectable()
 export class WhatsAppBusinessService {
@@ -11,10 +12,12 @@ export class WhatsAppBusinessService {
   private readonly accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
   private isReady = false;
   private recentMessages: any[] = []; // Store recent messages in memory
+  private autoReplyEnabled = true; // تفعيل الرد التلقائي
 
   constructor(
     private readonly httpService: HttpService,
     private readonly whatsappGateway: WhatsAppGateway,
+    private readonly botAutoReplyService: BotAutoReplyService,
   ) {
     // التحقق من البيانات المطلوبة
     if (this.phoneNumberId && this.accessToken) {
@@ -184,6 +187,20 @@ export class WhatsAppBusinessService {
 
         // إرسال الرسالة للواجهة عبر WebSocket
         this.whatsappGateway.sendMessage('new-message', newMessage);
+
+        // معالجة الرد التلقائي
+        if (this.autoReplyEnabled) {
+          try {
+            const autoReply = await this.botAutoReplyService.processMessage(from, messageBody);
+            if (autoReply) {
+              // إرسال الرد التلقائي
+              await this.sendMessage(from, autoReply);
+              this.logger.log(`🤖 Auto-reply sent to ${from}`);
+            }
+          } catch (error) {
+            this.logger.error(`❌ Error in auto-reply: ${error.message}`);
+          }
+        }
 
         return {
           success: true,
@@ -368,5 +385,20 @@ export class WhatsAppBusinessService {
       this.logger.error(`❌ Error sending interactive list: ${error.message}`);
       throw error;
     }
+  }
+
+  /**
+   * تفعيل الرد التلقائي
+   */
+  setAutoReplyEnabled(enabled: boolean) {
+    this.autoReplyEnabled = enabled;
+    this.logger.log(`🤖 Auto-reply ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  /**
+   * حالة الرد التلقائي
+   */
+  getAutoReplyEnabled(): boolean {
+    return this.autoReplyEnabled;
   }
 }

@@ -149,4 +149,41 @@ export class WhatsAppBusinessController {
       messages: this.whatsappBusinessService.getRecentMessages(),
     };
   }
+
+  /**
+   * تفعيل الرد التلقائي
+   */
+  @Post('auto-reply/enable')
+  enableAutoReply() {
+    this.whatsappBusinessService.setAutoReplyEnabled(true);
+    return {
+      success: true,
+      message: 'Auto-reply enabled',
+      enabled: true,
+    };
+  }
+
+  /**
+   * إيقاف الرد التلقائي
+   */
+  @Post('auto-reply/disable')
+  disableAutoReply() {
+    this.whatsappBusinessService.setAutoReplyEnabled(false);
+    return {
+      success: true,
+      message: 'Auto-reply disabled',
+      enabled: false,
+    };
+  }
+
+  /**
+   * حالة الرد التلقائي
+   */
+  @Get('auto-reply/status')
+  getAutoReplyStatus() {
+    return {
+      success: true,
+      enabled: this.whatsappBusinessService.getAutoReplyEnabled(),
+    };
+  }
 }
