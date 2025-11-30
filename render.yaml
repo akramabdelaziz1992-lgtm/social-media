@@ -39,19 +39,19 @@ services:
       - key: JWT_REFRESH_SECRET
         generateValue: true
       
-      # WhatsApp Business API (⚠️ أضفها يدوياً في Dashboard)
+      # WhatsApp Business API
       - key: WHATSAPP_PHONE_NUMBER_ID
-        sync: false
+        value: 946543245198666
       - key: WHATSAPP_PHONE_NUMBER
-        sync: false
+        value: 966555254915
       - key: WHATSAPP_ACCESS_TOKEN
-        sync: false
+        value: EAAMObRfDmLgBQDVpZBe8l61KFYzG2LH4t86KmZCI1bwCfjEHxcRuUeNhq7RwCfZCYVNO39mkGD8gA80Uw3fhyORRl3ZBDmd8IRdl2pWj2GpT71TZB46KUx894wp0ZCKQ6klST2HK9WJ82U62zAZC213nDujhtXOQtpLCFvpX4tkL48ZAZCflbdZC6kdF5v2BfeF0ZBQWyHSYOhRZA5tLvQlbNmXUXZCpyBn7iI25qrHFJTkGydHdBhsy03mPIp4ai3snjc74ODOGhC2vtLuBxP5EpP0EaEwKC
       - key: WHATSAPP_VERIFY_TOKEN
-        sync: false
+        value: almasar_webhook_secret_2024
       - key: WHATSAPP_API_VERSION
-        sync: false
+        value: v21.0
       - key: WHATSAPP_BUSINESS_ACCOUNT_ID
-        sync: false
+        value: 829226516635919
       
       # Meta/Facebook (⚠️ أضفها يدوياً في Dashboard)
       - key: META_PAGE_ACCESS_TOKEN
