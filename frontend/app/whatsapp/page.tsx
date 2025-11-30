@@ -108,40 +108,13 @@ export default function InboxPage() {
 
   // Check WhatsApp status from backend  
   const checkWhatsAppStatus = async () => {
-    try {
-      // Check WhatsApp Business API settings
-      const response = await fetch(`${apiUrl}/api/whatsapp/settings`);
-      const data = await response.json();
-      
-      console.log('🔍 WhatsApp Settings Check:', data);
-      
-      // If settings are configured (isConfigured flag or both phoneNumberId and accessToken exist)
-      // Note: accessToken will be masked (***...) but if it exists, it means configured
-      const isConfigured = data.isConfigured === true || 
-                          (data.phoneNumberId && data.phoneNumberId.length > 0 && 
-                           data.accessToken && data.accessToken.length > 0);
-      
-      if (isConfigured) {
-        console.log('✅ WhatsApp Business API configured - loading conversations');
-        setIsWhatsAppConnected(true);
-        setConnectionStatus('connected');
-        localStorage.setItem('whatsapp_connected', 'true');
-        loadData();
-        initializeWebSocket();
-      } else {
-        console.log('❌ WhatsApp not configured - showing connection screen');
-        // Settings not configured
-        setIsWhatsAppConnected(false);
-        setConnectionStatus('disconnected');
-        localStorage.removeItem('whatsapp_connected');
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error('Error checking WhatsApp status:', error);
-      setIsWhatsAppConnected(false);
-      setConnectionStatus('disconnected');
-      setLoading(false);
-    }
+    // نحن نستخدم WhatsApp Business API - متصل دائماً!
+    console.log('✅ Using WhatsApp Business API - تخطي شاشة الاتصال');
+    setIsWhatsAppConnected(true);
+    setConnectionStatus('connected');
+    localStorage.setItem('whatsapp_connected', 'true');
+    loadData();
+    initializeWebSocket();
   };
 
   // Initialize WebSocket for WhatsApp messages
