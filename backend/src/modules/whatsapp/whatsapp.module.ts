@@ -7,8 +7,8 @@ import { WhatsAppBusinessController } from './whatsapp-business.controller';
 import { WhatsAppBusinessService } from './whatsapp-business.service';
 import { WhatsAppGateway } from './whatsapp.gateway';
 import { AIModule } from '../ai/ai.module';
-import { Message } from '../messages/message.entity';
-import { Conversation } from '../conversations/conversation.entity';
+import { Message } from '../messages/entities/message.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
 
 @Module({
   imports: [

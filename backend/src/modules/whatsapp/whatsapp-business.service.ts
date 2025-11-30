@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { WhatsAppGateway } from './whatsapp.gateway';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Message } from '../messages/message.entity';
-import { Conversation } from '../conversations/conversation.entity';
+import { Message } from '../messages/entities/message.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
 
 @Injectable()
 export class WhatsAppBusinessService {
