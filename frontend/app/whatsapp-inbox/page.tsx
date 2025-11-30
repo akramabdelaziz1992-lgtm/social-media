@@ -41,6 +41,7 @@ export default function WhatsAppInboxPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'mine' | 'unassigned' | 'mentions'>('all');
+  const [showContactInfo, setShowContactInfo] = useState(false);
   const isInitialLoad = useRef(true);
 
   // Initialize notification sound
@@ -263,8 +264,6 @@ export default function WhatsAppInboxPage() {
       </div>
     );
   }
-
-  const [showContactInfo, setShowContactInfo] = useState(false);
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white" dir="rtl">
