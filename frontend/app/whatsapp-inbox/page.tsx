@@ -167,16 +167,25 @@ export default function WhatsAppInboxPage() {
 
       const result = await response.json();
       
+      const sentMessage = {
+        ...newMessage,
+        id: result.messageId || tempId,
+        status: 'sent' as const
+      };
+      
       setMessages(prev => prev.map(msg => 
-        msg.id === tempId 
-          ? { ...msg, id: result.messageId || tempId, status: 'sent' }
-          : msg
+        msg.id === tempId ? sentMessage : msg
       ));
       
-      // Update conversation last message
+      // Update conversation last message AND add message to conversation
       setConversations(prev => prev.map(c => 
         c.id === selectedConversation.id 
-          ? { ...c, lastMessage: messageToSend, lastMessageTime: new Date().toISOString() }
+          ? { 
+              ...c, 
+              lastMessage: messageToSend, 
+              lastMessageTime: new Date().toISOString(),
+              messages: [...(c.messages || []), sentMessage]
+            }
           : c
       ));
       
