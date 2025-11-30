@@ -267,45 +267,147 @@ export default function WhatsAppInboxPage() {
     );
   }
 
+  const [showAddContact, setShowAddContact] = useState(false);
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [newContact, setNewContact] = useState({ name: '', phone: '' });
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [quickReplies] = useState([
+    { id: '1', text: 'شكراً لتواصلك معنا! سنرد عليك قريباً' },
+    { id: '2', text: 'مرحباً بك في المسار الساخن للسفر والسياحة' },
+    { id: '3', text: 'نعتذر عن التأخير، سيتم الرد في أقرب وقت' },
+    { id: '4', text: 'تم استلام طلبك وجاري المعالجة' },
+    { id: '5', text: 'شكراً لثقتك بنا 🌍✨' },
+  ]);
+
+  const handleAddContact = async () => {
+    if (!newContact.name || !newContact.phone) {
+      alert('من فضلك أدخل الاسم ورقم الهاتف');
+      return;
+    }
+    
+    try {
+      await fetch(`${apiUrl}/api/whatsapp-business/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: newContact.phone,
+          message: `مرحباً ${newContact.name}! تم إضافتك كعميل في المسار الساخن للسفر والسياحة 🌍✨`
+        }),
+      });
+      
+      alert('تم إضافة العميل وإرسال رسالة ترحيب!');
+      setShowAddContact(false);
+      setNewContact({ name: '', phone: '' });
+      loadConversations(false);
+    } catch (error) {
+      alert('حدث خطأ في إضافة العميل');
+    }
+  };
+
+  const handleBroadcast = async () => {
+    if (!broadcastMessage.trim() || selectedContacts.length === 0) {
+      alert('من فضلك اختر عملاء واكتب رسالة');
+      return;
+    }
+    
+    try {
+      for (const contactId of selectedContacts) {
+        await fetch(`${apiUrl}/api/whatsapp-business/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: contactId,
+            message: broadcastMessage
+          }),
+        });
+      }
+      
+      alert(`تم إرسال الرسالة لـ ${selectedContacts.length} عميل!`);
+      setShowBroadcast(false);
+      setBroadcastMessage('');
+      setSelectedContacts([]);
+    } catch (error) {
+      alert('حدث خطأ في الإرسال الجماعي');
+    }
+  };
+
+  const insertQuickReply = (text: string) => {
+    setMessageText(text);
+    setShowQuickReplies(false);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 16 * 1024 * 1024) {
+      alert('حجم الملف كبير جداً (الحد الأقصى 16 ميجا)');
+      return;
+    }
+    
+    alert('جاري تحضير ميزة إرفاق الملفات...');
+  };
+
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white" dir="rtl">
+    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 text-white" dir="rtl">
       {/* Sidebar - Conversations List */}
       <div className="w-[380px] bg-gray-800/50 backdrop-blur-lg border-l border-gray-700/50 flex flex-col">
         {/* Header */}
-        <div className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 border-b border-blue-500/30">
+        <div className="p-4 bg-gradient-to-r from-teal-600 to-emerald-600 border-b border-teal-500/30 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold flex items-center gap-2">
               <MessageSquare className="w-6 h-6" />
               صندوق الوارد الموحد
             </h1>
-            <button 
-              onClick={() => router.push('/dashboard')}
-              className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setShowAddContact(true)}
+                className="text-white/90 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 text-sm font-medium"
+                title="إضافة عميل جديد"
+              >
+                <User className="w-4 h-4" />
+                عميل جديد
+              </button>
+              <button 
+                onClick={() => setShowBroadcast(true)}
+                className="text-white/90 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 text-sm font-medium"
+                title="رسالة جماعية"
+              >
+                <Bell className="w-4 h-4" />
+                جماعي
+              </button>
+              <button 
+                onClick={() => router.push('/dashboard')}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
           
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
             <input
               type="text"
               placeholder="ابحث عن محادثة..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 backdrop-blur-sm text-white placeholder-gray-300 pr-10 pl-4 py-2.5 rounded-xl border border-white/20 focus:border-white/40 focus:outline-none transition-all"
+              className="w-full bg-white/10 backdrop-blur-sm text-white placeholder-white/50 pr-10 pl-4 py-2.5 rounded-xl border border-white/20 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
             />
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-gray-800/30 backdrop-blur-sm border-b border-gray-700/50 text-sm">
+        <div className="flex bg-slate-800/40 backdrop-blur-sm border-b border-slate-700/50 text-sm">
           <button
             onClick={() => setActiveTab('all')}
             className={`flex-1 py-3 font-medium transition-all ${
               activeTab === 'all' 
-                ? 'text-blue-400 border-b-2 border-blue-400 bg-blue-500/10' 
+                ? 'text-teal-400 border-b-2 border-teal-400 bg-teal-500/10' 
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -315,7 +417,7 @@ export default function WhatsAppInboxPage() {
             onClick={() => setActiveTab('mine')}
             className={`flex-1 py-3 font-medium transition-all ${
               activeTab === 'mine' 
-                ? 'text-blue-400 border-b-2 border-blue-400 bg-blue-500/10' 
+                ? 'text-teal-400 border-b-2 border-teal-400 bg-teal-500/10' 
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -325,7 +427,7 @@ export default function WhatsAppInboxPage() {
             onClick={() => setActiveTab('unassigned')}
             className={`flex-1 py-3 font-medium transition-all ${
               activeTab === 'unassigned' 
-                ? 'text-blue-400 border-b-2 border-blue-400 bg-blue-500/10' 
+                ? 'text-teal-400 border-b-2 border-teal-400 bg-teal-500/10' 
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -486,34 +588,93 @@ export default function WhatsAppInboxPage() {
             </div>
 
             {/* Message Input */}
-            <div className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 p-4 shadow-2xl">
-              <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-slate-800/80 to-slate-900/80 backdrop-blur-lg border-t border-slate-700/50 p-4 shadow-2xl">
+              {/* Quick Replies */}
+              {showQuickReplies && (
+                <div className="mb-3 p-3 bg-slate-800/60 rounded-xl border border-slate-700/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-300">الردود الجاهزة</span>
+                    <button onClick={() => setShowQuickReplies(false)} className="text-gray-400 hover:text-white">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {quickReplies.map((reply) => (
+                      <button
+                        key={reply.id}
+                        onClick={() => insertQuickReply(reply.text)}
+                        className="w-full text-right p-2 bg-slate-700/40 hover:bg-slate-700/60 rounded-lg text-sm text-gray-300 hover:text-white transition-all"
+                      >
+                        {reply.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
+                />
                 <button 
-                  onClick={() => alert('إرفاق ملف')}
-                  className="p-2.5 hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 rounded-xl transition-all hover:shadow-lg"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  className="p-2.5 hover:bg-teal-600/20 text-teal-400 hover:text-teal-300 rounded-xl transition-all hover:shadow-lg"
                   title="إرفاق ملف"
                 >
                   <Paperclip className="w-5 h-5" />
                 </button>
+                
                 <button 
-                  onClick={() => alert('إضافة إيموجي')}
-                  className="p-2.5 hover:bg-yellow-600/20 text-yellow-400 hover:text-yellow-300 rounded-xl transition-all hover:shadow-lg"
+                  onClick={() => setShowQuickReplies(!showQuickReplies)}
+                  className="p-2.5 hover:bg-purple-600/20 text-purple-400 hover:text-purple-300 rounded-xl transition-all hover:shadow-lg"
+                  title="ردود جاهزة"
+                >
+                  <Star className="w-5 h-5" />
+                </button>
+                
+                <button 
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="p-2.5 hover:bg-yellow-600/20 text-yellow-400 hover:text-yellow-300 rounded-xl transition-all hover:shadow-lg relative"
                   title="إيموجي"
                 >
                   <Smile className="w-5 h-5" />
+                  {showEmojiPicker && (
+                    <div className="absolute bottom-full left-0 mb-2 p-3 bg-slate-800 rounded-xl border border-slate-700 shadow-2xl z-50">
+                      <div className="grid grid-cols-5 gap-2 text-2xl">
+                        {['😊', '😂', '❤️', '👍', '🔥', '🎉', '✨', '🌟', '💪', '🙏', '👏', '✅', '❌', '⚠️', '📱'].map((emoji) => (
+                          <button
+                            key={emoji}
+                            onClick={() => {
+                              setMessageText(prev => prev + emoji);
+                              setShowEmojiPicker(false);
+                            }}
+                            className="hover:bg-slate-700 p-2 rounded-lg transition-all"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </button>
+                
                 <input
                   type="text"
                   placeholder="اكتب رسالتك هنا... (Enter للإرسال)"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                  className="flex-1 bg-white/5 backdrop-blur-sm text-white placeholder-gray-400 px-5 py-3.5 rounded-2xl border border-white/10 focus:border-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="flex-1 bg-white/5 backdrop-blur-sm text-white placeholder-gray-400 px-5 py-3.5 rounded-2xl border border-white/10 focus:border-teal-500/50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"
                 />
+                
                 <button
                   onClick={sendMessage}
                   disabled={!messageText.trim()}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed p-3.5 rounded-2xl transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed p-3.5 rounded-2xl transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -634,6 +795,116 @@ export default function WhatsAppInboxPage() {
                   rows={4}
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Contact Modal */}
+      {showAddContact && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowAddContact(false)}>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 w-full max-w-md border border-slate-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">إضافة عميل جديد</h3>
+              <button onClick={() => setShowAddContact(false)} className="text-gray-400 hover:text-white transition-all">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">الاسم</label>
+                <input
+                  type="text"
+                  value={newContact.name}
+                  onChange={(e) => setNewContact({...newContact, name: e.target.value})}
+                  className="w-full bg-slate-700/50 text-white px-4 py-3 rounded-xl border border-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                  placeholder="أدخل الاسم"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">رقم الهاتف</label>
+                <input
+                  type="text"
+                  value={newContact.phone}
+                  onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
+                  className="w-full bg-slate-700/50 text-white px-4 py-3 rounded-xl border border-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-left"
+                  placeholder="966xxxxxxxxx"
+                  dir="ltr"
+                />
+                <p className="text-xs text-gray-400 mt-1">بدون + أو 00، مثال: 966555123456</p>
+              </div>
+              
+              <button
+                onClick={handleAddContact}
+                disabled={!newContact.name || !newContact.phone}
+                className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white py-3 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:shadow-none font-medium"
+              >
+                إضافة وإرسال رسالة ترحيبية
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Broadcast Modal */}
+      {showBroadcast && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowBroadcast(false)}>
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 w-full max-w-2xl border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">إرسال رسالة جماعية</h3>
+              <button onClick={() => setShowBroadcast(false)} className="text-gray-400 hover:text-white transition-all">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  اختر المستلمين ({selectedContacts.length} محدد)
+                </label>
+                <div className="bg-slate-700/30 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2">
+                  {conversations.map((conv) => (
+                    <label key={conv.id} className="flex items-center gap-3 p-2 hover:bg-slate-700/40 rounded-lg cursor-pointer transition-all">
+                      <input
+                        type="checkbox"
+                        checked={selectedContacts.includes(conv.contactPhone)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedContacts([...selectedContacts, conv.contactPhone]);
+                          } else {
+                            setSelectedContacts(selectedContacts.filter(p => p !== conv.contactPhone));
+                          }
+                        }}
+                        className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                      />
+                      <div className="flex-1">
+                        <div className="text-white font-medium">{conv.contactName}</div>
+                        <div className="text-xs text-gray-400">{conv.contactPhone}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">نص الرسالة</label>
+                <textarea
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  className="w-full bg-slate-700/50 text-white px-4 py-3 rounded-xl border border-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 min-h-32"
+                  placeholder="اكتب الرسالة التي تريد إرسالها لجميع المستلمين المحددين..."
+                />
+              </div>
+              
+              <button
+                onClick={handleBroadcast}
+                disabled={selectedContacts.length === 0 || !broadcastMessage.trim()}
+                className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white py-3 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:shadow-none font-medium"
+              >
+                إرسال لـ {selectedContacts.length} {selectedContacts.length === 1 ? 'شخص' : 'أشخاص'}
+              </button>
             </div>
           </div>
         </div>
