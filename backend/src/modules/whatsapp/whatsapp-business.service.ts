@@ -46,18 +46,18 @@ export class WhatsAppBusinessService {
   private async initializeWhatsAppChannel() {
     try {
       let channel = await this.channelRepository.findOne({
-        where: { platform: 'whatsapp' },
+        where: { type: 'whatsapp' as any },
       });
 
       if (!channel) {
         channel = this.channelRepository.create({
           name: 'WhatsApp Business',
-          platform: 'whatsapp',
-          isActive: true,
-          config: {
+          type: 'whatsapp' as any,
+          credentials: {
             phoneNumberId: this.phoneNumberId,
             phoneNumber: '0555254915',
           },
+          status: 'connected' as any,
         });
         await this.channelRepository.save(channel);
         this.logger.log('✅ WhatsApp channel created in database');
@@ -212,7 +212,7 @@ export class WhatsAppBusinessService {
             platform: 'whatsapp',
             platformId: phoneNumber,
           },
-          status: 'open',
+          status: 'open' as any,
           lastMessageAt: new Date(),
         });
         await this.conversationRepository.save(conversation);
@@ -427,7 +427,7 @@ export class WhatsAppBusinessService {
             platform: 'whatsapp',
             platformId: phoneNumber,
           },
-          status: 'open',
+          status: 'open' as any,
           lastMessageAt: new Date(parseInt(timestamp) * 1000),
           unreadCount: 1,
         });
