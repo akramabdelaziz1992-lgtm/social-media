@@ -142,8 +142,20 @@ export default function WhatsAppSettingsPage() {
           </div>
         </div>
 
+        {/* Saudi Number Info */}
+        <div className="mt-6 p-4 rounded-xl bg-teal-500/10 border border-teal-500/30">
+          <div className="flex items-center gap-3">
+            <Phone className="text-teal-400" size={24} />
+            <div>
+              <p className="font-semibold text-teal-400">الرقم السعودي المسجل</p>
+              <p className="text-lg font-mono text-white mt-1">+966 555 254 915</p>
+              <p className="text-sm text-white/70 mt-1">هذا هو رقم WhatsApp Business المعتمد لديك</p>
+            </div>
+          </div>
+        </div>
+
         {/* Connection Status */}
-        <div className={`mt-6 p-4 rounded-xl border ${
+        <div className={`mt-4 p-4 rounded-xl border ${
           isConnected 
             ? 'bg-green-500/10 border-green-500/30' 
             : 'bg-orange-500/10 border-orange-500/30'
@@ -162,7 +174,7 @@ export default function WhatsAppSettingsPage() {
                 <AlertCircle className="text-orange-400" size={24} />
                 <div>
                   <p className="font-semibold text-orange-400">غير متصل</p>
-                  <p className="text-sm text-white/70">يرجى إدخال بيانات WhatsApp Business API</p>
+                  <p className="text-sm text-white/70">يرجى إدخال بيانات WhatsApp Business API للرقم السعودي أعلاه</p>
                 </div>
               </>
             )}
@@ -190,7 +202,9 @@ export default function WhatsAppSettingsPage() {
               onChange={(e) => setConfig({ ...config, phoneNumberId: e.target.value })}
               placeholder="931180146738368"
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-teal-500 transition-colors"
+              dir="ltr"
             />
+            <p className="text-xs text-teal-400 mt-1 font-mono">للرقم السعودي: 0555254915 (+966555254915)</p>
             <p className="text-xs text-white/50 mt-2">
               يمكنك الحصول عليه من: Meta Business Manager → WhatsApp → API Setup
             </p>
@@ -205,12 +219,13 @@ export default function WhatsAppSettingsPage() {
             <textarea
               value={config.accessToken}
               onChange={(e) => setConfig({ ...config, accessToken: e.target.value })}
-              placeholder="EAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              placeholder="EAAMObRfDmLgBQ..."
               rows={3}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-teal-500 transition-colors font-mono text-sm"
+              dir="ltr"
             />
             <p className="text-xs text-white/50 mt-2">
-              Access Token من صفحة API Setup في Meta for Developers
+              Access Token من صفحة API Setup في Meta for Developers (للرقم السعودي 0555254915)
             </p>
           </div>
 
@@ -226,9 +241,10 @@ export default function WhatsAppSettingsPage() {
               onChange={(e) => setConfig({ ...config, verifyToken: e.target.value })}
               placeholder="almasar_webhook_secret_2024"
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-teal-500 transition-colors"
+              dir="ltr"
             />
             <p className="text-xs text-white/50 mt-2">
-              رمز سري لحماية Webhook (يمكنك اختيار أي نص عشوائي)
+              رمز سري لحماية Webhook (استخدم نفس الرمز في إعدادات Meta)
             </p>
           </div>
 
@@ -244,9 +260,10 @@ export default function WhatsAppSettingsPage() {
               onChange={(e) => setConfig({ ...config, businessAccountId: e.target.value })}
               placeholder="1986298265488975"
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-teal-500 transition-colors"
+              dir="ltr"
             />
             <p className="text-xs text-white/50 mt-2">
-              معرف حساب WhatsApp Business من Meta Business Manager
+              معرف حساب WhatsApp Business من Meta Business Manager (للرقم السعودي)
             </p>
           </div>
 
