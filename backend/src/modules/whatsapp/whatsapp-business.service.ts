@@ -200,7 +200,7 @@ export class WhatsAppBusinessService {
    * التحقق من صحة webhook verification token
    */
   verifyWebhook(mode: string, token: string, challenge: string): string | null {
-    const verifyToken = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
+    const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
 
     if (mode === 'subscribe' && token === verifyToken) {
       this.logger.log('✅ Webhook verified successfully');
