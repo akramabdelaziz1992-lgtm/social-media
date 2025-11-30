@@ -83,8 +83,14 @@ export default function WhatsAppInboxPage() {
       console.log('✅ الرد من API:', messagesData);
       
       // Backend returns { success: true, messages: [...] }
-      const messages = messagesData.messages || [];
+      const messages = Array.isArray(messagesData.messages) ? messagesData.messages : [];
       console.log('✅ عدد الرسائل:', messages.length);
+      
+      if (!Array.isArray(messages)) {
+        console.error('❌ الرسائل ليست array:', messages);
+        setLoading(false);
+        return;
+      }
       
       const conversationsMap = new Map<string, Conversation>();
       
