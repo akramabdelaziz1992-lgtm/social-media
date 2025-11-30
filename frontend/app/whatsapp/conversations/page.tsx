@@ -118,6 +118,47 @@ export default function WhatsAppConversationsPage() {
     return date.toLocaleDateString('ar-EG');
   };
 
+  const sendMessage = async () => {
+    if (!messageInput.trim() || !selectedPhone) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/whatsapp-business/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: selectedPhone,
+          message: messageInput,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Message sent:', data);
+        setMessageInput('');
+        
+        // Add sent message to UI
+        const sentMsg: WhatsAppMessage = {
+          id: data.messageId || Date.now().toString(),
+          from: selectedPhone,
+          body: messageInput,
+          timestamp: Math.floor(Date.now() / 1000).toString(),
+          contactName: conversations.get(selectedPhone)?.contactName || selectedPhone,
+          type: 'text',
+          createdAt: new Date(),
+        };
+        setMessages(prev => [...prev, sentMsg]);
+      } else {
+        alert('فشل إرسال الرسالة: ' + (data.error || 'خطأ غير معروف'));
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('فشل إرسال الرسالة');
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#0b1426]" dir="rtl">
       {/* Conversations List */}
@@ -248,19 +289,14 @@ export default function WhatsAppConversationsPage() {
                   className="flex-1 bg-[#0b1426] text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter' && messageInput.trim()) {
-                      // TODO: Send message
-                      setMessageInput('');
+                      sendMessage();
                     }
                   }}
                 />
                 <button
-                  onClick={() => {
-                    if (messageInput.trim()) {
-                      // TODO: Send message
-                      setMessageInput('');
-                    }
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition"
+                  onClick={sendMessage}
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition disabled:opacity-50"
+                  disabled={!messageInput.trim()}
                 >
                   <Send className="w-5 h-5" />
                 </button>
