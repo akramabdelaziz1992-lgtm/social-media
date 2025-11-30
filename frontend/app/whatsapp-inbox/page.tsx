@@ -28,7 +28,7 @@ interface Conversation {
 
 export default function WhatsAppInboxPage() {
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://almasar-backend-glxc.onrender.com';
   const socketRef = useRef<any>(null);
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -58,8 +58,8 @@ export default function WhatsAppInboxPage() {
   const loadConversations = async () => {
     setLoading(true);
     try {
-      console.log('🔄 جاري تحميل الرسائل من:', `${apiUrl}/api/whatsapp-business/recent-messages`);
-      const response = await fetch(`${apiUrl}/api/whatsapp-business/recent-messages`);
+      console.log('🔄 جاري تحميل الرسائل من:', `${apiUrl}/api/api/whatsapp-business/recent-messages`);
+      const response = await fetch(`${apiUrl}/api/api/whatsapp-business/recent-messages`);
       
       if (!response.ok) {
         console.warn('⚠️ Backend غير متاح');
@@ -153,7 +153,7 @@ export default function WhatsAppInboxPage() {
     setMessageText('');
 
     try {
-      const response = await fetch(`${apiUrl}/api/whatsapp-business/send`, {
+      const response = await fetch(`${apiUrl}/api/api/whatsapp-business/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
