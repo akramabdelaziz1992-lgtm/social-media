@@ -194,7 +194,7 @@ export const botQuestionsTree: { [key: string]: BotQuestion } = {
     requiresInput: true,
     inputType: 'text',
     options: [],
-    nextStep: 'get_contact_info'
+    nextStep: 'get_contact_info_support'
   },
 
   // قائمة الاستفسارات
@@ -218,7 +218,7 @@ export const botQuestionsTree: { [key: string]: BotQuestion } = {
     options: [
       { id: '0', label: 'رجوع', nextQuestionId: 'inquiries_menu' },
     ],
-    nextStep: 'get_contact_info'
+    nextStep: 'get_contact_info_sales'
   },
 
   packages_inquiry: {
@@ -247,7 +247,7 @@ export const botQuestionsTree: { [key: string]: BotQuestion } = {
     options: [
       { id: '0', label: 'رجوع', nextQuestionId: 'inquiries_menu' },
     ],
-    nextStep: 'get_contact_info'
+    nextStep: 'get_contact_info_sales'
   },
 
   // قائمة الشكاوى
@@ -269,10 +269,10 @@ export const botQuestionsTree: { [key: string]: BotQuestion } = {
     requiresInput: true,
     inputType: 'text',
     options: [],
-    nextStep: 'get_contact_info'
+    nextStep: 'get_contact_info_support'
   },
 
-  // جمع معلومات الاتصال
+  // جمع معلومات الاتصال - الحجوزات (تسنيم)
   get_contact_info: {
     id: 'get_contact_info',
     text: '📞 *معلومات التواصل*\n\nللمتابعة معك من قسم الحجوزات، من فضلك أرسل:\n\n👤 الاسم الكامل\n📱 رقم الجوال\n\n💡 مثال:\nأحمد محمد، 0501234567',
@@ -282,10 +282,50 @@ export const botQuestionsTree: { [key: string]: BotQuestion } = {
     nextStep: 'confirmation'
   },
 
-  // تأكيد الطلب
+  // جمع معلومات الاتصال - المبيعات (ساهر)
+  get_contact_info_sales: {
+    id: 'get_contact_info_sales',
+    text: '📞 *معلومات التواصل*\n\nللمتابعة معك من قسم المبيعات، من فضلك أرسل:\n\n👤 الاسم الكامل\n📱 رقم الجوال\n\n💡 مثال:\nأحمد محمد، 0501234567',
+    requiresInput: true,
+    inputType: 'text',
+    options: [],
+    nextStep: 'confirmation_sales'
+  },
+
+  // جمع معلومات الاتصال - الدعم الفني (أكرم)
+  get_contact_info_support: {
+    id: 'get_contact_info_support',
+    text: '📞 *معلومات التواصل*\n\nللمتابعة معك من قسم الدعم الفني، من فضلك أرسل:\n\n👤 الاسم الكامل\n📱 رقم الجوال\n\n💡 مثال:\nأحمد محمد، 0501234567',
+    requiresInput: true,
+    inputType: 'text',
+    options: [],
+    nextStep: 'confirmation_support'
+  },
+
+  // تأكيد الطلب - للحجوزات
   confirmation: {
     id: 'confirmation',
     text: '✅ *تم استلام طلبك بنجاح!*\n\n📋 تم تسجيل بياناتك\n👤 سيتم تحويلك إلى: *موظفة تسنيم - قسم الحجوزات*\n⏱️ سيتم التواصل معك خلال دقائق\n\n📱 للتواصل المباشر:\n0555254915\n\n🌍✨ شكرًا لثقتك في المسار الساخن\n\nهل تحتاج لخدمة أخرى؟\n1️⃣ نعم، خدمة جديدة\n0️⃣ لا، شكرًا',
+    options: [
+      { id: '1', label: 'نعم، خدمة جديدة', nextQuestionId: 'welcome' },
+      { id: '0', label: 'لا، شكرًا', nextQuestionId: 'thank_you' },
+    ],
+  },
+
+  // تأكيد الطلب - للاستفسارات (المبيعات)
+  confirmation_sales: {
+    id: 'confirmation_sales',
+    text: '✅ *تم استلام استفسارك بنجاح!*\n\n📋 تم تسجيل بياناتك\n👤 سيتم تحويلك إلى: *موظفة ساهر - قسم المبيعات*\n⏱️ سيتم التواصل معك خلال دقائق\n\n📱 للتواصل المباشر:\n0555254915\n\n🌍✨ شكرًا لثقتك في المسار الساخن\n\nهل تحتاج لخدمة أخرى؟\n1️⃣ نعم، خدمة جديدة\n0️⃣ لا، شكرًا',
+    options: [
+      { id: '1', label: 'نعم، خدمة جديدة', nextQuestionId: 'welcome' },
+      { id: '0', label: 'لا، شكرًا', nextQuestionId: 'thank_you' },
+    ],
+  },
+
+  // تأكيد الطلب - للشكاوى والدعم الفني
+  confirmation_support: {
+    id: 'confirmation_support',
+    text: '✅ *تم استلام طلبك بنجاح!*\n\n📋 تم تسجيل بياناتك\n👤 سيتم تحويلك إلى: *م. أكرم - الدعم الفني وخدمة العملاء*\n⏱️ سيتم التواصل معك خلال دقائق\n\n📱 للتواصل المباشر:\n0555254915\n\n🌍✨ شكرًا لثقتك في المسار الساخن\n\nهل تحتاج لخدمة أخرى؟\n1️⃣ نعم، خدمة جديدة\n0️⃣ لا، شكرًا',
     options: [
       { id: '1', label: 'نعم، خدمة جديدة', nextQuestionId: 'welcome' },
       { id: '0', label: 'لا، شكرًا', nextQuestionId: 'thank_you' },

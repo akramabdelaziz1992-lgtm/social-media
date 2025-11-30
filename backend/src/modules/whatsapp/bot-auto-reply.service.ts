@@ -126,37 +126,56 @@ export class BotAutoReplyService {
    * حفظ البيانات المدخلة من المستخدم
    */
   private saveUserInput(session: UserSession, questionId: string, input: string) {
+    let assignedStaff = '';
+    
     // حفظ البيانات بناءً على السؤال
     if (questionId === 'units_booking') {
       session.collectedData.notes = input;
       session.collectedData.service = 'حجز وحدات سكنية';
+      assignedStaff = 'تسنيم - قسم الحجوزات';
     } else if (questionId === 'car_details') {
       session.collectedData.notes = input;
       session.collectedData.service = 'حجز سيارات';
+      assignedStaff = 'تسنيم - قسم الحجوزات';
     } else if (questionId === 'package_details') {
       session.collectedData.notes = input;
       session.collectedData.service = 'باقة سياحية';
+      assignedStaff = 'تسنيم - قسم الحجوزات';
     } else if (questionId === 'event_details') {
       session.collectedData.notes = input;
-      session.collectedData.service = 'تنظيم حفلات';
+      session.collectedData.service = 'تنظيم حفلات خارجية';
+      assignedStaff = 'م. أكرم - الدعم الفني';
     } else if (questionId.includes('inquiry')) {
       session.collectedData.notes = input;
       session.collectedData.service = 'استفسار';
+      assignedStaff = 'ساهر - قسم المبيعات';
     } else if (questionId.includes('complaint')) {
       session.collectedData.notes = input;
       session.collectedData.service = 'شكوى';
-    } else if (questionId === 'get_contact_info') {
+      assignedStaff = 'م. أكرم - خدمة العملاء';
+    } else if (questionId === 'get_contact_info' || questionId === 'get_contact_info_sales' || questionId === 'get_contact_info_support') {
       // محاولة استخراج الاسم ورقم الهاتف
       const parts = input.split(/[،,]/);
       if (parts.length >= 1) session.collectedData.customerName = parts[0].trim();
       if (parts.length >= 2) session.collectedData.customerPhone = parts[1].trim();
       
+      // تحديد الموظف المسؤول حسب نوع الخدمة
+      if (questionId === 'get_contact_info_sales') {
+        assignedStaff = 'ساهر - قسم المبيعات';
+      } else if (questionId === 'get_contact_info_support') {
+        assignedStaff = 'م. أكرم - الدعم الفني وخدمة العملاء';
+      } else {
+        assignedStaff = 'تسنيم - قسم الحجوزات';
+      }
+      
       // Log collected data for staff notification
-      this.logger.log(`📋 طلب جديد من ${session.collectedData.customerName}:`);
+      this.logger.log(`\n🔔 ═══════════════════════════════════════`);
+      this.logger.log(`📋 طلب جديد من ${session.collectedData.customerName}`);
       this.logger.log(`📱 الهاتف: ${session.collectedData.customerPhone}`);
       this.logger.log(`🔖 الخدمة: ${session.collectedData.service}`);
-      this.logger.log(`📝 التفاصيل: ${session.collectedData.notes}`);
-      this.logger.log(`👤 تحويل إلى موظف: تسنيم - قسم الحجوزات`);
+      this.logger.log(`📝 التفاصيل: ${session.collectedData.notes || 'لا يوجد'}`);
+      this.logger.log(`👤 تحويل إلى: ${assignedStaff}`);
+      this.logger.log(`═══════════════════════════════════════\n`);
     }
 
     this.logger.log(`💾 Saved data for ${session.phoneNumber}: ${questionId} = ${input}`);

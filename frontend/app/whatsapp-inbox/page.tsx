@@ -31,6 +31,8 @@ export default function WhatsAppInboxPage() {
   // Always use Render backend where messages are stored
   const apiUrl = 'https://almasar-backend-glxc.onrender.com';
   const socketRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const previousMessageCountRef = useRef<number>(0);
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -39,6 +41,13 @@ export default function WhatsAppInboxPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'mine' | 'unassigned' | 'mentions'>('all');
+
+  // Initialize notification sound
+  useEffect(() => {
+    // Create audio element for notification sound
+    audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+    audioRef.current.volume = 0.7;
+  }, []);
 
   // Load conversations on mount
   useEffect(() => {
@@ -118,12 +127,33 @@ export default function WhatsAppInboxPage() {
       });
       
       console.log('📱 المحادثات:', conversationsArray.length);
+      
+      // Play notification sound if new messages arrived
+      const currentMessageCount = messages.length;
+      if (previousMessageCountRef.current > 0 && currentMessageCount > previousMessageCountRef.current) {
+        playNotificationSound();
+      }
+      previousMessageCountRef.current = currentMessageCount;
+      
       setConversations(conversationsArray);
       
     } catch (error) {
       console.error('❌ خطأ في تحميل البيانات:', error);
     }
     setLoading(false);
+  };
+
+  const playNotificationSound = () => {
+    try {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(err => {
+          console.warn('⚠️ Could not play notification sound:', err);
+        });
+      }
+    } catch (error) {
+      console.warn('⚠️ Notification sound error:', error);
+    }
   };
 
   const selectConversation = (conv: Conversation) => {
