@@ -83,14 +83,32 @@ export function useVoiceCall(): VoiceCallHook {
           }
         });
 
-        device.on('error', (error) => {
+        device.on('error', async (error) => {
           console.error('❌ خطأ في Twilio Device:', error);
           if (mounted) {
             let errorMessage = error?.message || 'خطأ في الجهاز';
             
-            // إذا كان الخطأ JWT Invalid
+            // إذا كان الخطأ JWT Invalid - أعد تهيئة Device بـ token جديد
             if (error?.message?.includes('JWT') || error?.message?.includes('AccessToken') || error?.code === 20101) {
-              errorMessage = '❌ خطأ في Token المكالمات. الـ API Key غير صالح. راجع ملف FIX_TWILIO_API_KEY.md';
+              console.log('🔄 Token منتهي، جاري تجديد الاتصال...');
+              try {
+                // تنظيف Device القديم
+                if (deviceRef.current) {
+                  deviceRef.current.destroy();
+                  deviceRef.current = null;
+                }
+                
+                // إعادة التهيئة بعد 2 ثانية
+                setTimeout(() => {
+                  if (mounted) {
+                    initializeDevice();
+                  }
+                }, 2000);
+                
+                errorMessage = 'جاري إعادة الاتصال...';
+              } catch (reinitError) {
+                errorMessage = '❌ فشل إعادة الاتصال. يرجى تحديث الصفحة';
+              }
             }
             
             setState(prev => ({ 
@@ -120,8 +138,21 @@ export function useVoiceCall(): VoiceCallHook {
 
     initializeDevice();
 
+    // تجديد Token تلقائياً كل 50 دقيقة (قبل انتهاء الـ 60 دقيقة)
+    const tokenRefreshInterval = setInterval(() => {
+      console.log('🔄 تجديد Token تلقائي...');
+      if (deviceRef.current) {
+        deviceRef.current.destroy();
+        deviceRef.current = null;
+      }
+      if (mounted) {
+        initializeDevice();
+      }
+    }, 50 * 60 * 1000); // 50 دقيقة
+
     return () => {
       mounted = false;
+      clearInterval(tokenRefreshInterval);
       if (deviceRef.current) {
         deviceRef.current.unregister();
         deviceRef.current.destroy();
