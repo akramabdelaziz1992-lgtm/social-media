@@ -190,11 +190,17 @@ export class WhatsAppController {
    */
   @Get('settings')
   async getSettings() {
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
+    const accessToken = process.env.META_PAGE_ACCESS_TOKEN || process.env.WHATSAPP_ACCESS_TOKEN || '';
+    const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || '';
+    const businessAccountId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '';
+    
     return {
-      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
-      accessToken: process.env.WHATSAPP_ACCESS_TOKEN ? '***' + process.env.WHATSAPP_ACCESS_TOKEN.slice(-10) : '',
-      verifyToken: process.env.WHATSAPP_VERIFY_TOKEN || '',
-      businessAccountId: process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '',
+      phoneNumberId,
+      accessToken: accessToken ? '***' + accessToken.slice(-10) : '',
+      verifyToken,
+      businessAccountId,
+      isConfigured: !!(phoneNumberId && accessToken), // Check if essential settings are configured
     };
   }
 

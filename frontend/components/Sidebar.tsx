@@ -213,7 +213,7 @@ export default function Sidebar() {
 
         {/* WhatsApp Business */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
-          <Link href="/whatsapp/settings" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname?.startsWith('/whatsapp') ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'واتساب بيزنس' : ''}>
+          <Link href="/whatsapp" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname?.startsWith('/whatsapp') ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'واتساب بيزنس' : ''}>
             <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname?.startsWith('/whatsapp') ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
               <MessageSquare size={16} className={pathname?.startsWith('/whatsapp') ? 'text-white' : 'text-green-300'} />
             </motion.div>

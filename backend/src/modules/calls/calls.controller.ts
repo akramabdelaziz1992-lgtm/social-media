@@ -216,8 +216,8 @@ export class CallsController {
   /**
    * جلب وتحديث Recordings من Twilio
    */
-  @Post('sync-recordings')
-  async syncRecordings() {
+  @Post('fetch-recordings-from-twilio')
+  async fetchRecordingsFromTwilio() {
     try {
       this.logger.log('🔄 Syncing recordings from Twilio...');
       

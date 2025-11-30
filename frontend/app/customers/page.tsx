@@ -199,7 +199,8 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-y-auto">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="p-6 pb-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -534,6 +535,7 @@ export default function CustomersPage() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -38,20 +38,34 @@ import { Department } from './modules/employees/entities/department.entity';
       envFilePath: '.env',
     }),
 
-    // Database - SQLite for all environments (simple and reliable)
+    // Database - PostgreSQL for production, SQLite for development
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const databasePath = configService.get<string>('DATABASE_URL') || '/tmp/database.db';
+        const databaseUrl = configService.get<string>('DATABASE_URL');
         const isProd = configService.get<string>('NODE_ENV') === 'production';
+        const isPostgres = databaseUrl && databaseUrl.startsWith('postgresql://');
 
-        return {
-          type: 'better-sqlite3',
-          database: databasePath,
-          entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
-          synchronize: true,
-          logging: !isProd,
-        };
+        if (isPostgres) {
+          // PostgreSQL for Production (Render)
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
+            synchronize: true, // ⚠️ Set to false in production after first deployment
+            logging: !isProd,
+            ssl: isProd ? { rejectUnauthorized: false } : false,
+          };
+        } else {
+          // SQLite for Development
+          return {
+            type: 'better-sqlite3',
+            database: databaseUrl || './data/almasar.db',
+            entities: [User, Channel, Conversation, Message, Template, AutoReplyRule, AuditLog, Call, Employee, Department],
+            synchronize: true,
+            logging: !isProd,
+          };
+        }
       },
       inject: [ConfigService],
     }),

@@ -59,10 +59,11 @@ export class WhatsAppBusinessService {
       );
 
       this.logger.log(`✅ Message sent successfully to ${cleanNumber}`);
+      const responseData: any = response.data;
       return {
         success: true,
-        messageId: response.data.messages[0].id,
-        data: response.data,
+        messageId: responseData.messages[0].id,
+        data: responseData,
       };
     } catch (error) {
       this.logger.error(`❌ Error sending message: ${error.message}`);
@@ -107,10 +108,11 @@ export class WhatsAppBusinessService {
       );
 
       this.logger.log(`✅ Template sent successfully to ${cleanNumber}`);
+      const responseData: any = response.data;
       return {
         success: true,
-        messageId: response.data.messages[0].id,
-        data: response.data,
+        messageId: responseData.messages[0].id,
+        data: responseData,
       };
     } catch (error) {
       this.logger.error(`❌ Error sending template: ${error.message}`);
@@ -284,9 +286,10 @@ export class WhatsAppBusinessService {
       );
 
       this.logger.log(`✅ Interactive buttons sent to ${cleanNumber}`);
+      const responseData: any = response.data;
       return {
         success: true,
-        messageId: response.data.messages[0].id,
+        messageId: responseData.messages[0].id,
       };
     } catch (error) {
       this.logger.error(`❌ Error sending interactive buttons: ${error.message}`);
@@ -341,9 +344,10 @@ export class WhatsAppBusinessService {
       );
 
       this.logger.log(`✅ Interactive list sent to ${cleanNumber}`);
+      const responseData: any = response.data;
       return {
         success: true,
-        messageId: response.data.messages[0].id,
+        messageId: responseData.messages[0].id,
       };
     } catch (error) {
       this.logger.error(`❌ Error sending interactive list: ${error.message}`);

@@ -63,11 +63,11 @@ export default function SettingsPage() {
       icon: '💬',
       color: 'from-green-500 to-emerald-600',
       items: [
+        { name: 'إعدادات الاتصال', href: '/settings/whatsapp', icon: '⚙️', description: 'إعدادات WhatsApp Business API' },
         { name: 'ربط الحساب', href: '/whatsapp/connect', icon: '🔗', description: 'ربط حساب واتساب الأعمال' },
         { name: 'إدارة البوت', href: '/bot-manager', icon: '🤖', description: 'إعدادات البوت الذكي' },
         { name: 'إدارة المشتركين', href: '/whatsapp/subscribers', icon: '👥', description: 'قائمة المشتركين والعملاء' },
         { name: 'الإذاعة والبث', href: '/whatsapp/broadcast', icon: '📢', description: 'إرسال رسائل جماعية' },
-        { name: 'المحادثة المباشرة', href: '/whatsapp/live-chat', icon: '💬', description: 'الرد المباشر على العملاء' },
         { name: 'سير عمل Webhook', href: '/whatsapp/webhooks', icon: '🔄', description: 'إدارة webhooks' },
         { name: 'إعلانات النقر', href: '/whatsapp/click-ads', icon: '🎯', description: 'إعلانات Click-to-Chat' },
         { name: 'كتالوج التجارة', href: '/whatsapp/catalog', icon: '🛍️', description: 'عرض المنتجات' },
@@ -163,7 +163,8 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-y-auto p-6">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative">
+      <div className="p-6 pb-20">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
@@ -212,42 +213,72 @@ export default function SettingsPage() {
 
               {/* Section Items */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {section.items.map((item) => (
-                  <button
-                    key={item.href}
-                    onClick={() => alert(`🚧 صفحة "${item.name}" قيد التطوير\n\nسيتم إضافتها قريباً 🔜`)}
-                    className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-5 border border-slate-700/50 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20 text-right w-full"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl">{item.icon}</span>
-                        <div>
-                          <h3 className="font-bold text-white group-hover:text-cyan-300 transition-colors">
-                            {item.name}
-                          </h3>
+                {section.items.map((item) => {
+                  // صفحات نشطة يمكن فتحها
+                  const activePages = [
+                    '/settings/whatsapp',
+                    '/bot-manager',
+                    '/whatsapp/subscribers',
+                    '/whatsapp/broadcast',
+                    '/whatsapp/webhooks',
+                    '/whatsapp/click-ads',
+                    '/whatsapp/catalog',
+                    '/whatsapp/appointments',
+                    '/whatsapp/live-chat'
+                  ];
+                  
+                  const isActive = activePages.includes(item.href);
+                  
+                  return (
+                    <button
+                      key={item.href}
+                      onClick={() => {
+                        if (isActive) {
+                          window.location.href = item.href;
+                        } else {
+                          alert(`🚧 صفحة "${item.name}" قيد التطوير\n\nسيتم إضافتها قريباً 🔜`);
+                        }
+                      }}
+                      className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-5 border border-slate-700/50 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20 text-right w-full"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">{item.icon}</span>
+                          <div>
+                            <h3 className="font-bold text-white group-hover:text-cyan-300 transition-colors">
+                              {item.name}
+                            </h3>
+                          </div>
                         </div>
+                        {item.badge && (
+                          <span className="px-2 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full font-bold shadow-md animate-pulse">
+                            {item.badge}
+                          </span>
+                        )}
                       </div>
-                      {item.badge && (
-                        <span className="px-2 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full font-bold shadow-md animate-pulse">
-                          {item.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-slate-400 text-sm">{item.description}</p>
-                    
-                    {/* Hover Arrow */}
-                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-cyan-400">→</span>
-                    </div>
-                    
-                    {/* Coming Soon Badge */}
-                    <div className="absolute top-4 left-4">
-                      <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded-full font-bold border border-yellow-500/30">
-                        قريباً
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                      <p className="text-slate-400 text-sm">{item.description}</p>
+                      
+                      {/* Hover Arrow */}
+                      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="text-cyan-400">→</span>
+                      </div>
+                      
+                      {/* Status Badge */}
+                      <div className="absolute top-4 left-4">
+                        {isActive ? (
+                          <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full font-bold border border-green-500/30 flex items-center gap-1">
+                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            نشط
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded-full font-bold border border-yellow-500/30">
+                            قريباً
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -270,6 +301,7 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

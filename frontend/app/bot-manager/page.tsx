@@ -156,7 +156,8 @@ export default function BotManagerPage() {
   const previewQuestion = questions[previewQuestionId];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900 p-6 overflow-y-auto">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900">
+      <div className="p-6 pb-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg shadow-2xl p-6 mb-6">
@@ -645,6 +646,7 @@ export default function BotManagerPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

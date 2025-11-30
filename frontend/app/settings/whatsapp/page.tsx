@@ -61,10 +61,11 @@ export default function WhatsAppSettingsPage() {
 
   const checkConnection = async () => {
     try {
-      const data = await api('/whatsapp/status', {
+      const data = await api('/whatsapp/settings', {
         method: 'GET',
       });
-      setIsConnected(data.connected);
+      // Check if both phoneNumberId and accessToken are configured
+      setIsConnected(data.isConfigured || (data.phoneNumberId && data.accessToken));
     } catch (error) {
       console.log('Connection check failed:', error);
       setIsConnected(false);

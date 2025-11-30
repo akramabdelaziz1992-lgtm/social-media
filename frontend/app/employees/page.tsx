@@ -436,7 +436,8 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-y-auto">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="p-6 pb-20">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-200 via-emerald-200 to-cyan-200 bg-clip-text text-transparent mb-2">
@@ -924,6 +925,7 @@ export default function EmployeesPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
