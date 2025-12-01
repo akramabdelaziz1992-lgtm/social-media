@@ -220,4 +220,16 @@ export class WhatsAppBusinessController {
       enabled: this.whatsappBusinessService.getAutoReplyEnabled(),
     };
   }
+
+  /**
+   * تهيئة قناة الواتساب يدوياً
+   */
+  @Post('initialize-channel')
+  async initializeChannel() {
+    await this.whatsappBusinessService.initializeChannel();
+    return {
+      success: true,
+      message: 'WhatsApp channel initialized',
+    };
+  }
 }

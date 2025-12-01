@@ -64,9 +64,21 @@ export class WhatsAppBusinessService {
       }
 
       this.whatsappChannelId = channel.id;
+      this.logger.log(`✅ WhatsApp channel ID: ${this.whatsappChannelId}`);
     } catch (error) {
       this.logger.error(`❌ Error initializing WhatsApp channel: ${error.message}`);
     }
+  }
+
+  /**
+   * تهيئة قناة الواتساب يدوياً (public method)
+   */
+  async initializeChannel() {
+    await this.initializeWhatsAppChannel();
+    return {
+      channelId: this.whatsappChannelId,
+      isReady: this.whatsappChannelId !== null,
+    };
   }
 
   /**
