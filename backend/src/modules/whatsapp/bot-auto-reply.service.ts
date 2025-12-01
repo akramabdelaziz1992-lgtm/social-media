@@ -1,11 +1,25 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { botQuestionsTree, botKeywords, UserSession, BotQuestion } from './bot-questions-tree';
 
 @Injectable()
-export class BotAutoReplyService {
+export class BotAutoReplyService implements OnModuleInit {
   private readonly logger = new Logger(BotAutoReplyService.name);
   private userSessions: Map<string, UserSession> = new Map();
   private readonly sessionTimeout = 30 * 60 * 1000; // 30 دقيقة
+  private readonly maxSessions = 100; // حد أقصى 100 جلسة
+  private cleanupInterval: NodeJS.Timeout;
+
+  /**
+   * تشغيل التنظيف التلقائي عند بدء الخدمة
+   */
+  onModuleInit() {
+    // تنظيف الجلسات المنتهية كل 5 دقائق
+    this.cleanupInterval = setInterval(() => {
+      this.cleanExpiredSessions();
+    }, 5 * 60 * 1000);
+    
+    this.logger.log('✅ Auto cleanup started - runs every 5 minutes');
+  }
 
   /**
    * معالجة رسالة واردة وإرجاع الرد التلقائي
@@ -185,6 +199,18 @@ export class BotAutoReplyService {
    * بدء جلسة جديدة
    */
   private startNewSession(phoneNumber: string) {
+    // تنظيف إذا تجاوز الحد الأقصى
+    if (this.userSessions.size >= this.maxSessions) {
+      this.cleanExpiredSessions();
+      
+      // لو لسه كبير، امسح الأقدم
+      if (this.userSessions.size >= this.maxSessions) {
+        const oldestKey = Array.from(this.userSessions.keys())[0];
+        this.userSessions.delete(oldestKey);
+        this.logger.warn(`⚠️ Max sessions reached, removed oldest: ${oldestKey}`);
+      }
+    }
+
     const session: UserSession = {
       phoneNumber,
       currentQuestionId: 'welcome',
@@ -194,7 +220,7 @@ export class BotAutoReplyService {
     };
 
     this.userSessions.set(phoneNumber, session);
-    this.logger.log(`🆕 New session started for ${phoneNumber}`);
+    this.logger.log(`🆕 New session started for ${phoneNumber} (Total: ${this.userSessions.size})`);
   }
 
   /**
