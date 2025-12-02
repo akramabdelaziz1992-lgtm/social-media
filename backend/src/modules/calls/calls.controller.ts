@@ -461,10 +461,13 @@ export class CallsController {
       const twiml = new (require('twilio').twiml.VoiceResponse)();
       
       // الاتصال مباشرة بالرقم من المتصفح (WebRTC to PSTN)
-      const backendUrl = process.env.BACKEND_URL || 'https://almasar-backend2025.onrender.com';
+      const backendUrl = process.env.BACKEND_URL || 'https://almasar-backend.onrender.com';
+      
+      // استخدام الرقم الأمريكي كـ Caller ID (لازم يكون Twilio Number مُفعّل)
+      const callerId = process.env.TWILIO_PHONE_NUMBER;
       
       const dial = twiml.dial({
-        callerId: process.env.TWILIO_PHONE_NUMBER || '+18154860356',
+        callerId: callerId,
         timeout: 60, // وقت أطول للانتظار
         record: 'record-from-answer-dual', // تسجيل الصوت من الجهتين
         recordingStatusCallback: `${backendUrl}/api/calls/webhook/recording`,
