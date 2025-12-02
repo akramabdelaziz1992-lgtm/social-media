@@ -27,6 +27,7 @@ export default function MobileCallPage() {
   const [currentView, setCurrentView] = useState<'dialpad' | 'contacts' | 'history' | 'settings'>('dialpad');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isInCall, setIsInCall] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false); // جاري الاتصال
   const [callDuration, setCallDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
@@ -147,7 +148,8 @@ export default function MobileCallPage() {
     }
     
     try {
-      setIsInCall(true);
+      // بدء حالة "جاري الاتصال"
+      setIsConnecting(true);
       setCallDuration(0);
       
       // تسجيل بيانات الموظف الذي يقوم بالمكالمة
@@ -229,10 +231,36 @@ export default function MobileCallPage() {
       
       setCurrentCallSid(call.parameters.CallSid || '');
       console.log('WebRTC Call started:', call.parameters.CallSid);
+      console.log('⏳ المكالمة تتصل... انتظر الرد');
+      
+      // عند الرد على المكالمة - هنا نبدأ العداد
+      call.on('accept', () => {
+        console.log('✅ تم الرد على المكالمة - بدء العداد');
+        setIsConnecting(false); // إيقاف "جاري الاتصال"
+        setIsInCall(true); // بدء المكالمة الفعلية
+        setCallDuration(0); // بدء العداد من الصفر
+      });
+      
+      // عند رفض المكالمة أو فشلها
+      call.on('reject', () => {
+        console.log('❌ تم رفض المكالمة');
+        alert('تم رفض المكالمة من الطرف الآخر');
+        setIsConnecting(false);
+        setIsInCall(false);
+        setCallDuration(0);
+      });
+      
+      call.on('cancel', () => {
+        console.log('⚠️ تم إلغاء المكالمة');
+        setIsConnecting(false);
+        setIsInCall(false);
+        setCallDuration(0);
+      });
       
       // عند إنهاء المكالمة تلقائياً (Customer hang up)
       call.on('disconnect', () => {
         console.log('Call disconnected by customer');
+        setIsConnecting(false);
         setIsInCall(false);
         setCallDuration(0);
         
@@ -276,6 +304,7 @@ export default function MobileCallPage() {
       console.error('Call error:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
       alert('حدث خطأ أثناء الاتصال: ' + errorMessage);
+      setIsConnecting(false);
       setIsInCall(false);
       
       // تنظيف الـ Device في حالة الخطأ
