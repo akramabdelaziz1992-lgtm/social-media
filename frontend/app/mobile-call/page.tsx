@@ -75,7 +75,7 @@ export default function MobileCallPage() {
   const [micVolume, setMicVolume] = useState(100);
   const [ringtoneVolume, setRingtoneVolume] = useState(70);
   
-  // Check authentication on mount
+  // Check authentication on mount and load phone from URL
   useEffect(() => {
     const user = authStorage.getUser();
     const token = authStorage.getAccessToken();
@@ -86,6 +86,14 @@ export default function MobileCallPage() {
     }
     
     setCurrentUser(user);
+
+    // جلب رقم الهاتف من URL إذا موجود
+    const params = new URLSearchParams(window.location.search);
+    const phoneFromUrl = params.get('phone');
+    if (phoneFromUrl) {
+      setPhoneNumber(decodeURIComponent(phoneFromUrl));
+      setCurrentView('dialpad');
+    }
   }, [router]);
 
   // Call timer
@@ -470,10 +478,13 @@ export default function MobileCallPage() {
     // حفظ في localStorage
     localStorage.setItem('mobile-call-contacts', JSON.stringify(updatedContacts));
     
+    // إطلاق حدث لتحديث صفحة العملاء
+    window.dispatchEvent(new Event('storage'));
+    
     setNewContactName('');
     setNewContactPhone('');
     setShowAddContactForm(false);
-    alert('✅ تم إضافة جهة الاتصال بنجاح!');
+    alert('✅ تم إضافة جهة الاتصال بنجاح! ستجدها في صفحة العملاء أيضاً.');
   };
 
   const handleCallFromHistory = (phone: string) => {

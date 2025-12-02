@@ -50,56 +50,88 @@ export default function CustomersPage() {
     notes: ''
   });
 
-  // Mock data - في الواقع سيتم جلبها من API
+  // Load customers from localStorage (contacts from Mobile Call)
   useEffect(() => {
-    const mockCustomers: Customer[] = [
-      {
-        id: '1',
-        name: 'أحمد محمد',
-        phone: '+201234567890',
-        email: 'ahmed@example.com',
-        company: 'شركة التقنية',
-        source: 'واتساب',
-        tags: ['عميل محتمل', 'مهتم بالمنتجات'],
-        priority: 'عالية',
-        assignedAgent: 'محمد سعيد',
-        department: 'المبيعات',
-        totalConversations: 5,
-        lastContact: '2024-01-20',
-        status: 'محتمل',
-        notes: 'عميل محتمل مهتم بخدماتنا',
-        createdAt: '2024-01-15'
-      },
-      {
-        id: '2',
-        name: 'فاطمة علي',
-        phone: '+201098765432',
-        email: 'fatma@company.com',
-        company: 'مؤسسة الإبداع',
-        source: 'فيسبوك',
-        tags: ['عميل حالي', 'VIP'],
-        priority: 'عالية',
-        assignedAgent: 'سارة أحمد',
-        department: 'خدمة العملاء',
-        totalConversations: 12,
-        lastContact: '2024-01-22',
-        status: 'عميل',
-        createdAt: '2023-12-01'
-      },
-      {
-        id: '3',
-        name: 'محمود خالد',
-        phone: '+201555555555',
-        source: 'إنستجرام',
-        tags: ['استفسار'],
-        priority: 'عادية',
-        totalConversations: 2,
-        lastContact: '2024-01-18',
-        status: 'نشط',
-        createdAt: '2024-01-18'
+    const loadCustomers = () => {
+      // جلب جهات الاتصال من Mobile Call
+      const mobileCallContacts = localStorage.getItem('mobile-call-contacts');
+      let contactsFromMobileCall: Customer[] = [];
+      
+      if (mobileCallContacts) {
+        try {
+          const contacts = JSON.parse(mobileCallContacts);
+          contactsFromMobileCall = contacts.map((contact: any) => ({
+            id: contact.id,
+            name: contact.name,
+            phone: contact.phone,
+            email: '',
+            company: '',
+            source: 'مكالمة هاتفية',
+            tags: ['جهة اتصال'],
+            priority: 'عادية' as 'عادية',
+            totalConversations: 0,
+            lastContact: new Date().toISOString().split('T')[0],
+            status: 'نشط' as 'نشط',
+            createdAt: new Date().toISOString().split('T')[0]
+          }));
+        } catch (e) {
+          console.error('Error loading contacts:', e);
+        }
       }
-    ];
-    setCustomers(mockCustomers);
+
+      // عملاء مثال إضافيين
+      const mockCustomers: Customer[] = [
+        {
+          id: 'demo-1',
+          name: 'أحمد محمد',
+          phone: '+201234567890',
+          email: 'ahmed@example.com',
+          company: 'شركة التقنية',
+          source: 'واتساب',
+          tags: ['عميل محتمل', 'مهتم بالمنتجات'],
+          priority: 'عالية',
+          assignedAgent: 'محمد سعيد',
+          department: 'المبيعات',
+          totalConversations: 5,
+          lastContact: '2024-01-20',
+          status: 'محتمل',
+          notes: 'عميل محتمل مهتم بخدماتنا',
+          createdAt: '2024-01-15'
+        },
+        {
+          id: 'demo-2',
+          name: 'فاطمة علي',
+          phone: '+201098765432',
+          email: 'fatma@company.com',
+          company: 'مؤسسة الإبداع',
+          source: 'فيسبوك',
+          tags: ['عميل حالي', 'VIP'],
+          priority: 'عالية',
+          assignedAgent: 'سارة أحمد',
+          department: 'خدمة العملاء',
+          totalConversations: 12,
+          lastContact: '2024-01-22',
+          status: 'عميل',
+          createdAt: '2023-12-01'
+        }
+      ];
+
+      // دمج جهات الاتصال مع العملاء المثال
+      setCustomers([...contactsFromMobileCall, ...mockCustomers]);
+    };
+
+    loadCustomers();
+
+    // الاستماع لتغييرات في localStorage
+    const handleStorageChange = () => {
+      loadCustomers();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleAddCustomer = () => {
@@ -338,14 +370,23 @@ export default function CustomersPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <button
+                          onClick={() => router.push(`/mobile-call?phone=${encodeURIComponent(customer.phone)}`)}
+                          className="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all"
+                          title="اتصال"
+                        >
+                          <Phone size={16} />
+                        </button>
+                        <button
                           onClick={() => openEditModal(customer)}
                           className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all"
+                          title="تعديل"
                         >
                           <Edit size={16} />
                         </button>
                         <button
                           onClick={() => handleDeleteCustomer(customer.id)}
                           className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all"
+                          title="حذف"
                         >
                           <Trash2 size={16} />
                         </button>
