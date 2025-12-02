@@ -239,4 +239,45 @@ export class TwilioService {
       throw error;
     }
   }
+
+  /**
+   * جلب ملف التسجيل الصوتي من Twilio مع authentication
+   */
+  async getRecordingAudio(url: string): Promise<Buffer> {
+    try {
+      const https = require('https');
+      
+      return new Promise((resolve, reject) => {
+        const auth = Buffer.from(`${this.accountSid}:${this.authToken}`).toString('base64');
+        
+        const options = {
+          headers: {
+            'Authorization': `Basic ${auth}`
+          }
+        };
+
+        https.get(url, options, (response: any) => {
+          if (response.statusCode !== 200) {
+            reject(new Error(`Failed to fetch recording: ${response.statusCode}`));
+            return;
+          }
+
+          const chunks: Buffer[] = [];
+          
+          response.on('data', (chunk: Buffer) => {
+            chunks.push(chunk);
+          });
+          
+          response.on('end', () => {
+            resolve(Buffer.concat(chunks));
+          });
+        }).on('error', (error: Error) => {
+          reject(error);
+        });
+      });
+    } catch (error) {
+      this.logger.error(`❌ Failed to fetch recording audio: ${error.message}`);
+      throw error;
+    }
+  }
 }

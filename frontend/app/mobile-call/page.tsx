@@ -1041,15 +1041,11 @@ export default function MobileCallPage() {
                             <div className="text-gray-600 text-xs">{call.duration}</div>
                             {call.recordingUrl && (
                               <a
-                                href={call.recordingUrl.replace('.json', '.mp3')}
+                                href={`${serverUrl.replace(/\/api$/, '')}/api/calls/recording-file/${call.id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs flex items-center gap-1"
-                                title="استماع للتسجيل (يفتح في نافذة جديدة)"
-                                onClick={(e) => {
-                                  // السماح بالفتح في نافذة جديدة
-                                  console.log('Opening recording:', call.recordingUrl);
-                                }}
+                                title="استماع للتسجيل"
                               >
                                 <span>🎧</span>
                               </a>

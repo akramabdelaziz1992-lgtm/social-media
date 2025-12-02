@@ -224,7 +224,7 @@ export class CallsController {
   }
 
   /**
-   * تحميل ملف التسجيل الصوتي
+   * تحميل ملف التسجيل الصوتي مع Proxy
    */
   @Get('recording-file/:callId')
   async getRecordingFile(
@@ -244,8 +244,17 @@ export class CallsController {
       // تحويل URL من .json إلى .mp3
       const audioUrl = call.recordingUrl.replace('.json', '.mp3');
       
-      // إعادة توجيه للتسجيل مع headers صحيحة
-      return res.redirect(audioUrl);
+      // جلب التسجيل من Twilio مع authentication
+      const recordingData = await this.twilioService.getRecordingAudio(audioUrl);
+      
+      // إرسال التسجيل للمستخدم
+      res.set({
+        'Content-Type': 'audio/mpeg',
+        'Content-Disposition': `inline; filename="recording-${callId}.mp3"`,
+        'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+      });
+      
+      return res.send(recordingData);
     } catch (error) {
       this.logger.error(`❌ Error fetching recording file: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
