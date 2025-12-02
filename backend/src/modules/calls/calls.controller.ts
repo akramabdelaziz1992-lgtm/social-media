@@ -64,7 +64,7 @@ export class CallsController {
    * الحصول على Twilio Access Token للاتصال من المتصفح (WebRTC)
    */
   @Get('token')
-  async getVoiceToken(@Query('identity') identity: string = 'agent', @Res() res) {
+  async getVoiceToken(@Query('identity') identity: string = 'agent', @Res() res: Response) {
     try {
       const token = await this.twilioService.generateVoiceToken(identity);
       this.logger.log(`🎫 Voice token generated for: ${identity}`);
@@ -79,7 +79,14 @@ export class CallsController {
       return res.json({ token });
     } catch (error) {
       this.logger.error(`❌ Error generating token: ${error.message}`);
-      throw error;
+      this.logger.error(`Stack: ${error.stack}`);
+      
+      // إرجاع رسالة خطأ واضحة للـ Frontend
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        error: 'Failed to generate Twilio token',
+        message: error.message,
+        details: 'Please check TWILIO_API_KEY, TWILIO_API_SECRET, and TWILIO_TWIML_APP_SID in .env file'
+      });
     }
   }
 

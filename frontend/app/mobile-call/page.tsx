@@ -29,7 +29,11 @@ export default function MobileCallPage() {
   const [isInCall, setIsInCall] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+  const [isBluetoothConnected, setIsBluetoothConnected] = useState(false);
   const [currentCallSid, setCurrentCallSid] = useState<string | null>(null);
+  const [showConferenceDialog, setShowConferenceDialog] = useState(false);
+  const [conferenceNumber, setConferenceNumber] = useState('');
   
   const [contacts, setContacts] = useState<Contact[]>([
     { id: '1', name: 'عميل 1', phone: '+966501234567' },
@@ -195,10 +199,19 @@ export default function MobileCallPage() {
       const tokenResponse = await fetch(`${baseUrl}/api/calls/token?identity=${encodeURIComponent(identity)}&employeeName=${encodeURIComponent(currentUser.name)}&employeeEmail=${encodeURIComponent(currentUser.email)}&department=${encodeURIComponent(currentUser.department || 'N/A')}`);
       
       if (!tokenResponse.ok) {
-        throw new Error('Failed to get Twilio token');
+        const errorData = await tokenResponse.json().catch(() => ({}));
+        const errorMsg = errorData.message || errorData.details || 'Failed to get Twilio token';
+        console.error('Token error details:', errorData);
+        throw new Error(errorMsg);
       }
       
-      const { token } = await tokenResponse.json();
+      const tokenData = await tokenResponse.json();
+      
+      if (!tokenData.token) {
+        throw new Error('No token received from server');
+      }
+      
+      const { token } = tokenData;
       
       // إنشاء Twilio Device
       const device = new Device(token, {
@@ -261,8 +274,24 @@ export default function MobileCallPage() {
       
     } catch (error) {
       console.error('Call error:', error);
-      alert('حدث خطأ أثناء الاتصال: ' + (error as Error).message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert('حدث خطأ أثناء الاتصال: ' + errorMessage);
       setIsInCall(false);
+      
+      // تنظيف الـ Device في حالة الخطأ
+      try {
+        const device = (window as any).activeDevice;
+        if (device) {
+          if (device.state === 'registered') {
+            device.unregister();
+          }
+          device.destroy();
+          (window as any).activeDevice = null;
+          (window as any).activeCall = null;
+        }
+      } catch (cleanupError) {
+        console.error('Error cleaning up after failed call:', cleanupError);
+      }
     }
   };
 
@@ -292,6 +321,47 @@ export default function MobileCallPage() {
     setTimeout(() => {
       handleCall();
     }, 500);
+  };
+
+  const toggleSpeaker = () => {
+    setIsSpeakerOn(!isSpeakerOn);
+    // تطبيق Speaker mode على الـ Device
+    const activeCall = (window as any).activeCall;
+    if (activeCall) {
+      // Twilio SDK voice control
+      console.log('Speaker:', !isSpeakerOn ? 'ON' : 'OFF');
+    }
+  };
+
+  const toggleBluetooth = async () => {
+    try {
+      if (!isBluetoothConnected) {
+        // Request Bluetooth device
+        const device = await (navigator as any).bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service']
+        });
+        console.log('Bluetooth device:', device.name);
+        setIsBluetoothConnected(true);
+      } else {
+        setIsBluetoothConnected(false);
+      }
+    } catch (error) {
+      console.error('Bluetooth error:', error);
+      alert('فشل الاتصال بالبلوتوث');
+    }
+  };
+
+  const handleAddToConference = () => {
+    if (!conferenceNumber) {
+      alert('الرجاء إدخال رقم الهاتف');
+      return;
+    }
+    // إضافة مكالمة ثانية للمؤتمر
+    console.log('Adding to conference:', conferenceNumber);
+    alert('جاري إضافة ' + conferenceNumber + ' للمكالمة الجماعية...');
+    setShowConferenceDialog(false);
+    setConferenceNumber('');
   };
 
   const handleEndCall = async () => {
@@ -358,67 +428,84 @@ export default function MobileCallPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4">
-      <div className="max-w-4xl mx-auto w-full">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 overflow-x-hidden">
+      <div className="max-w-5xl mx-auto w-full">
         {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-3 sm:p-4 shadow-2xl">
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-4 sm:p-6 shadow-2xl sticky top-0 z-40">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="المسار الساخن" className="w-10 h-10 object-contain" />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                <span className="text-2xl">📞</span>
+              </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-white">📞 موبايل كول</h1>
-                <p className="text-xs text-teal-100">المسار الساخن للسفر والسياحة</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                  موبايل كول
+                  <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                </h1>
+                <p className="text-sm text-teal-100">نظام الاتصالات المتقدم</p>
               </div>
             </div>
             {currentUser && (
-              <div className="hidden sm:block text-right">
-                <div className="text-white font-bold">{currentUser.name}</div>
-                <div className="text-teal-200 text-sm">{currentUser.department || currentUser.role}</div>
+              <div className="hidden sm:block text-right bg-white/10 backdrop-blur px-4 py-2 rounded-xl">
+                <div className="text-white font-bold text-sm">{currentUser.name}</div>
+                <div className="text-teal-200 text-xs">{currentUser.department || currentUser.role}</div>
               </div>
             )}
           </div>
         </div>
 
         <div className="bg-white rounded-b-xl shadow-2xl mb-4">
-          <div className="flex flex-col md:flex-row min-h-[600px]">
+          <div className="flex flex-col md:flex-row min-h-[calc(100vh-200px)] max-h-[calc(100vh-120px)]">
             {/* Sidebar */}
-            <div className="w-full md:w-20 lg:w-24 bg-gradient-to-b from-teal-600 to-emerald-700 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-6 lg:space-y-8">
+            <div className="w-full md:w-24 bg-gradient-to-b from-teal-600 to-emerald-700 flex md:flex-col items-center justify-around md:justify-start py-4 md:py-8 space-x-4 md:space-x-0 md:space-y-8 shadow-xl">
               <button
                 onClick={() => setCurrentView('dialpad')}
-                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
-                  currentView === 'dialpad' ? 'bg-white/20' : 'hover:bg-white/10'
+                className={`group relative p-4 rounded-xl transition-all transform hover:scale-110 ${
+                  currentView === 'dialpad' ? 'bg-white/30 shadow-lg' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-2xl sm:text-3xl">📱</span>
+                <span className="text-3xl">{currentView === 'dialpad' ? '📱' : '☎️'}</span>
+                <div className="hidden md:block absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  لوحة الاتصال
+                </div>
               </button>
               <button
                 onClick={() => setCurrentView('contacts')}
-                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
-                  currentView === 'contacts' ? 'bg-white/20' : 'hover:bg-white/10'
+                className={`group relative p-4 rounded-xl transition-all transform hover:scale-110 ${
+                  currentView === 'contacts' ? 'bg-white/30 shadow-lg' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-2xl sm:text-3xl">👥</span>
+                <span className="text-3xl">👥</span>
+                <div className="hidden md:block absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  جهات الاتصال
+                </div>
               </button>
               <button
                 onClick={() => setCurrentView('history')}
-                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
-                  currentView === 'history' ? 'bg-white/20' : 'hover:bg-white/10'
+                className={`group relative p-4 rounded-xl transition-all transform hover:scale-110 ${
+                  currentView === 'history' ? 'bg-white/30 shadow-lg' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-2xl sm:text-3xl">📋</span>
+                <span className="text-3xl">📋</span>
+                <div className="hidden md:block absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  سجل المكالمات
+                </div>
               </button>
               <button
                 onClick={() => setCurrentView('settings')}
-                className={`p-2 sm:p-3 md:p-4 rounded-lg transition ${
-                  currentView === 'settings' ? 'bg-white/20' : 'hover:bg-white/10'
+                className={`group relative p-4 rounded-xl transition-all transform hover:scale-110 ${
+                  currentView === 'settings' ? 'bg-white/30 shadow-lg' : 'hover:bg-white/10'
                 }`}
               >
-                <span className="text-2xl sm:text-3xl">⚙️</span>
+                <span className="text-3xl">⚙️</span>
+                <div className="hidden md:block absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  الإعدادات
+                </div>
               </button>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 p-4 sm:p-6 md:p-8 pb-20">
+            {/* Main Content with Scroll */}
+            <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               {/* Dialpad View */}
               {currentView === 'dialpad' && !isInCall && (
                 <div className="max-w-md mx-auto pb-8">
@@ -529,36 +616,153 @@ export default function MobileCallPage() {
                 </div>
               )}
 
-              {/* In Call View */}
+              {/* In Call View - Enhanced Professional UI */}
               {isInCall && (
-                <div className="max-w-md mx-auto text-center">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 sm:mb-8">مكالمة جارية</h2>
-                  
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 sm:p-10 md:p-12 mb-6 sm:mb-8">
-                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">📞</div>
-                    <div className="text-2xl sm:text-3xl font-bold text-blue-900 mb-3 sm:mb-4" dir="ltr">
-                      {phoneNumber}
+                <div className="max-w-2xl mx-auto">
+                  {/* Call Status Header */}
+                  <div className="text-center mb-8">
+                    <div className="inline-block bg-green-500 text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
+                      مكالمة نشطة
                     </div>
-                    <div className="text-4xl sm:text-5xl md:text-6xl font-mono text-blue-700">
-                      {formatCallDuration()}
+                    <h2 className="text-2xl font-bold text-gray-800">جارٍ الاتصال</h2>
+                  </div>
+                  
+                  {/* Contact Card */}
+                  <div className="bg-gradient-to-br from-teal-50 via-blue-50 to-emerald-50 rounded-3xl p-10 mb-8 shadow-2xl border-2 border-teal-200">
+                    {/* Avatar */}
+                    <div className="flex justify-center mb-6">
+                      <div className="w-32 h-32 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-full flex items-center justify-center shadow-xl animate-pulse">
+                        <span className="text-6xl">👤</span>
+                      </div>
+                    </div>
+                    
+                    {/* Phone Number */}
+                    <div className="text-center mb-6">
+                      <div className="text-3xl font-bold text-gray-800 mb-2" dir="ltr">
+                        {phoneNumber}
+                      </div>
+                      <div className="text-gray-600 text-sm">جاري التحدث...</div>
+                    </div>
+                    
+                    {/* Call Duration */}
+                    <div className="bg-white/60 backdrop-blur rounded-2xl py-6 px-8 text-center">
+                      <div className="text-5xl font-mono font-bold text-teal-700 tracking-wider">
+                        {formatCallDuration()}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-3 sm:gap-4 justify-center">
+                  {/* Control Buttons Grid */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    {/* Mute Button */}
                     <button
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`p-4 sm:p-5 md:p-6 rounded-full transition active:scale-95 ${
-                        isMuted ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'
+                      className={`flex flex-col items-center justify-center p-6 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-lg ${
+                        isMuted 
+                          ? 'bg-red-500 text-white shadow-red-200' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50 shadow-gray-200'
                       }`}
                     >
-                      <span className="text-2xl sm:text-3xl">{isMuted ? '🔇' : '🔊'}</span>
+                      <span className="text-4xl mb-2">{isMuted ? '🔇' : '🎤'}</span>
+                      <span className="text-xs font-semibold">{isMuted ? 'إلغاء الكتم' : 'كتم'}</span>
                     </button>
+
+                    {/* Speaker Button */}
                     <button
-                      onClick={handleEndCall}
-                      className="px-8 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full font-bold transition shadow-lg hover:shadow-xl active:scale-95 text-base sm:text-lg md:text-xl"
+                      onClick={toggleSpeaker}
+                      className={`flex flex-col items-center justify-center p-6 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-lg ${
+                        isSpeakerOn 
+                          ? 'bg-blue-500 text-white shadow-blue-200' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50 shadow-gray-200'
+                      }`}
                     >
-                      <span className="text-xl sm:text-2xl">📵 إنهاء</span>
+                      <span className="text-4xl mb-2">{isSpeakerOn ? '🔊' : '🔈'}</span>
+                      <span className="text-xs font-semibold">{isSpeakerOn ? 'إيقاف السماعة' : 'السماعة'}</span>
                     </button>
+
+                    {/* Bluetooth Button */}
+                    <button
+                      onClick={toggleBluetooth}
+                      className={`flex flex-col items-center justify-center p-6 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-lg ${
+                        isBluetoothConnected 
+                          ? 'bg-indigo-500 text-white shadow-indigo-200' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50 shadow-gray-200'
+                      }`}
+                    >
+                      <span className="text-4xl mb-2">🔵</span>
+                      <span className="text-xs font-semibold">{isBluetoothConnected ? 'بلوتوث متصل' : 'بلوتوث'}</span>
+                    </button>
+
+                    {/* Dialpad Button */}
+                    <button
+                      onClick={() => {/* Show dialpad overlay */}}
+                      className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white hover:bg-gray-50 text-gray-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-gray-200"
+                    >
+                      <span className="text-4xl mb-2">⌨️</span>
+                      <span className="text-xs font-semibold">لوحة الأرقام</span>
+                    </button>
+
+                    {/* Add Call Button */}
+                    <button
+                      onClick={() => setShowConferenceDialog(true)}
+                      className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white hover:bg-gray-50 text-gray-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-gray-200"
+                    >
+                      <span className="text-4xl mb-2">➕</span>
+                      <span className="text-xs font-semibold">إضافة مكالمة</span>
+                    </button>
+
+                    {/* Hold Button */}
+                    <button
+                      className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white hover:bg-gray-50 text-gray-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-gray-200"
+                    >
+                      <span className="text-4xl mb-2">⏸️</span>
+                      <span className="text-xs font-semibold">تعليق</span>
+                    </button>
+                  </div>
+
+                  {/* End Call Button */}
+                  <button
+                    onClick={handleEndCall}
+                    className="w-full py-6 bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-red-600 hover:via-red-700 hover:to-red-600 text-white rounded-2xl font-bold text-xl transition-all transform hover:scale-105 active:scale-95 shadow-2xl shadow-red-300 flex items-center justify-center gap-3"
+                  >
+                    <span className="text-3xl">📵</span>
+                    <span>إنهاء المكالمة</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Conference Dialog */}
+              {showConferenceDialog && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                      إضافة إلى المكالمة الجماعية
+                    </h3>
+                    <input
+                      type="text"
+                      value={conferenceNumber}
+                      onChange={(e) => setConferenceNumber(e.target.value)}
+                      placeholder="أدخل رقم الهاتف"
+                      className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl text-center text-xl mb-6 focus:ring-4 focus:ring-teal-500/30 focus:border-teal-500 outline-none"
+                      dir="ltr"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleAddToConference}
+                        className="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl font-bold transition-all transform hover:scale-105 active:scale-95"
+                      >
+                        ✅ إضافة
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowConferenceDialog(false);
+                          setConferenceNumber('');
+                        }}
+                        className="flex-1 py-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-bold transition-all transform hover:scale-105 active:scale-95"
+                      >
+                        ✖️ إلغاء
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

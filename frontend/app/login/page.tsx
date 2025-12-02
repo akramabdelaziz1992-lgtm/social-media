@@ -5,6 +5,58 @@ import { useRouter } from 'next/navigation';
 import { authStorage } from '@/lib/auth';
 import Image from 'next/image';
 
+// Generate static star positions to avoid hydration mismatch
+const generateStars = (count: number) => {
+  const stars = [];
+  const seed = 12345; // Fixed seed for consistent random values
+  let random = seed;
+  
+  const seededRandom = () => {
+    random = (random * 9301 + 49297) % 233280;
+    return random / 233280;
+  };
+  
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      width: 1 + seededRandom() * 2,
+      height: 1 + seededRandom() * 2,
+      top: seededRandom() * 100,
+      left: seededRandom() * 100,
+      delay: seededRandom() * 3,
+      duration: 2 + seededRandom() * 3,
+    });
+  }
+  return stars;
+};
+
+// Generate static bubble positions
+const generateBubbles = (count: number) => {
+  const bubbles = [];
+  const seed = 54321; // Different seed for bubbles
+  let random = seed;
+  
+  const seededRandom = () => {
+    random = (random * 9301 + 49297) % 233280;
+    return random / 233280;
+  };
+  
+  for (let i = 0; i < count; i++) {
+    const size = 20 + seededRandom() * 60;
+    bubbles.push({
+      width: size,
+      height: size,
+      left: seededRandom() * 100,
+      bottom: -(seededRandom() * 100),
+      delay: seededRandom() * 5,
+      duration: 10 + seededRandom() * 10,
+    });
+  }
+  return bubbles;
+};
+
+const STARS = generateStars(30);
+const BUBBLES = generateBubbles(15);
+
 export default function LoginPage() {
   const router = useRouter();
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -56,34 +108,34 @@ export default function LoginPage() {
         <div className="absolute -bottom-20 left-1/3 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
         
         {/* Animated Stars */}
-        {[...Array(30)].map((_, i) => (
+        {STARS.map((star, i) => (
           <div
             key={`star-${i}`}
             className="absolute bg-white rounded-full animate-twinkle"
             style={{
-              width: `${1 + Math.random() * 2}px`,
-              height: `${1 + Math.random() * 2}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
+              width: `${star.width}px`,
+              height: `${star.height}px`,
+              top: `${star.top}%`,
+              left: `${star.left}%`,
+              animationDelay: `${star.delay}s`,
+              animationDuration: `${star.duration}s`,
               boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)',
             }}
           />
         ))}
 
         {/* Floating Bubbles */}
-        {[...Array(15)].map((_, i) => (
+        {BUBBLES.map((bubble, i) => (
           <div
             key={`bubble-${i}`}
             className="absolute rounded-full bg-gradient-to-br from-teal-400/20 to-emerald-400/20 backdrop-blur-sm animate-float"
             style={{
-              width: `${20 + Math.random() * 60}px`,
-              height: `${20 + Math.random() * 60}px`,
-              left: `${Math.random() * 100}%`,
-              bottom: `-${Math.random() * 100}px`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${10 + Math.random() * 10}s`,
+              width: `${bubble.width}px`,
+              height: `${bubble.height}px`,
+              left: `${bubble.left}%`,
+              bottom: `${bubble.bottom}px`,
+              animationDelay: `${bubble.delay}s`,
+              animationDuration: `${bubble.duration}s`,
             }}
           />
         ))}
