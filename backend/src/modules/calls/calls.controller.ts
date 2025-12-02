@@ -224,6 +224,38 @@ export class CallsController {
   }
 
   /**
+   * تحميل ملف التسجيل الصوتي
+   */
+  @Get('recording-file/:callId')
+  async getRecordingFile(
+    @Param('callId') callId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const call = await this.callsService.getCallById(callId);
+      
+      if (!call.recordingUrl) {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          error: 'Recording not found',
+          message: 'لا يوجد تسجيل لهذه المكالمة'
+        });
+      }
+
+      // تحويل URL من .json إلى .mp3
+      const audioUrl = call.recordingUrl.replace('.json', '.mp3');
+      
+      // إعادة توجيه للتسجيل مع headers صحيحة
+      return res.redirect(audioUrl);
+    } catch (error) {
+      this.logger.error(`❌ Error fetching recording file: ${error.message}`);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        error: 'Failed to fetch recording',
+        message: error.message
+      });
+    }
+  }
+
+  /**
    * الحصول على مكالمة محددة
    */
   @Get(':id')
