@@ -163,40 +163,40 @@ export default function EmployeesPage() {
 
   // Load employees from API
   useEffect(() => {
-    const loadEmployees = async () => {
-      setLoadingEmployees(true);
-      try {
-        const response = await fetch(`${apiUrl}/api/employees`);
-        if (response.ok) {
-          const data = await response.json();
-          // Transform API data to match Employee interface
-          const transformedEmployees = data.map((emp: any) => ({
-            id: emp.id,
-            name: emp.name,
-            email: emp.email,
-            phone: emp.phone || 'غير محدد',
-            department: emp.department?.name || 'غير محدد',
-            role: emp.role === 'admin' ? 'مدير' : emp.role === 'supervisor' ? 'مشرف' : 'موظف',
-            status: emp.status === 'active' ? 'نشط' : emp.status === 'inactive' ? 'غير نشط' : 'إجازة',
-            hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-            totalAssignedChats: 0,
-            todayChats: 0,
-            responseTime: '0 دقيقة',
-            permissions: emp.permissions || []
-          }));
-          setEmployees(transformedEmployees);
-        } else {
-          console.error('Failed to load employees');
-        }
-      } catch (error) {
-        console.error('Error loading employees:', error);
-      } finally {
-        setLoadingEmployees(false);
-      }
-    };
-
     loadEmployees();
   }, [apiUrl]);
+
+  const loadEmployees = async () => {
+    setLoadingEmployees(true);
+    try {
+      const response = await fetch(`${apiUrl}/api/users`);
+      if (response.ok) {
+        const data = await response.json();
+        // Transform API data to match Employee interface
+        const transformedEmployees = data.map((emp: any) => ({
+          id: emp.id,
+          name: emp.name,
+          email: emp.email,
+          phone: emp.phone || 'غير محدد',
+          department: emp.department || 'غير محدد',
+          role: emp.role === 'admin' ? 'مدير' : emp.role === 'sales' ? 'موظف' : 'مشرف',
+          status: emp.isActive ? 'نشط' : 'غير نشط',
+          hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          totalAssignedChats: 0,
+          todayChats: 0,
+          responseTime: '0 دقيقة',
+          permissions: emp.permissions || []
+        }));
+        setEmployees(transformedEmployees);
+      } else {
+        console.error('Failed to load employees');
+      }
+    } catch (error) {
+      console.error('Error loading employees:', error);
+    } finally {
+      setLoadingEmployees(false);
+    }
+  };
 
   // Filter employees
   const filteredEmployees = employees.filter(emp => {
@@ -215,20 +215,20 @@ export default function EmployeesPage() {
       return;
     }
 
+    if (!formData.password) {
+      alert('الرجاء إدخال كلمة المرور');
+      return;
+    }
+
     try {
       // Convert Arabic role to English
       const roleMapping: any = {
         'مدير': 'admin',
-        'مشرف': 'supervisor',
-        'موظف': 'agent'
-      };
-      const statusMapping: any = {
-        'نشط': 'active',
-        'غير نشط': 'inactive',
-        'إجازة': 'leave'
+        'مشرف': 'sales',
+        'موظف': 'sales'
       };
 
-      const response = await fetch(`${apiUrl}/api/employees`, {
+      const response = await fetch(`${apiUrl}/api/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -237,40 +237,21 @@ export default function EmployeesPage() {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          departmentId: formData.department, // This should be department ID
+          department: formData.department,
           role: roleMapping[formData.role || 'موظف'],
-          status: statusMapping[formData.status || 'نشط'],
-          password: formData.password || '123456', // Default password
+          password: formData.password,
+          permissions: formData.permissions || []
         }),
       });
 
       if (response.ok) {
-        const newEmployee = await response.json();
-        // Reload employees list
-        const reloadResponse = await fetch(`${apiUrl}/api/employees`);
-        if (reloadResponse.ok) {
-          const data = await reloadResponse.json();
-          const transformedEmployees = data.map((emp: any) => ({
-            id: emp.id,
-            name: emp.name,
-            email: emp.email,
-            phone: emp.phone || 'غير محدد',
-            department: emp.department?.name || 'غير محدد',
-            role: emp.role === 'admin' ? 'مدير' : emp.role === 'supervisor' ? 'مشرف' : 'موظف',
-            status: emp.status === 'active' ? 'نشط' : emp.status === 'inactive' ? 'غير نشط' : 'إجازة',
-            hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-            totalAssignedChats: 0,
-            todayChats: 0,
-            responseTime: '0 دقيقة',
-            permissions: emp.permissions || []
-          }));
-          setEmployees(transformedEmployees);
-        }
+        await loadEmployees(); // Reload employees list
         setShowAddModal(false);
         resetForm();
-        alert('تم إضافة الموظف بنجاح');
+        alert('✅ تم إضافة الموظف بنجاح');
       } else {
-        alert('فشل إضافة الموظف');
+        const error = await response.json();
+        alert(`❌ فشل إضافة الموظف: ${error.message || 'خطأ غير معروف'}`);
       }
     } catch (error) {
       console.error('Error adding employee:', error);
@@ -723,6 +704,17 @@ export default function EmployeesPage() {
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
                     placeholder="+966XXXXXXXXX"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">كلمة المرور *</label>
+                  <input
+                    type="password"
+                    value={formData.password || ''}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-teal-500 transition-colors"
+                    placeholder="أدخل كلمة المرور"
                   />
                 </div>
 

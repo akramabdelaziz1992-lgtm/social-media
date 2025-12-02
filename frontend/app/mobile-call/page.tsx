@@ -19,6 +19,8 @@ interface CallRecord {
   time: string;
   type: 'outgoing' | 'incoming' | 'missed';
   employeeName?: string;
+  recordingUrl?: string;
+  recordingSid?: string;
 }
 
 export default function MobileCallPage() {
@@ -103,11 +105,13 @@ export default function MobileCallPage() {
       
       const formattedHistory: CallRecord[] = calls.slice(0, 10).map((call: any) => ({
         id: call.id,
-        phone: call.to || call.from || 'Unknown',
-        duration: formatDuration(call.duration || 0),
+        phone: call.toNumber || call.fromNumber || 'Unknown',
+        duration: formatDuration(call.durationSeconds || 0),
         time: new Date(call.createdAt || Date.now()).toLocaleString('ar-EG'),
         type: call.status === 'completed' ? 'outgoing' : 'incoming',
         employeeName: call.employeeName || currentUser?.name || undefined,
+        recordingUrl: call.recordingUrl,
+        recordingSid: call.recordingSid,
       }));
       
       setCallHistory(formattedHistory);
@@ -1001,6 +1005,21 @@ export default function MobileCallPage() {
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <div className="text-gray-600 text-xs">{call.duration}</div>
+                            {call.recordingUrl && (
+                              <button
+                                onClick={() => {
+                                  const audio = new Audio(call.recordingUrl);
+                                  audio.play().catch(err => {
+                                    console.error('Error playing audio:', err);
+                                    alert('لا يمكن تشغيل التسجيل');
+                                  });
+                                }}
+                                className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs flex items-center gap-1"
+                                title="استماع للتسجيل"
+                              >
+                                <span>🎧</span>
+                              </button>
+                            )}
                             <button
                               onClick={() => handleCallFromHistory(call.phone)}
                               className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs flex items-center gap-1"

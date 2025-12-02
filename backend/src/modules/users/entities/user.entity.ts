@@ -60,6 +60,9 @@ export class User {
   @Column({ type: 'text', nullable: true })
   avatar: string;
 
+  @Column({ type: 'simple-json', nullable: true })
+  permissions: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 

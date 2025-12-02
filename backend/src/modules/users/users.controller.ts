@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
@@ -32,5 +32,48 @@ export class UsersController {
   @ApiOperation({ summary: 'الحصول على بيانات مستخدم محدد' })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
+  }
+
+  @Post()
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RbacGuard)
+  @ApiOperation({ summary: 'إنشاء موظف جديد (للمدراء فقط)' })
+  async createEmployee(@Body() employeeData: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    department?: string;
+    role: UserRole;
+    permissions?: string[];
+  }) {
+    return this.usersService.createEmployee(employeeData);
+  }
+
+  @Put(':id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RbacGuard)
+  @ApiOperation({ summary: 'تحديث بيانات موظف (للمدراء فقط)' })
+  async updateEmployee(
+    @Param('id') id: string,
+    @Body() employeeData: {
+      name?: string;
+      email?: string;
+      password?: string;
+      phone?: string;
+      department?: string;
+      role?: UserRole;
+      permissions?: string[];
+    }
+  ) {
+    return this.usersService.updateEmployee(id, employeeData);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RbacGuard)
+  @ApiOperation({ summary: 'حذف موظف (للمدراء فقط)' })
+  async deleteEmployee(@Param('id') id: string) {
+    return this.usersService.deleteEmployee(id);
   }
 }
