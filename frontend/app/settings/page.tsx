@@ -47,71 +47,15 @@ export default function SettingsPage() {
       ]
     },
     {
-      id: 'notifications',
-      title: 'الإشعارات',
-      icon: Bell,
-      color: 'from-yellow-500 to-orange-600',
-      items: [
-        { name: 'إشعارات البريد', href: '/settings/notifications/email', icon: '📧', description: 'تنبيهات البريد الإلكتروني' },
-        { name: 'إشعارات الموبايل', href: '/settings/notifications/push', icon: '📱', description: 'التنبيهات الفورية' },
-        { name: 'إشعارات SMS', href: '/settings/notifications/sms', icon: '💬', description: 'الرسائل النصية' },
-      ]
-    },
-    {
-      id: 'whatsapp',
-      title: 'واتساب للأعمال',
-      icon: '💬',
+      id: 'callcenter',
+      title: 'إعدادات مركز الاتصالات',
+      icon: Phone,
       color: 'from-green-500 to-emerald-600',
       items: [
-        { name: 'إعدادات الاتصال', href: '/settings/whatsapp', icon: '⚙️', description: 'إعدادات WhatsApp Business API' },
-        { name: 'ربط الحساب', href: '/whatsapp/connect', icon: '🔗', description: 'ربط حساب واتساب الأعمال' },
-        { name: 'إدارة البوت', href: '/bot-manager', icon: '🤖', description: 'إعدادات البوت الذكي' },
-        { name: 'إدارة المشتركين', href: '/whatsapp/subscribers', icon: '👥', description: 'قائمة المشتركين والعملاء' },
-        { name: 'الإذاعة والبث', href: '/whatsapp/broadcast', icon: '📢', description: 'إرسال رسائل جماعية' },
-        { name: 'سير عمل Webhook', href: '/whatsapp/webhooks', icon: '🔄', description: 'إدارة webhooks' },
-        { name: 'إعلانات النقر', href: '/whatsapp/click-ads', icon: '🎯', description: 'إعلانات Click-to-Chat' },
-        { name: 'كتالوج التجارة', href: '/whatsapp/catalog', icon: '🛍️', description: 'عرض المنتجات' },
-        { name: 'المواعيد', href: '/whatsapp/appointments', icon: '📅', description: 'حجز المواعيد', badge: '3' },
-      ]
-    },
-    {
-      id: 'facebook',
-      title: 'فيسبوك',
-      icon: '👍',
-      color: 'from-blue-500 to-indigo-600',
-      items: [
-        { name: 'ربط الحساب', href: '/facebook/connect', icon: '🔗', description: 'ربط صفحة فيسبوك' },
-        { name: 'إدارة البوت', href: '/facebook/bot-manager', icon: '🤖', description: 'بوت ماسنجر' },
-        { name: 'إدارة المشتركين', href: '/facebook/subscribers', icon: '👥', description: 'متابعي الصفحة' },
-        { name: 'الإذاعة والبث', href: '/facebook/broadcast', icon: '📢', description: 'رسائل جماعية' },
-        { name: 'المحادثة المباشرة', href: '/facebook/live-chat', icon: '💬', description: 'Messenger' },
-        { name: 'أتمتة التعليقات', href: '/facebook/comments', icon: '💭', description: 'الرد على التعليقات' },
-      ]
-    },
-    {
-      id: 'instagram',
-      title: 'إنستجرام',
-      icon: '📷',
-      color: 'from-pink-500 to-purple-600',
-      items: [
-        { name: 'ربط الحساب', href: '/instagram/connect', icon: '🔗', description: 'ربط حساب إنستجرام' },
-        { name: 'إدارة البوت', href: '/instagram/bot-manager', icon: '🤖', description: 'بوت Direct Messages' },
-        { name: 'المحادثة المباشرة', href: '/instagram/live-chat', icon: '💬', description: 'الرسائل المباشرة' },
-        { name: 'أتمتة التعليقات', href: '/instagram/comments', icon: '💭', description: 'الرد على التعليقات' },
-      ]
-    },
-    {
-      id: 'telegram',
-      title: 'تيليجرام',
-      icon: '✈️',
-      color: 'from-sky-400 to-blue-600',
-      items: [
-        { name: 'ربط البوت', href: '/telegram/connect', icon: '🔗', description: 'ربط بوت تيليجرام' },
-        { name: 'إدارة البوت', href: '/telegram/bot-manager', icon: '🤖', description: 'إعدادات البوت' },
-        { name: 'إدارة المجموعات', href: '/telegram/groups', icon: '👥', description: 'مجموعات وقنوات' },
-        { name: 'إدارة المشتركين', href: '/telegram/subscribers', icon: '📊', description: 'المشتركين' },
-        { name: 'الإذاعة والبث', href: '/telegram/broadcast', icon: '📢', description: 'رسائل جماعية' },
-        { name: 'المحادثة المباشرة', href: '/telegram/live-chat', icon: '💬', description: 'الرد المباشر' },
+        { name: 'إعدادات Twilio', href: '/settings/twilio', icon: '📞', description: 'إعدادات حساب Twilio' },
+        { name: 'أرقام الهاتف', href: '/settings/phone-numbers', icon: '📱', description: 'إدارة أرقام الاتصال' },
+        { name: 'التسجيلات الصوتية', href: '/settings/recordings', icon: '🎙️', description: 'تسجيلات المكالمات' },
+        { name: 'قوائم الانتظار', href: '/settings/call-queues', icon: '⏳', description: 'إدارة قوائم الانتظار' },
       ]
     },
     {
@@ -133,31 +77,8 @@ export default function SettingsPage() {
       color: 'from-purple-500 to-indigo-600',
       items: [
         { name: 'الموظفين', href: '/employees', icon: '👨‍💼', description: 'إدارة الموظفين والصلاحيات' },
+        { name: 'العملاء', href: '/customers', icon: '👥', description: 'إدارة العملاء' },
         { name: 'الأدوار والصلاحيات', href: '/settings/users/roles', icon: '🎭', description: 'تحديد الأدوار' },
-        { name: 'الأقسام', href: '/settings/users/departments', icon: '🏢', description: 'تنظيم الأقسام' },
-      ]
-    },
-    {
-      id: 'integrations',
-      title: 'التكاملات',
-      icon: Zap,
-      color: 'from-yellow-500 to-orange-600',
-      items: [
-        { name: 'API Keys', href: '/settings/integrations/api', icon: '🔑', description: 'مفاتيح API' },
-        { name: 'Webhooks', href: '/settings/integrations/webhooks', icon: '🔗', description: 'إعدادات Webhooks' },
-        { name: 'تطبيقات خارجية', href: '/settings/integrations/apps', icon: '🔌', description: 'ربط التطبيقات' },
-      ]
-    },
-    {
-      id: 'billing',
-      title: 'الفواتير والاشتراكات',
-      icon: CreditCard,
-      color: 'from-green-500 to-teal-600',
-      items: [
-        { name: 'الاشتراك الحالي', href: '/settings/billing/subscription', icon: '💳', description: 'تفاصيل الباقة' },
-        { name: 'طرق الدفع', href: '/settings/billing/payment', icon: '💰', description: 'البطاقات والحسابات' },
-        { name: 'الفواتير', href: '/settings/billing/invoices', icon: '🧾', description: 'سجل الفواتير' },
-        { name: 'الترقية', href: '/settings/billing/upgrade', icon: '⬆️', description: 'ترقية الباقة' },
       ]
     },
   ];

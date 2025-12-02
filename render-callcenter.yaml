@@ -1,0 +1,63 @@
+# Render Deployment Configuration for LinkCall Call Center
+
+services:
+  # Backend Service
+  - type: web
+    name: linkcall-backend
+    env: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_API_KEY
+        sync: false
+      - key: TWILIO_API_SECRET
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        value: +13204336644
+      - key: TWILIO_CALLER_ID
+        value: +966555254915
+    healthCheckPath: /api/health
+
+  # Frontend Service
+  - type: web
+    name: linkcall-frontend
+    env: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: linkcall-backend
+          property: host
+      - key: NEXT_PUBLIC_TWILIO_ACCOUNT_SID
+        sync: false
+
+# Database (PostgreSQL)
+databases:
+  - name: linkcall-db
+    plan: free
+    databaseName: linkcall_callcenter
+    user: linkcall_user

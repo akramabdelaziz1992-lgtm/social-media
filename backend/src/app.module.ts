@@ -14,7 +14,6 @@ import { GatewayModule } from './modules/gateway/gateway.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { CallsModule } from './modules/calls/calls.module';
-import { WhatsAppModule } from './modules/whatsapp/whatsapp.module';
 import { AIModule } from './modules/ai/ai.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 
@@ -96,7 +95,6 @@ import { Department } from './modules/employees/entities/department.entity';
     AuditModule,
     AIModule,
     CallsModule,
-    WhatsAppModule,
     EmployeesModule,
   ],
 })

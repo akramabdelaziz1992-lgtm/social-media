@@ -21,72 +21,8 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false); // For mobile
   const [isCollapsed, setIsCollapsed] = useState(false); // For desktop
 
-  const channels = [
-    { 
-      id: 'whatsapp', 
-      name: 'واتساب', 
-      icon: '💬', 
-      color: 'text-green-400',
-      submenus: [
-        { name: 'ربط الحساب', href: '/whatsapp/connect', icon: '🔗' },
-        { name: 'إدارة البوت', href: '/bot-manager', icon: '🤖' },
-        { name: 'إدارة المشتركين', href: '/whatsapp/subscribers', icon: '👥' },
-        { name: 'الإذاعة والبث', href: '/whatsapp/broadcast', icon: '📢' },
-        { name: 'المحادثة المباشرة', href: '/whatsapp/live-chat', icon: '💬' },
-        { name: 'سير عمل Webhook', href: '/whatsapp/webhooks', icon: '🔄' },
-        { name: 'إعلانات النقر', href: '/whatsapp/click-ads', icon: '🎯' },
-        { name: 'كتالوج التجارة', href: '/whatsapp/catalog', icon: '🛍️' },
-        { name: 'المواعيد', href: '/whatsapp/appointments', icon: '📅', badge: '3' },
-      ]
-    },
-    { 
-      id: 'facebook', 
-      name: 'فيسبوك', 
-      icon: '👍', 
-      color: 'text-blue-500',
-      submenus: [
-        { name: 'ربط الحساب', href: '/facebook/connect', icon: '🔗' },
-        { name: 'إدارة البوت', href: '/facebook/bot-manager', icon: '🤖' },
-        { name: 'إدارة المشتركين', href: '/facebook/subscribers', icon: '👥' },
-        { name: 'الإذاعة والبث', href: '/facebook/broadcast', icon: '📢' },
-        { name: 'المحادثة المباشرة', href: '/facebook/live-chat', icon: '💬' },
-        { name: 'أتمتة التعليقات', href: '/facebook/comments', icon: '💭' },
-      ]
-    },
-    { 
-      id: 'instagram', 
-      name: 'إنستجرام', 
-      icon: '📷', 
-      color: 'text-pink-500',
-      submenus: [
-        { name: 'ربط الحساب', href: '/instagram/connect', icon: '🔗' },
-        { name: 'إدارة البوت', href: '/instagram/bot-manager', icon: '🤖' },
-        { name: 'المحادثة المباشرة', href: '/instagram/live-chat', icon: '💬' },
-        { name: 'أتمتة التعليقات', href: '/instagram/comments', icon: '💭' },
-      ]
-    },
-    { 
-      id: 'telegram', 
-      name: 'تيليجرام', 
-      icon: '✈️', 
-      color: 'text-sky-400',
-      submenus: [
-        { name: 'ربط البوت', href: '/telegram/connect', icon: '🔗' },
-        { name: 'إدارة البوت', href: '/telegram/bot-manager', icon: '🤖' },
-        { name: 'إدارة المجموعات', href: '/telegram/groups', icon: '👥' },
-        { name: 'إدارة المشتركين', href: '/telegram/subscribers', icon: '📊' },
-        { name: 'الإذاعة والبث', href: '/telegram/broadcast', icon: '📢' },
-        { name: 'المحادثة المباشرة', href: '/telegram/live-chat', icon: '💬' },
-      ]
-    },
-    { 
-      id: 'webchat', 
-      name: 'محادثة الويب', 
-      icon: '💭', 
-      color: 'text-gray-400',
-      submenus: []
-    },
-  ];
+  // All social media channels removed - Call Center focused app only
+  const channels: any[] = [];
 
 
 
@@ -208,26 +144,6 @@ export default function Sidebar() {
                 لوحة التحكم
               </span>
             )}
-          </Link>
-        </motion.div>
-
-        {/* WhatsApp Inbox */}
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
-          <Link href="/whatsapp-inbox" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname?.startsWith('/whatsapp-inbox') ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-sm border border-green-400/30 shadow-lg shadow-green-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-green-400/20 border border-transparent'}`} title={isCollapsed ? 'واتساب' : ''}>
-            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname?.startsWith('/whatsapp-inbox') ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-              <MessageSquare size={16} className={pathname?.startsWith('/whatsapp-inbox') ? 'text-white' : 'text-green-300'} />
-            </motion.div>
-            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname?.startsWith('/whatsapp-inbox') ? 'text-white' : 'text-slate-300'}`}>واتساب</span>}
-          </Link>
-        </motion.div>
-
-        {/* Social Posting */}
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.3 }}>
-          <Link href="/social-media" onClick={() => setIsOpen(false)} className={`group w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-3 py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 backdrop-blur-sm border border-violet-400/30 shadow-lg shadow-violet-500/20' : 'text-slate-300 hover:bg-white/5 hover:border-violet-400/20 border border-transparent'}`} title={isCollapsed ? 'النشر الاجتماعي' : ''}>
-            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-9 h-9 rounded-lg lg:rounded-xl flex items-center justify-center transition-all duration-300 ${pathname === '/social-media' ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg' : 'bg-white/10 group-hover:bg-white/15'}`}>
-              <span className="text-lg">📱</span>
-            </motion.div>
-            {!isCollapsed && <span className={`font-medium text-sm lg:text-base ${pathname === '/social-media' ? 'text-white' : 'text-slate-300'}`}>النشر الاجتماعي</span>}
           </Link>
         </motion.div>
 

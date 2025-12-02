@@ -1,7 +1,7 @@
 {
-  "name": "almasar-suite",
-  "version": "1.0.0",
-  "description": "المسار الساخن - مركز المحادثات الموحد",
+  "name": "linkcall-callcenter",
+  "version": "2.0.0",
+  "description": "لينك كول - مركز الاتصالات | LinkCall Call Center",
   "private": true,
   "scripts": {
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
@@ -18,15 +18,15 @@
     "setup": "npm run install:all && npm run docker:up"
   },
   "keywords": [
-    "chat",
-    "unified-inbox",
-    "whatsapp",
-    "telegram",
-    "messenger",
-    "instagram",
-    "customer-service"
+    "call-center",
+    "voip",
+    "twilio",
+    "mobile-call",
+    "customer-service",
+    "crm",
+    "phone-system"
   ],
-  "author": "AlMasar Team",
+  "author": "LinkCall Team",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"

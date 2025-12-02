@@ -73,7 +73,7 @@ export class AutoReplyRule {
   @Column({ default: 0 })
   executionCount: number;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastExecutedAt: Date;
 
   @CreateDateColumn()

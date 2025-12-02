@@ -72,10 +72,10 @@ export class Conversation {
   })
   status: ConversationStatus;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastMessageAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   firstResponseAt: Date;
 
   @Column({ default: 0 })
