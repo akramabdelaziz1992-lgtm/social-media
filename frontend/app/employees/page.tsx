@@ -161,11 +161,6 @@ export default function EmployeesPage() {
     color: 'blue'
   });
 
-  // Load employees from API
-  useEffect(() => {
-    loadEmployees();
-  }, [apiUrl]);
-
   const loadEmployees = async () => {
     setLoadingEmployees(true);
     try {
@@ -197,6 +192,11 @@ export default function EmployeesPage() {
       setLoadingEmployees(false);
     }
   };
+
+  // Load employees from API
+  useEffect(() => {
+    loadEmployees();
+  }, [apiUrl]);
 
   // Filter employees
   const filteredEmployees = employees.filter(emp => {

@@ -38,10 +38,23 @@ export default function MobileCallPage() {
   const [showConferenceDialog, setShowConferenceDialog] = useState(false);
   const [conferenceNumber, setConferenceNumber] = useState('');
   
-  const [contacts, setContacts] = useState<Contact[]>([
-    { id: '1', name: 'عميل 1', phone: '+966501234567' },
-    { id: '2', name: 'عميل 2', phone: '+966509876543' },
-  ]);
+  const [contacts, setContacts] = useState<Contact[]>(() => {
+    // تحميل جهات الاتصال من localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mobile-call-contacts');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Error loading contacts:', e);
+        }
+      }
+    }
+    return [
+      { id: '1', name: 'عميل 1', phone: '+966501234567' },
+      { id: '2', name: 'عميل 2', phone: '+966509876543' },
+    ];
+  });
   
   const [callHistory, setCallHistory] = useState<CallRecord[]>([]);
   const [serverUrl, setServerUrl] = useState(apiUrl);
@@ -451,7 +464,12 @@ export default function MobileCallPage() {
       phone: newContactPhone.trim(),
     };
     
-    setContacts([...contacts, newContact]);
+    const updatedContacts = [...contacts, newContact];
+    setContacts(updatedContacts);
+    
+    // حفظ في localStorage
+    localStorage.setItem('mobile-call-contacts', JSON.stringify(updatedContacts));
+    
     setNewContactName('');
     setNewContactPhone('');
     setShowAddContactForm(false);
@@ -947,15 +965,30 @@ export default function MobileCallPage() {
                               <div className="text-gray-600 text-xs" dir="ltr">{contact.phone}</div>
                             </div>
                           </div>
-                          <button 
-                            onClick={() => {
-                              setPhoneNumber(contact.phone);
-                              setCurrentView('dialpad');
-                            }}
-                            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs flex-shrink-0"
-                          >
-                            📞 اتصال
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => {
+                                setPhoneNumber(contact.phone);
+                                setCurrentView('dialpad');
+                              }}
+                              className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs flex-shrink-0"
+                            >
+                              📞 اتصال
+                            </button>
+                            <button 
+                              onClick={() => {
+                                if (confirm(`هل تريد حذف ${contact.name}؟`)) {
+                                  const updatedContacts = contacts.filter(c => c.id !== contact.id);
+                                  setContacts(updatedContacts);
+                                  localStorage.setItem('mobile-call-contacts', JSON.stringify(updatedContacts));
+                                }
+                              }}
+                              className="px-2 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-xs flex-shrink-0"
+                              title="حذف"
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}
