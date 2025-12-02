@@ -330,4 +330,60 @@ export class CallsService {
     
     return null;
   }
+
+  /**
+   * تسجيل مكالمة موظف مع جميع التفاصيل
+   */
+  async logEmployeeCall(callData: {
+    callSid: string;
+    to: string;
+    employeeName: string;
+    employeeEmail: string;
+    department: string;
+    status: string;
+    direction: string;
+    duration?: number;
+    startTime?: string;
+    endTime?: string;
+  }): Promise<Call> {
+    try {
+      // البحث عن المكالمة إذا كانت موجودة
+      let call = await this.callsRepository.findOne({
+        where: { twilioCallSid: callData.callSid }
+      });
+
+      if (call) {
+        // تحديث المكالمة الموجودة
+        call.status = callData.status as CallStatus;
+        if (callData.duration !== undefined) {
+          call.durationSeconds = callData.duration;
+        }
+        if (callData.endTime) {
+          call.endedAt = new Date(callData.endTime);
+        }
+        this.logger.log(`🔄 Updating call: ${callData.callSid} - Status: ${callData.status}`);
+      } else {
+        // إنشاء مكالمة جديدة
+        call = this.callsRepository.create({
+          twilioCallSid: callData.callSid,
+          direction: callData.direction as CallDirection,
+          fromNumber: callData.employeeEmail, // رقم الموظف أو البريد
+          toNumber: callData.to,
+          status: callData.status as CallStatus,
+          durationSeconds: callData.duration || 0,
+          employeeName: callData.employeeName,
+          employeeEmail: callData.employeeEmail,
+          department: callData.department,
+          createdAt: callData.startTime ? new Date(callData.startTime) : new Date(),
+          endedAt: callData.endTime ? new Date(callData.endTime) : undefined,
+        });
+        this.logger.log(`✨ Creating new call: ${callData.callSid} - Employee: ${callData.employeeName}`);
+      }
+
+      return await this.callsRepository.save(call);
+    } catch (error) {
+      this.logger.error(`❌ Error logging employee call: ${error.message}`);
+      throw error;
+    }
+  }
 }

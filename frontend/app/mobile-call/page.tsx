@@ -225,43 +225,153 @@ export default function MobileCallPage() {
       await device.register();
       
       // بدء المكالمة مباشرة من المتصفح إلى رقم العميل
+      const callStartTime = Date.now();
       const call = await device.connect({
-        params: { To: formattedNumber }
+        params: { 
+          To: formattedNumber,
+          employeeName: currentUser.name,
+          employeeEmail: currentUser.email,
+          department: currentUser.department || 'N/A'
+        }
       });
       
-      setCurrentCallSid(call.parameters.CallSid || '');
-      console.log('WebRTC Call started:', call.parameters.CallSid);
+      const callSid = call.parameters.CallSid || '';
+      setCurrentCallSid(callSid);
+      console.log('WebRTC Call started:', callSid);
       console.log('⏳ المكالمة تتصل... انتظر الرد');
       
+      // تتبع حالة المكالمة
+      let callAnswered = false;
+      let callAnswerTime: number | null = null;
+      
       // عند الرد على المكالمة - هنا نبدأ العداد
-      call.on('accept', () => {
+      call.on('accept', async () => {
         console.log('✅ تم الرد على المكالمة - بدء العداد');
+        callAnswered = true;
+        callAnswerTime = Date.now();
         setIsConnecting(false); // إيقاف "جاري الاتصال"
         setIsInCall(true); // بدء المكالمة الفعلية
         setCallDuration(0); // بدء العداد من الصفر
+        
+        // حفظ بداية المكالمة في قاعدة البيانات
+        try {
+          const baseUrl = serverUrl.replace(/\/api$/, '');
+          await fetch(`${baseUrl}/api/calls/log-call`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              callSid: callSid,
+              to: formattedNumber,
+              employeeName: currentUser.name,
+              employeeEmail: currentUser.email,
+              department: currentUser.department || 'N/A',
+              status: 'in-progress',
+              direction: 'outbound',
+              startTime: new Date().toISOString()
+            })
+          });
+          console.log('✅ تم حفظ بداية المكالمة');
+        } catch (error) {
+          console.error('❌ خطأ في حفظ بداية المكالمة:', error);
+        }
       });
       
       // عند رفض المكالمة أو فشلها
-      call.on('reject', () => {
+      call.on('reject', async () => {
         console.log('❌ تم رفض المكالمة');
         alert('تم رفض المكالمة من الطرف الآخر');
         setIsConnecting(false);
         setIsInCall(false);
         setCallDuration(0);
+        
+        // حفظ المكالمة المرفوضة
+        try {
+          const baseUrl = serverUrl.replace(/\/api$/, '');
+          await fetch(`${baseUrl}/api/calls/log-call`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              callSid: callSid,
+              to: formattedNumber,
+              employeeName: currentUser.name,
+              employeeEmail: currentUser.email,
+              department: currentUser.department || 'N/A',
+              status: 'no-answer',
+              direction: 'outbound',
+              duration: 0
+            })
+          });
+        } catch (error) {
+          console.error('❌ خطأ في حفظ المكالمة المرفوضة:', error);
+        }
       });
       
-      call.on('cancel', () => {
+      call.on('cancel', async () => {
         console.log('⚠️ تم إلغاء المكالمة');
         setIsConnecting(false);
         setIsInCall(false);
         setCallDuration(0);
+        
+        // حفظ المكالمة الملغاة
+        if (!callAnswered) {
+          try {
+            const baseUrl = serverUrl.replace(/\/api$/, '');
+            await fetch(`${baseUrl}/api/calls/log-call`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                callSid: callSid,
+                to: formattedNumber,
+                employeeName: currentUser.name,
+                employeeEmail: currentUser.email,
+                department: currentUser.department || 'N/A',
+                status: 'cancelled',
+                direction: 'outbound',
+                duration: 0
+              })
+            });
+          } catch (error) {
+            console.error('❌ خطأ في حفظ المكالمة الملغاة:', error);
+          }
+        }
       });
       
       // عند إنهاء المكالمة تلقائياً (Customer hang up)
-      call.on('disconnect', () => {
-        console.log('Call disconnected by customer');
+      call.on('disconnect', async () => {
+        console.log('Call disconnected');
+        const callEndTime = Date.now();
+        const actualDuration = callAnswered && callAnswerTime 
+          ? Math.floor((callEndTime - callAnswerTime) / 1000) 
+          : 0;
+        
         setIsConnecting(false);
         setIsInCall(false);
+        
+        // حفظ نهاية المكالمة مع المدة الفعلية
+        if (callAnswered) {
+          try {
+            const baseUrl = serverUrl.replace(/\/api$/, '');
+            await fetch(`${baseUrl}/api/calls/log-call`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                callSid: callSid,
+                to: formattedNumber,
+                employeeName: currentUser.name,
+                employeeEmail: currentUser.email,
+                department: currentUser.department || 'N/A',
+                status: 'completed',
+                direction: 'outbound',
+                duration: actualDuration,
+                endTime: new Date().toISOString()
+              })
+            });
+            console.log(`✅ تم حفظ المكالمة - المدة: ${actualDuration} ثانية`);
+          } catch (error) {
+            console.error('❌ خطأ في حفظ نهاية المكالمة:', error);
+          }
+        }
+        
         setCallDuration(0);
         
         // تنظيف الـ Device

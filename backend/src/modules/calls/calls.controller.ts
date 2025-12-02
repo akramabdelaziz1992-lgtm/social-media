@@ -91,6 +91,36 @@ export class CallsController {
   }
 
   /**
+   * تسجيل المكالمة مع معلومات الموظف
+   */
+  @Post('log-call')
+  async logCall(@Body() callData: {
+    callSid: string;
+    to: string;
+    employeeName: string;
+    employeeEmail: string;
+    department: string;
+    status: string;
+    direction: string;
+    duration?: number;
+    startTime?: string;
+    endTime?: string;
+  }) {
+    try {
+      this.logger.log(`📞 Logging call: ${callData.callSid} by ${callData.employeeName}`);
+      
+      // حفظ أو تحديث المكالمة في قاعدة البيانات
+      const call = await this.callsService.logEmployeeCall(callData);
+      
+      this.logger.log(`✅ Call logged successfully: ${callData.callSid}`);
+      return { success: true, call };
+    } catch (error) {
+      this.logger.error(`❌ Error logging call: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * مزامنة التسجيلات مع المكالمات
    */
   @Post('sync-recordings')

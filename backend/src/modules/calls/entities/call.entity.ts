@@ -66,6 +66,15 @@ export class Call {
   @Column({ name: 'agent_name', nullable: true })
   agentName: string;
 
+  @Column({ name: 'employee_name', nullable: true })
+  employeeName: string;
+
+  @Column({ name: 'employee_email', nullable: true })
+  employeeEmail: string;
+
+  @Column({ name: 'department', nullable: true })
+  department: string;
+
   @Column({ name: 'customer_name', nullable: true })
   customerName: string;
 
