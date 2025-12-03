@@ -108,6 +108,17 @@ async function bootstrap() {
   📡 API: http://localhost:${port}/api
   📚 Swagger Docs: http://localhost:${port}/api/docs
   `);
+
+  // Keep process alive - handle graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    app.close().then(() => process.exit(0));
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT signal received: closing HTTP server');
+    app.close().then(() => process.exit(0));
+  });
 }
 
 bootstrap().catch((error) => {
