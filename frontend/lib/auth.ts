@@ -6,6 +6,7 @@ export interface User {
   department?: 'sales' | 'reservations' | 'accounting' | 'management';
   avatar?: string;
   phone?: string;
+  permissions?: string[]; // صلاحيات المستخدم
 }
 
 export interface AuthResponse {

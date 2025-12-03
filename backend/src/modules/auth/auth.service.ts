@@ -61,6 +61,8 @@ export class AuthService {
         role: user.role,
         department: user.department,
         avatar: user.avatar,
+        phone: user.phone,
+        permissions: user.permissions || [],
       },
     };
   }

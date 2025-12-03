@@ -31,7 +31,7 @@ interface Department {
 }
 
 export default function EmployeesPage() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   const [activeTab, setActiveTab] = useState<'employees' | 'departments'>('employees');
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(true);
@@ -48,7 +48,7 @@ export default function EmployeesPage() {
       totalAssignedChats: 245,
       todayChats: 12,
       responseTime: '2.5 دقيقة',
-      permissions: ['view_chats', 'reply_messages', 'assign_chats', 'view_reports']
+      permissions: ['view_chats', 'reply_messages', 'assign_chats', 'view_reports', 'listen_own_calls', 'listen_all_calls']
     },
     {
       id: '2',
@@ -791,6 +791,8 @@ export default function EmployeesPage() {
                     { id: 'reply_messages', label: 'الرد على الرسائل' },
                     { id: 'assign_chats', label: 'تعيين المحادثات' },
                     { id: 'view_reports', label: 'عرض التقارير' },
+                    { id: 'listen_own_calls', label: '🎧 سماع مكالماتي' },
+                    { id: 'listen_all_calls', label: '🔊 سماع كل المكالمات' },
                     { id: 'manage_employees', label: 'إدارة الموظفين' },
                     { id: 'manage_department', label: 'إدارة القسم' },
                   ].map(perm => (

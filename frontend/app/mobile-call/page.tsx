@@ -1264,17 +1264,34 @@ export default function MobileCallPage() {
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <div className="text-gray-600 text-xs">{call.duration}</div>
-                            {call.recordingUrl && (
-                              <a
-                                href={`${serverUrl.replace(/\/api$/, '')}/api/calls/recording-file/${call.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs flex items-center gap-1"
-                                title="استماع للتسجيل"
-                              >
-                                <span>🎧</span>
-                              </a>
-                            )}
+                            {call.recordingUrl && (() => {
+                              // فحص الصلاحيات
+                              const userPermissions = currentUser?.permissions || [];
+                              const canListenOwnCalls = userPermissions.includes('listen_own_calls');
+                              const canListenAllCalls = userPermissions.includes('listen_all_calls');
+                              const isOwnCall = call.employeeName === currentUser?.name || call.employeeEmail === currentUser?.email;
+                              
+                              // إذا كان المستخدم admin، يمكنه سماع كل شيء
+                              const isAdmin = currentUser?.role === 'admin';
+                              
+                              // يظهر زر الاستماع إذا:
+                              // 1. المستخدم admin
+                              // 2. لديه صلاحية سماع كل المكالمات
+                              // 3. لديه صلاحية سماع مكالماته الخاصة وهذه مكالمته
+                              const canListen = isAdmin || canListenAllCalls || (canListenOwnCalls && isOwnCall);
+                              
+                              return canListen ? (
+                                <a
+                                  href={`${serverUrl.replace(/\/api$/, '')}/api/calls/recording-file/${call.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition text-xs flex items-center gap-1"
+                                  title="استماع للتسجيل"
+                                >
+                                  <span>🎧</span>
+                                </a>
+                              ) : null;
+                            })()}
                             <button
                               onClick={() => handleCallFromHistory(call.phone)}
                               className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-xs flex items-center gap-1"
