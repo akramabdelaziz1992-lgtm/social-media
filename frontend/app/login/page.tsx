@@ -182,14 +182,14 @@ export default function LoginPage() {
 
           <div className="group">
             <label className="block text-slate-700 font-bold mb-2 text-sm transition-colors group-focus-within:text-teal-600">
-              📧 البريد الإلكتروني
+              👤 اسم المستخدم
             </label>
             <input
-              type="email"
+              type="text"
               value={credentials.email}
               onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
               className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-teal-500/30 focus:border-teal-600 transition-all duration-200 text-slate-700 placeholder:text-slate-400 hover:border-teal-300"
-              placeholder="admin@elmasarelsa5en.com"
+              placeholder="saher"
               required
               disabled={loading}
             />
@@ -254,15 +254,22 @@ export default function LoginPage() {
             الحساب المتاح
           </p>
           <div className="bg-white p-4 rounded-xl border-2 border-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <p className="font-bold text-teal-700 mb-2 text-lg">👨‍💻 Akram</p>
+            <p className="font-bold text-teal-700 mb-2 text-lg">👨‍💻 حسابات الموظفين</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 group">
-                <span className="text-xs text-slate-500 group-hover:scale-125 transition-transform">📧</span>
-                <p className="text-sm text-slate-700 font-mono font-bold">akram@local.com</p>
+                <span className="text-xs text-slate-500 group-hover:scale-125 transition-transform">👤</span>
+                <p className="text-sm text-slate-700 font-mono font-bold">saher, amira, tasneem, shaker</p>
               </div>
               <div className="flex items-center gap-2 group">
                 <span className="text-xs text-slate-500 group-hover:scale-125 transition-transform">🔐</span>
-                <p className="text-sm text-slate-700 font-mono font-bold">Aazxc123</p>
+                <p className="text-sm text-slate-700 font-mono font-bold">Aa123456</p>
+              </div>
+              <div className="mt-3 pt-3 border-t border-teal-200">
+                <p className="text-xs text-slate-600 mb-1">الأدمن:</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs">👤</span>
+                  <p className="text-sm text-slate-700 font-mono font-bold">Akram / Aazxc</p>
+                </div>
               </div>
             </div>
           </div>
