@@ -19,6 +19,7 @@ interface CallRecord {
   time: string;
   type: 'outgoing' | 'incoming' | 'missed';
   employeeName?: string;
+  employeeEmail?: string;
   recordingUrl?: string;
   recordingSid?: string;
 }
