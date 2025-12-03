@@ -164,7 +164,12 @@ export default function EmployeesPage() {
   const loadEmployees = async () => {
     setLoadingEmployees(true);
     try {
-      const response = await fetch(`${apiUrl}/api/users`);
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${apiUrl}/api/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         // Transform API data to match Employee interface
@@ -228,10 +233,14 @@ export default function EmployeesPage() {
         'موظف': 'sales'
       };
 
+      // الحصول على الـ token
+      const token = localStorage.getItem('accessToken');
+      
       const response = await fetch(`${apiUrl}/api/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: formData.name,
@@ -259,48 +268,71 @@ export default function EmployeesPage() {
     }
   };
 
-  const handleUpdateEmployee = () => {
+  const handleUpdateEmployee = async () => {
     if (!selectedEmployee) return;
 
-    const updatedEmployees = employees.map(emp =>
-      emp.id === selectedEmployee.id ? { ...emp, ...formData } : emp
-    );
+    if (!formData.name || !formData.email || !formData.phone || !formData.department) {
+      alert('الرجاء ملء جميع الحقول المطلوبة');
+      return;
+    }
 
-    setEmployees(updatedEmployees);
-    setShowEditModal(false);
-    setSelectedEmployee(null);
-    resetForm();
+    try {
+      const token = localStorage.getItem('accessToken');
+      
+      // Convert Arabic role to English
+      const roleMapping: any = {
+        'مدير': 'admin',
+        'مشرف': 'sales',
+        'موظف': 'sales'
+      };
+
+      const response = await fetch(`${apiUrl}/api/users/${selectedEmployee.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          department: formData.department,
+          role: roleMapping[formData.role || 'موظف'],
+          password: formData.password || undefined,
+          permissions: formData.permissions || []
+        }),
+      });
+
+      if (response.ok) {
+        await loadEmployees();
+        setShowEditModal(false);
+        setSelectedEmployee(null);
+        resetForm();
+        alert('✅ تم تحديث بيانات الموظف بنجاح');
+      } else {
+        const error = await response.json();
+        alert(`❌ فشل تحديث الموظف: ${error.message || 'خطأ غير معروف'}`);
+      }
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      alert('حدث خطأ أثناء تحديث الموظف');
+    }
   };
 
   const handleDeleteEmployee = async (id: string) => {
     if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
       try {
-        const response = await fetch(`${apiUrl}/api/employees/${id}`, {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${apiUrl}/api/users/${id}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         });
 
         if (response.ok) {
-          // Reload employees list
-          const reloadResponse = await fetch(`${apiUrl}/api/employees`);
-          if (reloadResponse.ok) {
-            const data = await reloadResponse.json();
-            const transformedEmployees = data.map((emp: any) => ({
-              id: emp.id,
-              name: emp.name,
-              email: emp.email,
-              phone: emp.phone || 'غير محدد',
-              department: emp.department?.name || 'غير محدد',
-              role: emp.role === 'admin' ? 'مدير' : emp.role === 'supervisor' ? 'مشرف' : 'موظف',
-              status: emp.status === 'active' ? 'نشط' : emp.status === 'inactive' ? 'غير نشط' : 'إجازة',
-              hireDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-              totalAssignedChats: 0,
-              todayChats: 0,
-              responseTime: '0 دقيقة',
-              permissions: emp.permissions || []
-            }));
-            setEmployees(transformedEmployees);
-          }
-          alert('تم حذف الموظف بنجاح');
+          await loadEmployees();
+          alert('✅ تم حذف الموظف بنجاح');
         } else {
           alert('فشل حذف الموظف');
         }
