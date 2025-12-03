@@ -93,6 +93,18 @@ export default function MobileCallPage() {
     
     setCurrentUser(user);
 
+    // طلب صلاحيات الميكروفون عند التحميل
+    if (typeof window !== 'undefined' && navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          console.log('✅ Microphone access granted on page load');
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch(err => {
+          console.warn('⚠️ Microphone permission not granted yet:', err);
+        });
+    }
+
     // جلب رقم الهاتف من URL إذا موجود
     const params = new URLSearchParams(window.location.search);
     const phoneFromUrl = params.get('phone');
@@ -256,6 +268,19 @@ export default function MobileCallPage() {
     }
     
     try {
+      // طلب صلاحيات الميكروفون أولاً
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('✅ Microphone permission granted');
+        // إيقاف الـ stream فوراً (Twilio سيطلبه بنفسه)
+        stream.getTracks().forEach(track => track.stop());
+      } catch (micError) {
+        console.error('❌ Microphone permission denied:', micError);
+        alert('⚠️ يجب السماح باستخدام الميكروفون لإجراء المكالمات!\n\nالرجاء:\n1. اضغط على أيقونة القفل بجانب عنوان الموقع\n2. اسمح بالوصول للميكروفون\n3. أعد تحميل الصفحة');
+        setIsConnecting(false);
+        return;
+      }
+      
       // بدء حالة "جاري الاتصال"
       setIsConnecting(true);
       setCallDuration(0);
@@ -345,6 +370,11 @@ export default function MobileCallPage() {
       
       const callSid = call.parameters.CallSid || '';
       setCurrentCallSid(callSid);
+      
+      // حفظ المكالمة والـ Device في window للوصول إليهما
+      (window as any).activeDevice = device;
+      (window as any).activeCall = call;
+      
       console.log('WebRTC Call started:', callSid);
       console.log('⏳ المكالمة تتصل... انتظر الرد');
       
@@ -1044,7 +1074,21 @@ export default function MobileCallPage() {
                   <div className="grid grid-cols-3 gap-4 mb-6">
                     {/* Mute Button */}
                     <button
-                      onClick={() => setIsMuted(!isMuted)}
+                      onClick={() => {
+                        const call = (window as any).activeCall;
+                        if (call) {
+                          if (isMuted) {
+                            call.mute(false);
+                            console.log('🎤 Microphone unmuted');
+                          } else {
+                            call.mute(true);
+                            console.log('🔇 Microphone muted');
+                          }
+                          setIsMuted(!isMuted);
+                        } else {
+                          console.warn('No active call to mute/unmute');
+                        }
+                      }}
                       className={`flex flex-col items-center justify-center p-6 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-lg ${
                         isMuted 
                           ? 'bg-red-500 text-white shadow-red-200' 
