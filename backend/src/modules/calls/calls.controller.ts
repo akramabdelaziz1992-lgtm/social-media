@@ -403,12 +403,12 @@ export class CallsController {
       const call = await this.callsService.handleInboundCall(twilioData);
       this.logger.log(`✅ Call saved: ${call.id}`);
 
-      // إرجاع TwiML Response
-      const twiml = this.twilioService.createInboundCallTwiML(
-        'مرحباً بك في مركز اتصالات المسار الساخن. سيتم تحويلك للموظف المختص',
-      );
+      // إرجاع TwiML Response - توجيه المكالمة للموظف عبر WebRTC
+      // استخدام Identity ثابت للموظف المتاح
+      const clientIdentity = 'mobile-agent'; // يمكن تطويره لاحقاً لدعم موظفين متعددين
+      const twiml = this.twilioService.createInboundCallTwiML(clientIdentity);
 
-      this.logger.log('📤 Sending TwiML response');
+      this.logger.log(`📤 Sending TwiML response - routing to ${clientIdentity}`);
       res.type('text/xml');
       res.send(twiml);
     } catch (error) {

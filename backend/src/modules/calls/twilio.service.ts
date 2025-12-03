@@ -106,9 +106,9 @@ export class TwilioService {
   }
 
   /**
-   * إنشاء TwiML Response للمكالمات الواردة
+   * إنشاء TwiML Response للمكالمات الواردة - توجيه المكالمة للموظف المتاح
    */
-  createInboundCallTwiML(message: string = 'مرحباً بك في مركز الاتصالات'): string {
+  createInboundCallTwiML(clientIdentity: string = 'mobile-agent'): string {
     const twiml = new twilio.twiml.VoiceResponse();
     
     // رسالة الترحيب
@@ -117,27 +117,28 @@ export class TwilioService {
         voice: 'Polly.Zeina', // صوت عربي
         language: 'ar-AE', // عربي إماراتي (الأقرب للسعودي)
       },
-      message,
+      'مرحباً بك في لينك كول. جاري تحويلك للموظف المختص',
     );
 
-    // قائمة الخيارات
-    const gather = twiml.gather({
-      input: ['dtmf'], // استقبال أرقام من لوحة المفاتيح
-      numDigits: 1,
-      action: '/api/calls/webhook/menu', // URL لمعالجة الاختيار
-      timeout: 10,
+    // توجيه المكالمة للموظف عبر WebRTC
+    const dial = twiml.dial({
+      timeout: 30, // انتظار 30 ثانية للرد
+      record: 'record-from-answer-dual', // تسجيل المكالمة
+      recordingStatusCallback: `${this.configService.get('BACKEND_URL') || 'https://unacetic-nearly-tawanna.ngrok-free.dev'}/api/calls/webhook/recording`,
+      trim: 'trim-silence',
     });
 
-    gather.say(
+    // الاتصال بالموظف عبر Client (WebRTC)
+    dial.client(clientIdentity);
+
+    // إذا لم يرد الموظف
+    twiml.say(
       {
         voice: 'Polly.Zeina',
         language: 'ar-AE',
       },
-      'للتحدث مع خدمة العملاء اضغط واحد. لترك رسالة صوتية اضغط اثنين',
+      'عذراً، جميع الموظفين مشغولون حالياً. يرجى الاتصال لاحقاً',
     );
-
-    // إذا لم يضغط شيء - نعيد القائمة
-    twiml.redirect('/api/calls/webhook/inbound');
 
     return twiml.toString();
   }

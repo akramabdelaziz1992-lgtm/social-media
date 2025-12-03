@@ -38,6 +38,11 @@ export default function MobileCallPage() {
   const [showConferenceDialog, setShowConferenceDialog] = useState(false);
   const [conferenceNumber, setConferenceNumber] = useState('');
   
+  // States للمكالمات الواردة
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
+  const [incomingCallFrom, setIncomingCallFrom] = useState('');
+  const [incomingCall, setIncomingCall] = useState<any>(null);
+  
   const [contacts, setContacts] = useState<Contact[]>(() => {
     // تحميل جهات الاتصال من localStorage
     if (typeof window !== 'undefined') {
@@ -113,6 +118,82 @@ export default function MobileCallPage() {
       loadCallHistory();
     }
   }, [currentUser]);
+
+  // تهيئة Twilio Device لاستقبال المكالمات الواردة
+  useEffect(() => {
+    let device: any = null;
+    
+    const initializeDevice = async () => {
+      if (!currentUser) return;
+      
+      try {
+        const { Device } = await import('@twilio/voice-sdk');
+        
+        // الحصول على Token من Backend مع Identity ثابت
+        const identity = 'mobile-agent'; // Identity ثابت لاستقبال المكالمات
+        const baseUrl = serverUrl.replace(/\/api$/, '');
+        const tokenResponse = await fetch(`${baseUrl}/api/calls/token?identity=${encodeURIComponent(identity)}`);
+        
+        if (!tokenResponse.ok) {
+          console.error('Failed to get token for incoming calls');
+          return;
+        }
+        
+        const tokenData = await tokenResponse.json();
+        
+        if (!tokenData.token) {
+          console.error('No token received');
+          return;
+        }
+        
+        // إنشاء Device
+        device = new Device(tokenData.token, {
+          logLevel: 1,
+          codecPreferences: ['opus', 'pcmu'] as any,
+        });
+        
+        // تسجيل Device لاستقبال المكالمات
+        await device.register();
+        console.log('✅ Device registered and ready for incoming calls');
+        
+        // الاستماع للمكالمات الواردة
+        device.on('incoming', (call: any) => {
+          console.log('📞 Incoming call from:', call.parameters.From);
+          
+          setIncomingCall(call);
+          setIncomingCallFrom(call.parameters.From);
+          setIsIncomingCall(true);
+          
+          // تشغيل صوت الرنين (اختياري)
+          // يمكن إضافة Audio element هنا
+        });
+        
+        device.on('error', (error: any) => {
+          console.error('❌ Device error:', error);
+        });
+        
+        // حفظ Device في window لاستخدامه لاحقاً
+        (window as any).twilioDevice = device;
+        
+      } catch (error) {
+        console.error('Error initializing device:', error);
+      }
+    };
+    
+    initializeDevice();
+    
+    // Cleanup عند unmount
+    return () => {
+      if (device) {
+        try {
+          device.unregister();
+          device.destroy();
+        } catch (err) {
+          console.error('Error cleaning up device:', err);
+        }
+      }
+    };
+  }, [currentUser, serverUrl]);
 
   const loadCallHistory = async () => {
     try {
@@ -496,6 +577,89 @@ export default function MobileCallPage() {
     }, 500);
   };
 
+  // قبول المكالمة الواردة
+  const handleAcceptIncomingCall = async () => {
+    if (!incomingCall) return;
+    
+    try {
+      console.log('✅ Accepting incoming call');
+      
+      // قبول المكالمة
+      await incomingCall.accept();
+      
+      // تحديث الحالة
+      setIsIncomingCall(false);
+      setIsInCall(true);
+      setCallDuration(0);
+      setCurrentCallSid(incomingCall.parameters.CallSid);
+      
+      // تسجيل بدء المكالمة
+      const callStartTime = Date.now();
+      
+      // الاستماع لإنهاء المكالمة
+      incomingCall.on('disconnect', async () => {
+        console.log('📴 Incoming call disconnected');
+        const callEndTime = Date.now();
+        const duration = Math.floor((callEndTime - callStartTime) / 1000);
+        
+        setIsInCall(false);
+        setCallDuration(0);
+        setIncomingCall(null);
+        
+        // حفظ المكالمة في Database
+        try {
+          const baseUrl = serverUrl.replace(/\/api$/, '');
+          await fetch(`${baseUrl}/api/calls/log-call`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              callSid: incomingCall.parameters.CallSid,
+              to: currentUser?.phone || 'N/A',
+              from: incomingCallFrom,
+              employeeName: currentUser?.name,
+              employeeEmail: currentUser?.email,
+              department: currentUser?.department || 'N/A',
+              status: 'completed',
+              direction: 'inbound',
+              duration: duration,
+            })
+          });
+          console.log('✅ Incoming call logged');
+        } catch (error) {
+          console.error('❌ Error logging incoming call:', error);
+        }
+        
+        // تحديث السجل
+        loadCallHistory();
+      });
+      
+      console.log('✅ Incoming call accepted');
+    } catch (error) {
+      console.error('Error accepting call:', error);
+      alert('حدث خطأ في قبول المكالمة');
+      setIsIncomingCall(false);
+      setIncomingCall(null);
+    }
+  };
+  
+  // رفض المكالمة الواردة
+  const handleRejectIncomingCall = () => {
+    if (!incomingCall) return;
+    
+    try {
+      console.log('❌ Rejecting incoming call');
+      incomingCall.reject();
+      
+      setIsIncomingCall(false);
+      setIncomingCall(null);
+      setIncomingCallFrom('');
+      
+      console.log('✅ Incoming call rejected');
+    } catch (error) {
+      console.error('Error rejecting call:', error);
+    }
+  };
+
   const toggleSpeaker = () => {
     setIsSpeakerOn(!isSpeakerOn);
     // تطبيق Speaker mode على الـ Device
@@ -602,6 +766,56 @@ export default function MobileCallPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-2 sm:p-4 overflow-x-hidden">
+      {/* نافذة المكالمة الواردة */}
+      {isIncomingCall && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-gradient-to-br from-teal-600 to-emerald-600 rounded-3xl p-8 max-w-md w-full shadow-2xl transform animate-bounce-subtle">
+            <div className="text-center">
+              {/* رمز المكالمة الواردة */}
+              <div className="mb-6 relative">
+                <div className="w-32 h-32 mx-auto bg-white/20 backdrop-blur rounded-full flex items-center justify-center animate-pulse">
+                  <span className="text-7xl">📞</span>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-40 h-40 border-4 border-white/30 rounded-full animate-ping"></div>
+                </div>
+              </div>
+
+              {/* معلومات المتصل */}
+              <h2 className="text-3xl font-bold text-white mb-2">مكالمة واردة</h2>
+              <p className="text-xl text-teal-100 mb-8 font-semibold" dir="ltr">
+                {incomingCallFrom}
+              </p>
+
+              {/* أزرار الإجراءات */}
+              <div className="flex gap-4 justify-center">
+                {/* زر الرفض */}
+                <button
+                  onClick={handleRejectIncomingCall}
+                  className="flex flex-col items-center gap-2 group"
+                >
+                  <div className="w-20 h-20 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition transform hover:scale-110 active:scale-95 shadow-lg">
+                    <span className="text-4xl">✖️</span>
+                  </div>
+                  <span className="text-white font-bold text-sm">رفض</span>
+                </button>
+
+                {/* زر القبول */}
+                <button
+                  onClick={handleAcceptIncomingCall}
+                  className="flex flex-col items-center gap-2 group"
+                >
+                  <div className="w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition transform hover:scale-110 active:scale-95 shadow-lg animate-pulse">
+                    <span className="text-4xl">✔️</span>
+                  </div>
+                  <span className="text-white font-bold text-sm">قبول</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto w-full">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-t-xl p-4 sm:p-6 shadow-2xl sticky top-0 z-40">
