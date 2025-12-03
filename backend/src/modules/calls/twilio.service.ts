@@ -164,6 +164,8 @@ export class TwilioService {
       const VoiceGrant = AccessToken.VoiceGrant;
 
       const twimlAppSid = this.configService.get<string>('TWILIO_TWIML_APP_SID');
+      const apiKey = this.configService.get<string>('TWILIO_API_KEY');
+      const apiSecret = this.configService.get<string>('TWILIO_API_SECRET');
 
       // التحقق من وجود المتطلبات
       if (!twimlAppSid) {
@@ -171,19 +173,22 @@ export class TwilioService {
         throw new Error('Missing TWILIO_TWIML_APP_SID');
       }
 
+      if (!apiKey || !apiSecret) {
+        this.logger.error('❌ Missing TWILIO_API_KEY or TWILIO_API_SECRET');
+        throw new Error('Missing TWILIO_API_KEY or TWILIO_API_SECRET');
+      }
+
       this.logger.log('🔑 Creating Access Token with:');
       this.logger.log(`  Account SID: ${this.accountSid}`);
-      this.logger.log(`  Auth Token: ${this.authToken.substring(0, 8)}...`);
+      this.logger.log(`  API Key: ${apiKey}`);
       this.logger.log(`  TwiML App SID: ${twimlAppSid}`);
       this.logger.log(`  Identity: ${identity}`);
 
-      // ✅ إنشاء Access Token باستخدام Account SID + Auth Token
-      // ✅ هذه الطريقة تعمل للتطوير المحلي
-      // ⚠️  في Production يفضل استخدام API Key منفصل
+      // ✅ إنشاء Access Token باستخدام API Key (الطريقة الصحيحة)
       const token = new AccessToken(
         this.accountSid,
-        this.accountSid,    // ✅ استخدام Account SID كـSigning Key
-        this.authToken,     // ✅ استخدام Auth Token كـSecret
+        apiKey,           // ✅ استخدام API Key SID
+        apiSecret,        // ✅ استخدام API Secret
         { identity, ttl: 3600 }, // صالح لمدة ساعة
       );
 

@@ -20,6 +20,7 @@
   "author": "Almasar Hot Line",
   "license": "MIT",
   "dependencies": {
+    "@twilio/voice-sdk": "^2.17.0",
     "electron-store": "^8.1.0",
     "socket.io-client": "^4.7.2"
   },
