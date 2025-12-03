@@ -924,8 +924,72 @@ export default function MobileCallPage() {
 
             {/* Main Content with Scroll */}
             <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              {/* Connecting View - جاري الاتصال */}
+              {isConnecting && (
+                <div className="max-w-2xl mx-auto">
+                  {/* Call Status Header */}
+                  <div className="text-center mb-8">
+                    <div className="inline-block bg-yellow-500 text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
+                      جاري الاتصال...
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-800">يرجى الانتظار</h2>
+                  </div>
+                  
+                  {/* Contact Card */}
+                  <div className="bg-gradient-to-br from-teal-50 via-blue-50 to-emerald-50 rounded-3xl p-10 mb-8 shadow-2xl border-2 border-teal-200">
+                    {/* Company Logo */}
+                    <div className="flex justify-center mb-6">
+                      <div className="w-32 h-32 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-xl animate-pulse">
+                        <span className="text-6xl">🏢</span>
+                      </div>
+                    </div>
+                    
+                    {/* Company Name */}
+                    <div className="text-center mb-4">
+                      <div className="text-2xl font-bold text-emerald-700 mb-1">
+                        المسار الساخن للسفر والسياحة
+                      </div>
+                      <div className="text-base text-emerald-600 font-semibold mb-3" dir="ltr">
+                        +966 55 990 2557
+                      </div>
+                      <div className="h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent mb-4"></div>
+                    </div>
+                    
+                    {/* Customer Phone Number */}
+                    <div className="text-center mb-6">
+                      <div className="text-sm text-gray-500 mb-1">الرقم المتصل به</div>
+                      <div className="text-3xl font-bold text-gray-800 mb-2" dir="ltr">
+                        {phoneNumber}
+                      </div>
+                      <div className="text-yellow-600 text-sm font-semibold animate-pulse">
+                        🔄 جاري الاتصال...
+                      </div>
+                    </div>
+                    
+                    {/* Connecting Animation */}
+                    <div className="bg-white/60 backdrop-blur rounded-2xl py-4 px-8 text-center">
+                      <div className="flex justify-center items-center gap-2">
+                        <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* End Call Button */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={handleEndCall}
+                      className="w-24 h-24 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-full shadow-2xl flex items-center justify-center transition-all transform hover:scale-110 active:scale-95"
+                    >
+                      <span className="text-5xl">📞</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Dialpad View */}
-              {currentView === 'dialpad' && !isInCall && (
+              {currentView === 'dialpad' && !isInCall && !isConnecting && (
                 <div className="max-w-md mx-auto pb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">لوحة الاتصال</h2>
                   
@@ -1047,15 +1111,27 @@ export default function MobileCallPage() {
                   
                   {/* Contact Card */}
                   <div className="bg-gradient-to-br from-teal-50 via-blue-50 to-emerald-50 rounded-3xl p-10 mb-8 shadow-2xl border-2 border-teal-200">
-                    {/* Avatar */}
+                    {/* Company Logo/Avatar */}
                     <div className="flex justify-center mb-6">
-                      <div className="w-32 h-32 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-full flex items-center justify-center shadow-xl animate-pulse">
-                        <span className="text-6xl">👤</span>
+                      <div className="w-32 h-32 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-xl animate-pulse">
+                        <span className="text-6xl">🏢</span>
                       </div>
                     </div>
                     
-                    {/* Phone Number */}
+                    {/* Company Name */}
+                    <div className="text-center mb-4">
+                      <div className="text-2xl font-bold text-emerald-700 mb-1">
+                        المسار الساخن للسفر والسياحة
+                      </div>
+                      <div className="text-base text-emerald-600 font-semibold mb-3" dir="ltr">
+                        +966 55 990 2557
+                      </div>
+                      <div className="h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent mb-4"></div>
+                    </div>
+                    
+                    {/* Customer Phone Number */}
                     <div className="text-center mb-6">
+                      <div className="text-sm text-gray-500 mb-1">الرقم المتصل به</div>
                       <div className="text-3xl font-bold text-gray-800 mb-2" dir="ltr">
                         {phoneNumber}
                       </div>
