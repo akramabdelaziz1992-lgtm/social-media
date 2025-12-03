@@ -406,6 +406,14 @@ export default function CallCenterPage() {
                 <div className="text-xl font-bold text-green-600 text-center" dir="ltr">0555254915</div>
               </div>
               <button 
+                onClick={() => setShowNewCallModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition flex items-center gap-2"
+                title="إجراء مكالمة جديدة"
+              >
+                <Phone size={20} />
+                <span>📞 مكالمة جديدة</span>
+              </button>
+              <button 
                 onClick={() => {
                   loadCallRecords();
                   checkSoftphoneStatus();
