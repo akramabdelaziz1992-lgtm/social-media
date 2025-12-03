@@ -40,3 +40,19 @@ services:
       # Meta Page Access Token
       - key: META_PAGE_ACCESS_TOKEN
         value: EAAMObRfDmLgBQDVpZBe8l61KFYzG2LH4t86KmZCI1bwCfjEHxcRuUeNhq7RwCfZCYVNO39mkGD8gA80Uw3fhyORRl3ZBDmd8IRdl2pWj2GpT71TZB46KUx894wp0ZCKQ6klST2HK9WJ82U62zAZC213nDujhtXOQtpLCFvpX4tkL48ZAZCflbdZC6kdF5v2BfeF0ZBQWyHSYOhRZA5tLvQlbNmXUXZCpyBn7iI25qrHFJTkGydHdBhsy03mPIp4ai3snjc74ODOGhC2vtLuBxP5EpP0EaEwKC
+      
+      # Twilio (Call Center) - يجب إضافة هذه القيم يدوياً في لوحة Render
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: TWILIO_SAUDI_CALLER_ID
+        sync: false
+      - key: TWILIO_TWIML_APP_SID
+        sync: false
+      - key: TWILIO_API_KEY
+        sync: false
+      - key: TWILIO_API_SECRET
+        sync: false
