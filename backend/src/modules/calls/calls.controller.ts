@@ -495,7 +495,84 @@ export class CallsController {
   }
 
   /**
+   * Voice webhook endpoint - يستقبل المكالمات الصادرة من TwiML App
+   * هذا هو الـendpoint اللي Twilio بيستخدمه لما تيجي مكالمة من WebRTC Client
+   */
+  @Post('voice')
+  async handleVoiceCall(
+    @Body() twilioData: any,
+    @Res() res: Response,
+  ) {
+    try {
+      const toNumber = twilioData.To;
+      const callSid = twilioData.CallSid;
+      const fromClient = twilioData.From; // client:mobile-agent-xxx
+      
+      this.logger.log(`📞 Voice Call - WebRTC to PSTN`);
+      this.logger.log(`From (Client): ${fromClient}`);
+      this.logger.log(`To (Number): ${toNumber}`);
+      this.logger.log(`Call SID: ${callSid}`);
+      
+      // حفظ المكالمة في Database
+      try {
+        const { CallDirection } = await import('./entities/call.entity');
+        await this.callsService.createCall({
+          twilioCallSid: callSid,
+          fromNumber: fromClient,
+          toNumber: toNumber,
+          direction: CallDirection.OUTBOUND,
+          status: CallStatus.INITIATED,
+          agentId: fromClient.replace('client:', ''),
+          agentName: 'Mobile Agent',
+        });
+        this.logger.log(`✅ Call saved to database: ${callSid}`);
+      } catch (dbError) {
+        this.logger.error(`⚠️ Error saving call to DB: ${dbError.message}`);
+      }
+      
+      const twiml = new (require('twilio').twiml.VoiceResponse)();
+      
+      const backendUrl = process.env.BACKEND_URL || 'https://almasar-backend.onrender.com';
+      const callerId = process.env.TWILIO_SAUDI_CALLER_ID || '+966555254915';
+      
+      this.logger.log(`📞 Calling ${toNumber} with Caller ID: ${callerId}`);
+      
+      const dial = twiml.dial({
+        callerId: callerId,
+        timeout: 60,
+        record: 'record-from-answer-dual',
+        recordingStatusCallback: `${backendUrl}/api/calls/webhook/recording`,
+        recordingStatusCallbackEvent: ['completed'],
+        trim: 'trim-silence',
+      });
+      
+      dial.number({
+        statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
+        statusCallback: `${backendUrl}/api/calls/webhook/status`,
+      }, toNumber);
+      
+      this.logger.log(`📤 Sending TwiML response for voice call`);
+      res.type('text/xml');
+      res.send(twiml.toString());
+      
+    } catch (error) {
+      this.logger.error(`❌ Error in voice endpoint: ${error.message}`);
+      this.logger.error(error.stack);
+      
+      const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zeina" language="ar-AE">عذراً، حدث خطأ في الاتصال</Say>
+  <Hangup/>
+</Response>`;
+      
+      res.type('text/xml');
+      res.status(HttpStatus.OK).send(errorTwiml);
+    }
+  }
+
+  /**
    * TwiML للمكالمات الصادرة من المتصفح (WebRTC) - اتصال مباشر WebRTC
+   * (Deprecated - استخدم /voice بدلاً منه)
    */
   @Post('twiml/outbound')
   async handleOutboundCall(
