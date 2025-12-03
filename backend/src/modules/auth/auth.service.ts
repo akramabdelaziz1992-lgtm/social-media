@@ -89,7 +89,7 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    return this.login({ email: user.email, password: registerDto.password });
+    return this.login({ username: user.username, password: registerDto.password });
   }
 
   async refreshToken(refreshToken: string) {
