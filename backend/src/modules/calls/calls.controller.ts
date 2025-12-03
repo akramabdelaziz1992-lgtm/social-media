@@ -534,8 +534,10 @@ export class CallsController {
       // الاتصال مباشرة بالرقم من المتصفح (WebRTC to PSTN)
       const backendUrl = process.env.BACKEND_URL || 'https://almasar-backend.onrender.com';
       
-      // استخدام الرقم الأمريكي كـ Caller ID (لازم يكون Twilio Number مُفعّل)
-      const callerId = process.env.TWILIO_PHONE_NUMBER;
+      // استخدام رقم الشركة السعودي كـ Caller ID (يظهر للعميل)
+      const callerId = process.env.TWILIO_SAUDI_CALLER_ID || '+966555254915';
+      
+      this.logger.log(`📞 Using Saudi Caller ID: ${callerId}`);
       
       const dial = twiml.dial({
         callerId: callerId,
