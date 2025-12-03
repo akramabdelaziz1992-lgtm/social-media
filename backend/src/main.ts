@@ -55,6 +55,23 @@ async function bootstrap() {
   // API prefix
   app.setGlobalPrefix('api');
 
+  // Root endpoint - Welcome message
+  app.getHttpAdapter().get('/', (req, res) => {
+    res.json({ 
+      message: 'LinkCall Backend API',
+      version: '2.0',
+      status: 'running',
+      timestamp: new Date().toISOString(),
+      endpoints: {
+        health: '/api/health',
+        docs: '/api/docs',
+        auth: '/api/auth/login',
+        calls: '/api/calls',
+        users: '/api/users'
+      }
+    });
+  });
+
   // Health check endpoint (for Render)
   app.getHttpAdapter().get('/api/health', (req, res) => {
     res.json({ 
