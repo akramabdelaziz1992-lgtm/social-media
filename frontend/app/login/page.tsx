@@ -90,7 +90,8 @@ export default function LoginPage() {
       authStorage.setTokens(data.accessToken, data.refreshToken || '');
       authStorage.setUser(data.user);
 
-      router.push('/dashboard');
+      // توجيه الموظفين إلى صفحة Mobile Call فقط
+      router.push('/mobile-call');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ في تسجيل الدخول');
     } finally {
@@ -238,8 +239,8 @@ export default function LoginPage() {
                 name: 'Akram',
                 role: 'admin'
               }));
-              // Redirect to dashboard
-              router.push('/dashboard');
+              // توجيه إلى صفحة Mobile Call
+              router.push('/mobile-call');
             }}
             className="w-full mt-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-700 hover:to-teal-700 transform hover:scale-[1.02] transition-all duration-200 shadow-xl hover:shadow-2xl"
           >
